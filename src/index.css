@@ -1,0 +1,386 @@
+@import "tailwindcss";
+
+/* ---------- Design tokens ---------- */
+@theme {
+  --color-void: #0a0a0c;
+  --color-panel: #0f1014;
+  --color-edge: #1e222c;
+  --color-cyber: #00f0ff; /* electric cyan */
+  --color-matrix: #00ff66; /* terminal green */
+  --color-warn: #ffb700; /* warning amber */
+  --color-danger: #ff3b5c;
+  --color-magenta: #ff2e97;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ---------- Base ---------- */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+body {
+  background: var(--color-void);
+  color: #c9d1d9;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+#root {
+  position: relative;
+  z-index: 1;
+}
+/* Ambient grid behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 25%, transparent 80%);
+  mask-image: radial-gradient(ellipse at center, #000 25%, transparent 80%);
+}
+::selection {
+  background: rgba(0, 240, 255, 0.35);
+  color: #fff;
+}
+:focus-visible {
+  outline: 2px solid var(--color-cyber);
+  outline-offset: 2px;
+}
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0c;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e2a33;
+  border-radius: 4px;
+}
+
+/* ---------- Accent system: set --accent on an element, children inherit ---------- */
+.accent-text {
+  color: var(--accent, var(--color-cyber));
+}
+.accent-border {
+  border-color: color-mix(in srgb, var(--accent, #00f0ff) 35%, transparent);
+}
+.accent-bg-soft {
+  background-color: color-mix(in srgb, var(--accent, #00f0ff) 7%, transparent);
+}
+.accent-glow {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent, #00f0ff) 30%, transparent),
+    0 0 22px color-mix(in srgb, var(--accent, #00f0ff) 22%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--accent, #00f0ff) 6%, transparent);
+}
+.hover-glow {
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s,
+    background-color 0.2s,
+    opacity 0.2s;
+}
+.hover-glow:hover,
+.hover-glow:focus-visible,
+.hover-glow[data-hot="true"] {
+  border-color: var(--accent, #00f0ff);
+  background-color: color-mix(in srgb, var(--accent, #00f0ff) 13%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent, #00f0ff) 55%, transparent),
+    0 0 26px color-mix(in srgb, var(--accent, #00f0ff) 35%, transparent),
+    inset 0 0 22px color-mix(in srgb, var(--accent, #00f0ff) 10%, transparent);
+}
+/* Elements that fade/blur away when the camera zooms into a node.
+   Declared after .hover-glow so this transition list wins. */
+.zoomable {
+  transition:
+    opacity 0.55s ease,
+    filter 0.55s ease,
+    box-shadow 0.2s,
+    border-color 0.2s,
+    background-color 0.2s;
+}
+.zoomable.is-dim {
+  opacity: 0;
+  filter: blur(8px);
+  pointer-events: none;
+}
+.text-glow {
+  text-shadow: 0 0 10px color-mix(in srgb, currentColor 70%, transparent);
+}
+
+/* ---------- Terminal cursor ---------- */
+.cursor-block {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Glitch text (needs data-text attr) ---------- */
+.glitch {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere; /* long SNAKE_CASE titles must wrap on phones */
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.glitch::before {
+  color: var(--color-magenta);
+  clip-path: inset(0 0 55% 0);
+}
+.glitch::after {
+  color: var(--color-cyber);
+  clip-path: inset(55% 0 0 0);
+}
+.glitch:hover::before,
+.group:hover .glitch::before {
+  animation: glitch-h-a 0.55s steps(1) infinite;
+}
+.glitch:hover::after,
+.group:hover .glitch::after {
+  animation: glitch-h-b 0.55s steps(1) infinite;
+}
+.glitch-auto::before {
+  animation: glitch-i-a 5s steps(1) infinite;
+}
+.glitch-auto::after {
+  animation: glitch-i-b 5s steps(1) infinite;
+}
+@keyframes glitch-h-a {
+  0% { opacity: 0.9; transform: translate(-3px, 1px); clip-path: inset(0 0 60% 0); }
+  25% { opacity: 0.9; transform: translate(2px, -1px); clip-path: inset(30% 0 35% 0); }
+  50% { opacity: 0; transform: none; }
+  75% { opacity: 0.9; transform: translate(-2px, 0); clip-path: inset(10% 0 70% 0); }
+  100% { opacity: 0; transform: none; }
+}
+@keyframes glitch-h-b {
+  0% { opacity: 0.9; transform: translate(3px, -1px); clip-path: inset(60% 0 0 0); }
+  30% { opacity: 0; transform: none; }
+  55% { opacity: 0.9; transform: translate(-2px, 1px); clip-path: inset(40% 0 30% 0); }
+  80% { opacity: 0.9; transform: translate(2px, 0); clip-path: inset(75% 0 5% 0); }
+  100% { opacity: 0; transform: none; }
+}
+@keyframes glitch-i-a {
+  0%, 91%, 100% { opacity: 0; transform: none; }
+  92% { opacity: 0.9; transform: translate(-4px, 1px); clip-path: inset(10% 0 60% 0); }
+  94% { opacity: 0.9; transform: translate(3px, -1px); clip-path: inset(45% 0 25% 0); }
+  96% { opacity: 0; }
+}
+@keyframes glitch-i-b {
+  0%, 91%, 100% { opacity: 0; transform: none; }
+  93% { opacity: 0.9; transform: translate(4px, -1px); clip-path: inset(65% 0 5% 0); }
+  95% { opacity: 0.9; transform: translate(-3px, 1px); clip-path: inset(25% 0 45% 0); }
+  97% { opacity: 0; }
+}
+
+/* ---------- Flicker ---------- */
+.flicker {
+  animation: flicker 6s linear infinite;
+}
+@keyframes flicker {
+  0%, 89%, 100% { opacity: 1; }
+  90% { opacity: 0.45; }
+  91% { opacity: 1; }
+  93% { opacity: 0.6; }
+  94% { opacity: 1; }
+}
+
+/* ---------- CRT overlay ---------- */
+.crt-lines {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03) 0,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+.crt-vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+.crt-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -160px;
+  height: 160px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.05), transparent);
+  animation: sweep 9s linear infinite;
+}
+@keyframes sweep {
+  to {
+    transform: translateY(calc(100vh + 320px));
+  }
+}
+
+/* ---------- Locked-sector hatch ---------- */
+.hatch {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 183, 0, 0.06) 0,
+    rgba(255, 183, 0, 0.06) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+/* ---------- Blueprint ---------- */
+.blueprint-grid {
+  background-color: #08121a;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px, 16px 16px, 16px 16px;
+}
+.rack-rail {
+  background-color: #14171e;
+  background-image: radial-gradient(circle, #000 2px, transparent 2.6px);
+  background-size: 100% 18px;
+  background-position: center 4px;
+}
+.trace {
+  stroke-dasharray: 5 7;
+  animation: dash 1.2s linear infinite;
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.led {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--led, #00ff66);
+  box-shadow: 0 0 6px var(--led, #00ff66);
+  animation: led 2.4s ease-in-out infinite;
+}
+@keyframes led {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ---------- Dossier folders (Sector 03) ---------- */
+/* Holographic sheen: the gradient position follows the pointer via --mx / --my
+   (set from JS on pointermove, 0..1). */
+.holo {
+  background: linear-gradient(
+    115deg,
+    transparent 15%,
+    rgba(0, 240, 255, 0.3) 35%,
+    rgba(255, 46, 151, 0.24) 50%,
+    rgba(0, 255, 102, 0.28) 65%,
+    transparent 85%
+  );
+  background-size: 260% 260%;
+  background-position: calc(var(--mx, 0.5) * 100%) calc(var(--my, 0.5) * 100%);
+  mix-blend-mode: screen;
+}
+.folder-lines {
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--accent, #00f0ff) 9%, transparent) 0,
+    color-mix(in srgb, var(--accent, #00f0ff) 9%, transparent) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+/* Black redaction bar; the text only sets its width. */
+.redact {
+  background: #000;
+  color: transparent;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  user-select: none;
+}
+
+/* ---------- Ambient background readouts ---------- */
+.ambient-drift {
+  animation: drift-up 70s linear infinite;
+}
+.ambient-drift-slow {
+  animation-duration: 95s;
+}
+@keyframes drift-up {
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* ---------- Onboarding tour ---------- */
+.tour-ring {
+  animation: tour-pulse 1.6s ease-in-out infinite;
+}
+@keyframes tour-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 color-mix(in srgb, var(--accent, #ffb700) 55%, transparent),
+      0 0 18px color-mix(in srgb, var(--accent, #ffb700) 35%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px color-mix(in srgb, var(--accent, #ffb700) 0%, transparent),
+      0 0 30px color-mix(in srgb, var(--accent, #ffb700) 55%, transparent);
+  }
+}
+
+/* ---------- Buttons ---------- */
+.btn-cyber {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(0, 240, 255, 0.45);
+  background: rgba(0, 240, 255, 0.06);
+  color: var(--color-cyber);
+  padding: 0.5rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  transition: all 0.2s;
+}
+.btn-cyber:hover {
+  background: rgba(0, 240, 255, 0.16);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.4);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .flicker,
+  .ambient-drift,
+  .tour-ring,
+  .crt-sweep,
+  .trace,
+  .led,
+  .glitch-auto::before,
+  .glitch-auto::after,
+  .cursor-block {
+    animation: none !important;
+  }
+}
