@@ -9,10 +9,10 @@ import { Server, Code2, ShieldAlert } from 'lucide-react';
 export const SECTORS = [
   {
     id: '01',
-    code: 'INFRASTRUCTURE_LAB',
+    code: 'HOME LAB',
     label: 'Proxmox Home Server',
     blurb:
-      'A self-hosted hypervisor running smart-home automation, a security-testing node and local LLMs. Explore the live blueprint.',
+      'A physical home lab built by repurposing an old laptop into a Proxmox hypervisor, accessible securely from anywhere via Tailscale.',
     status: 'ACTIVE',
     locked: false,
     icon: Server,
@@ -23,7 +23,7 @@ export const SECTORS = [
   },
   {
     id: '02',
-    code: 'DEV_DISTRICT',
+    code: 'PROJECTS',
     label: 'Full-Stack Applications',
     blurb: 'Web apps, APIs and tooling built end-to-end. Deployment in progress.',
     status: 'LOCKED',
@@ -35,7 +35,7 @@ export const SECTORS = [
   },
   {
     id: '03',
-    code: 'SEC_OPS_GRID',
+    code: 'REPORTS',
     label: 'Vulnerability Reports',
     blurb:
       'Bug bounty and vulnerability disclosure write-ups, filed as encrypted dossiers. Open a folder to read the reports.',

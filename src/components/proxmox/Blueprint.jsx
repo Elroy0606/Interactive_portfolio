@@ -94,7 +94,7 @@ export default function Blueprint({ hoveredId, activeId, onHover, onDrill, zoom,
       >
         {/* blueprint chrome */}
         <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
-          BLUEPRINT // REV_1.0
+          PVE Blueprint
         </div>
         <div aria-hidden className="pointer-events-none absolute right-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
           SCALE 1:1 · SCHEMATIC

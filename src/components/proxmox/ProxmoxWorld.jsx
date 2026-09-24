@@ -84,15 +84,19 @@ export default function ProxmoxWorld() {
                 dispatch({ type: 'RETURN_TO_HUB' });
               }}
             >
-              <ArrowLeft size={14} aria-hidden /> RETURN_TO_MAINFRAME
+              <ArrowLeft size={14} aria-hidden /> RETURN TO HOME
             </button>
             <p className="font-mono text-xs tracking-[0.3em] text-matrix">[SECTOR 01] // ACCESS_GRANTED</p>
             <h1 className="mt-1 font-mono text-3xl font-bold leading-tight text-cyber text-glow sm:text-4xl">
-              <GlitchText auto>INFRASTRUCTURE_LAB</GlitchText>
+              <GlitchText auto>Home Lab</GlitchText>
             </h1>
-            <p className="mt-2 max-w-xl text-sm text-white/60">
-              Live schematic of the home lab: one {HOST.name.replace('_', ' ')} node running {HOST.os.replace('_', ' ')}.
-              Click any module and the camera flies to it. Enter Docker or Pi-hole to look inside.
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
+              <span className="font-mono text-cyan-400">&gt; INFRA_OVERVIEW:</span> I built this home lab by repurposing my old laptop into a Proxmox hypervisor. 
+              Connected globally via <span className="text-white font-semibold">Tailscale</span>, this lab runs a suite of containers I use to practice penetration testing, 
+              orchestrate security exercises with <span className="text-white font-semibold">Kali Linux</span>, and run a local AI that controls my smart devices. 
+              <span className="block mt-1 text-emerald-400 font-mono text-xs">
+                [ACTION REQUIRED]: Click any module to focus the view. <br></br>Dive into DOCKER or PI-HOLE to ENTER the internal architecture.
+              </span>
             </p>
           </div>
 

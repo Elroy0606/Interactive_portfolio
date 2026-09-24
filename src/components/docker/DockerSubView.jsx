@@ -15,7 +15,7 @@ import ContainerCard from './ContainerCard';
 import { sfx } from '../../lib/sound';
 
 const MANIFEST_LINE = [
-  { text: `> mounting CONTAINER_SUBSTRATE_MANIFEST ... ${CONTAINERS.length} services indexed`, pause: 0 },
+  { text: `> CONTAINER_OVERVIEW: This panel indexes 4 core services running in my Docker environment, including my local AI models and security testing tools.`, pause: 0 }, 
 ];
 
 // Drill-down view for the Docker node: an engine hub with the services running
@@ -83,11 +83,11 @@ export default function DockerSubView() {
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <button type="button" className="btn-cyber mb-4" onClick={exit}>
-              <ArrowLeft size={14} aria-hidden /> [RETURN_TO_PROXMOX_LAB]
+              <ArrowLeft size={14} aria-hidden /> [RETURN_TO_PROXMOX]
             </button>
             <p className="font-mono text-xs tracking-[0.3em] text-matrix">[SECTOR 01 ▸ NODE {docker.slot}] // ACCESS_GRANTED</p>
             <h1 className="mt-1 break-words font-mono text-xl font-bold leading-tight text-cyber text-glow sm:text-3xl">
-              <GlitchText auto>CONTAINER_SUBSTRATE_MANIFEST::DOCKER_INFRA</GlitchText>
+              <GlitchText auto>DOCKER_INFRASTRUCTURE</GlitchText>
             </h1>
             <p className="mt-2 min-h-[1.5em] font-mono text-xs text-white/50">
               {MANIFEST_LINE[0].text.slice(0, pos.i > 0 ? undefined : pos.c)}

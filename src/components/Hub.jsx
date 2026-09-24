@@ -10,7 +10,7 @@ import GlitchText from './ui/GlitchText';
 import SectorCard from './SectorCard';
 import SystemLog from './SystemLog';
 
-const SUBTITLE = [{ text: '// SELECT A SECTOR TO INITIATE NODE CONNECTION', pause: 0 }];
+const SUBTITLE = [{ text: "> Everything built into this interface represents real systems I've deployed, applications I've coded, and security labs I've configured. Select a sector below to dive in.", pause: 0 }];
 const stamp = () => new Date().toLocaleTimeString('en-GB');
 
 export default function Hub() {
@@ -68,7 +68,7 @@ export default function Hub() {
         <div className={cn('zoomable mb-8 sm:mb-12', dim && 'is-dim')}>
           <p className="mb-2 font-mono text-xs tracking-[0.3em] text-matrix">&gt; SYSTEM ONLINE</p>
           <h1 className="flicker font-mono text-4xl font-bold leading-none tracking-tight text-cyber text-glow sm:text-6xl lg:text-7xl">
-            <GlitchText auto>MAINFRAME_OS</GlitchText>
+            <GlitchText auto>WELCOME TO MY INTERACTIVE PORTFOLIO</GlitchText>
           </h1>
           <p className="mt-4 min-h-[1.5em] font-mono text-sm text-white/60">
             {SUBTITLE[0].text.slice(0, pos.i > 0 ? undefined : pos.c)}
