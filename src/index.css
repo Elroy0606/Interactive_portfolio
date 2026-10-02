@@ -1,17 +1,262 @@
 @import "tailwindcss";
 
-/* ---------- Design tokens ---------- */
-@theme {
-  --color-void: #0a0a0c;
-  --color-panel: #0f1014;
+/* =====================================================================
+   DESIGN TOKENS
+   ---------------------------------------------------------------------
+   One set of components, two sets of tokens. <html data-theme="..."> picks
+   the set (written by index.html before first paint, then by the toggle).
+
+     CYBERPUNK      the values in @theme and :root just below (the default)
+     PROFESSIONAL   the [data-theme="professional"] block further down
+
+   To restyle a theme, change a value in its block; components only read
+   tokens. Motion timings that Framer Motion needs as numbers are the other
+   half of the theme: src/theme/motion.js.
+   ===================================================================== */
+
+/* ---------- Cyberpunk: colour and font tokens (also Tailwind utilities) ---------- */
+@theme static {
+  /* Surfaces */
+  --color-void: #0a0a0c; /* page background */
+  --color-panel: #0f1014; /* cards */
   --color-edge: #1e222c;
-  --color-cyber: #00f0ff; /* electric cyan */
-  --color-matrix: #00ff66; /* terminal green */
-  --color-warn: #ffb700; /* warning amber */
-  --color-danger: #ff3b5c;
-  --color-magenta: #ff2e97;
+  --color-shell: #080a0e; /* report reader frame */
+  --color-paper: #0b0e13; /* document page, folder back plate */
+  --color-sheet: #10141a; /* loose sheets inside a folder */
+  --color-folder: #0d1117; /* folder front, report thumbnail */
+  --color-glass: #070b11; /* frosted boards (always used with an alpha) */
+  --color-blueprint: #08121a; /* stage background */
+  --color-body: #c9d1d9; /* default text */
+
+  /* Ink and recess. Every `white/NN` utility (text, hairlines, tints) is ink at
+     NN% strength, every `black/NN` utility is a recessed surface. */
+  --color-white: #fff;
+  --color-black: #000;
+
+  /* Semantic colours */
+  --color-cyber: #00f0ff; /* primary accent: links, focus, headings */
+  --color-matrix: #00ff66; /* ok / online / allowed */
+  --color-warn: #ffb700; /* warning / pending */
+  --color-danger: #ff3b5c; /* error / blocked */
+  --color-magenta: #ff2e97; /* critical */
+  --color-violet: #a78bfa; /* third series in diagrams */
+  --color-pihole: #4da3ff; /* fourth series in diagrams */
+  --color-cyan-400: oklch(78.9% 0.154 211.53);
+  --color-emerald-400: oklch(76.5% 0.177 163.223);
+
+  /* Identity colours: what a sector, lab node, container or folder calls
+     "its" colour (the `accent` field in src/data). Each has its own hue here;
+     the professional theme points them all at the one accent. */
+  --color-id-cyan: #00f0ff;
+  --color-id-amber: #ffb700;
+  --color-id-green: #00ff66;
+  --color-id-magenta: #ff2e97;
+  --color-id-blue: #4da3ff;
+  --color-id-violet: #a78bfa;
+  --color-id-red: #ff3b5c;
+
+  /* Fonts. `font-ui` is the interface face (labels, headings, chips);
+     `font-mono` is reserved for real code and terminal output. */
+  --font-ui: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ---------- Cyberpunk: effect tokens ---------- */
+:root {
+  color-scheme: dark;
+
+  /* Letter-spacing multiplier for the `track-NN` utilities (NN = hundredths of an em). */
+  --track: 1;
+  /* Decorative CSS animations (flicker, glitch, LED blink, trace dashes, guide ring). */
+  --fx: running;
+  /* Transition speeds for hover feedback and the camera-zoom fade. */
+  --dur-hover: 0.2s;
+  --dur-dim: 0.55s;
+
+  /* Glow colours. `transparent` switches a glow off everywhere it is used. */
+  --glow-cyber: var(--color-cyber);
+  --glow-matrix: var(--color-matrix);
+  --glow-warn: var(--color-warn);
+  --glow-danger: var(--color-danger);
+  --glow-pihole: var(--color-pihole);
+  --glow-current: currentColor;
+  --text-glow: 0 0 10px color-mix(in srgb, currentColor 70%, transparent);
+
+  /* Elevation */
+  --shadow-board: 0 30px 120px rgba(0, 0, 0, 0.7); /* centered info boards */
+  --shadow-card: none; /* resting cards (professional uses a soft shadow instead of a glow) */
+  --shadow-card-hover: none;
+
+  /* Backgrounds and textures */
+  --page-grid: rgba(0, 240, 255, 0.05);
+  --blueprint-major: rgba(0, 240, 255, 0.09);
+  --blueprint-minor: rgba(0, 240, 255, 0.04);
+  --rail-bg: #14171e;
+  --rail-hole: #000;
+  --hatch: rgba(255, 183, 0, 0.06);
+  --holo: linear-gradient(
+    115deg,
+    transparent 15%,
+    rgba(0, 240, 255, 0.3) 35%,
+    rgba(255, 46, 151, 0.24) 50%,
+    rgba(0, 255, 102, 0.28) 65%,
+    transparent 85%
+  );
+  --redact: #000;
+  --redact-edge: rgba(255, 255, 255, 0.1);
+  --pointer-fill: rgba(8, 12, 18, 0.85); /* guide cursor */
+
+  /* Ambient canvas and CRT overlay (only mounted in the cyberpunk theme) */
+  --ambient-stream-head: #befff0;
+  --crt-line: rgba(255, 255, 255, 0.03);
+  --crt-vignette: rgba(0, 0, 0, 0.55);
+  --crt-sweep: rgba(0, 240, 255, 0.05);
+
+  /* Chrome */
+  --selection-bg: rgba(0, 240, 255, 0.35);
+  --selection-fg: #fff;
+  --scrollbar-track: #0a0a0c;
+  --scrollbar-thumb: #1e2a33;
+
+  /* Buttons (.btn-cyber) and the theme switch */
+  --btn-border: rgba(0, 240, 255, 0.45);
+  --btn-bg: rgba(0, 240, 255, 0.06);
+  --btn-bg-hover: rgba(0, 240, 255, 0.16);
+  --btn-glow: 0 0 18px rgba(0, 240, 255, 0.4);
+  --btn-text-glow: 0 0 8px rgba(0, 240, 255, 0.8);
+  --toggle-on-bg: rgba(0, 240, 255, 0.16);
+  --toggle-on-fg: var(--color-cyber);
+  --toggle-off-fg: rgba(255, 255, 255, 0.55);
+  --toggle-pad: 0 0.5rem;
+  --radius: 0px;
+  /* Scanline texture on folders and info boards (strength of the accent tint). */
+  --texture-lines: 9%;
+}
+/* The glow of whatever accent an element inherits. Declared on every element
+   because `--accent` is set per element (inline), not on the root. */
+*,
+::before,
+::after {
+  --glow-accent: var(--accent, var(--color-cyber));
+}
+
+/* =====================================================================
+   PROFESSIONAL: light, neutral, one restrained accent.
+   Status colours (ok / warning / error) stay distinct but muted; every
+   identity colour collapses onto the accent.
+   ===================================================================== */
+[data-theme="professional"] {
+  color-scheme: light;
+
+  /* Surfaces */
+  --color-void: #f4f5f7;
+  --color-panel: #ffffff;
+  --color-edge: #d9dde3;
+  --color-shell: #eef0f3;
+  --color-paper: #ffffff;
+  --color-sheet: #f8fafc;
+  --color-folder: #ffffff;
+  --color-glass: #ffffff;
+  --color-blueprint: #fbfcfd;
+  --color-body: #1f2937;
+
+  /* Ink and recess */
+  --color-white: #111827;
+  --color-black: #cbd5e1;
+  /* Text that the markup dims below ~60% ink is raised to this, so small
+     labels still meet WCAG AA (see the contrast floor rules below). */
+  --color-muted: #566070;
+
+  /* The accent. Change this one value to recolour the whole theme. */
+  --color-cyber: #1e4fa3;
+
+  /* Status and diagram series: muted, all AA on white */
+  --color-matrix: #166534;
+  --color-warn: #8a4b08;
+  --color-danger: #a81f14;
+  --color-magenta: #9d174d;
+  --color-violet: #5b3fb3;
+  --color-pihole: #475569;
+  --color-cyan-400: var(--color-cyber);
+  --color-emerald-400: var(--color-matrix);
+
+  /* One accent for every sector, node, container and folder */
+  --color-id-cyan: var(--color-cyber);
+  --color-id-amber: var(--color-cyber);
+  --color-id-green: var(--color-cyber);
+  --color-id-magenta: var(--color-cyber);
+  --color-id-blue: var(--color-cyber);
+  --color-id-violet: var(--color-cyber);
+  --color-id-red: var(--color-cyber);
+
+  /* Sans-serif interface; monospace stays for code and terminal output only */
+  --font-ui: var(--font-sans);
+  --font-weight-bold: 600;
+  --tracking-wide: 0.005em;
+  --tracking-wider: 0.02em;
+  --tracking-widest: 0.04em;
+  --track: 0.2;
+
+  /* Quiet motion: decorative loops are frozen, feedback is quicker */
+  --fx: paused;
+  --dur-hover: 0.12s;
+  --dur-dim: 0.18s;
+
+  /* No glows */
+  --glow-cyber: transparent;
+  --glow-matrix: transparent;
+  --glow-warn: transparent;
+  --glow-danger: transparent;
+  --glow-pihole: transparent;
+  --glow-current: transparent;
+  --text-glow: none;
+
+  /* Subtle elevation instead */
+  --shadow-board: 0 24px 64px rgb(15 23 42 / 0.18), 0 2px 8px rgb(15 23 42 / 0.08);
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06);
+  --shadow-card-hover: 0 6px 18px rgb(15 23 42 / 0.1);
+
+  /* Backgrounds and textures */
+  --page-grid: transparent;
+  --blueprint-major: rgb(15 23 42 / 0.05);
+  --blueprint-minor: transparent;
+  --rail-bg: #e5e7eb;
+  --rail-hole: #9ca3af;
+  --hatch: rgb(15 23 42 / 0.035);
+  --holo: none;
+  --redact: #111827;
+  --redact-edge: transparent;
+  --pointer-fill: #ffffff;
+
+  /* Chrome */
+  --selection-bg: color-mix(in srgb, var(--color-cyber) 22%, transparent);
+  --selection-fg: #111827;
+  --scrollbar-track: #f4f5f7;
+  --scrollbar-thumb: #c3c9d2;
+
+  /* Buttons and the theme switch */
+  --btn-border: color-mix(in srgb, var(--color-cyber) 45%, transparent);
+  --btn-bg: #ffffff;
+  --btn-bg-hover: color-mix(in srgb, var(--color-cyber) 9%, #ffffff);
+  --btn-glow: var(--shadow-card);
+  --btn-text-glow: none;
+  --toggle-on-bg: var(--color-cyber);
+  --toggle-on-fg: #ffffff;
+  --toggle-off-fg: #3f4a5a;
+  --toggle-pad: 0.2rem 0.6rem;
+  --radius: 4px;
+  --texture-lines: 0%;
+}
+[data-theme="professional"] *,
+[data-theme="professional"] ::before,
+[data-theme="professional"] ::after {
+  --glow-accent: transparent;
+}
+
+/* ---------- Letter-spacing utility: track-25 = 0.25em x the theme's --track ---------- */
+@utility track-* {
+  letter-spacing: calc(--value(integer) * 0.01em * var(--track));
 }
 
 /* ---------- Base ---------- */
@@ -22,7 +267,7 @@ body,
 }
 body {
   background: var(--color-void);
-  color: #c9d1d9;
+  color: var(--color-body);
   font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -39,15 +284,15 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(var(--page-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--page-grid) 1px, transparent 1px);
   background-size: 48px 48px;
   -webkit-mask-image: radial-gradient(ellipse at center, #000 25%, transparent 80%);
   mask-image: radial-gradient(ellipse at center, #000 25%, transparent 80%);
 }
 ::selection {
-  background: rgba(0, 240, 255, 0.35);
-  color: #fff;
+  background: var(--selection-bg);
+  color: var(--selection-fg);
 }
 :focus-visible {
   outline: 2px solid var(--color-cyber);
@@ -57,10 +302,10 @@ body::before {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0c;
+  background: var(--scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e2a33;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
@@ -69,43 +314,43 @@ body::before {
   color: var(--accent, var(--color-cyber));
 }
 .accent-border {
-  border-color: color-mix(in srgb, var(--accent, #00f0ff) 35%, transparent);
+  border-color: color-mix(in srgb, var(--accent, var(--color-cyber)) 35%, transparent);
 }
 .accent-bg-soft {
-  background-color: color-mix(in srgb, var(--accent, #00f0ff) 7%, transparent);
+  background-color: color-mix(in srgb, var(--accent, var(--color-cyber)) 7%, transparent);
 }
 .accent-glow {
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent, #00f0ff) 30%, transparent),
-    0 0 22px color-mix(in srgb, var(--accent, #00f0ff) 22%, transparent),
-    inset 0 0 20px color-mix(in srgb, var(--accent, #00f0ff) 6%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--glow-accent) 30%, transparent),
+    0 0 22px color-mix(in srgb, var(--glow-accent) 22%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--glow-accent) 6%, transparent);
 }
 .hover-glow {
   transition:
-    box-shadow 0.2s,
-    border-color 0.2s,
-    background-color 0.2s,
-    opacity 0.2s;
+    box-shadow var(--dur-hover),
+    border-color var(--dur-hover),
+    background-color var(--dur-hover),
+    opacity var(--dur-hover);
 }
 .hover-glow:hover,
 .hover-glow:focus-visible,
 .hover-glow[data-hot="true"] {
-  border-color: var(--accent, #00f0ff);
-  background-color: color-mix(in srgb, var(--accent, #00f0ff) 13%, transparent);
+  border-color: var(--accent, var(--color-cyber));
+  background-color: color-mix(in srgb, var(--accent, var(--color-cyber)) 13%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent, #00f0ff) 55%, transparent),
-    0 0 26px color-mix(in srgb, var(--accent, #00f0ff) 35%, transparent),
-    inset 0 0 22px color-mix(in srgb, var(--accent, #00f0ff) 10%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--glow-accent) 55%, transparent),
+    0 0 26px color-mix(in srgb, var(--glow-accent) 35%, transparent),
+    inset 0 0 22px color-mix(in srgb, var(--glow-accent) 10%, transparent);
 }
 /* Elements that fade/blur away when the camera zooms into a node.
    Declared after .hover-glow so this transition list wins. */
 .zoomable {
   transition:
-    opacity 0.55s ease,
-    filter 0.55s ease,
-    box-shadow 0.2s,
-    border-color 0.2s,
-    background-color 0.2s;
+    opacity var(--dur-dim) ease,
+    filter var(--dur-dim) ease,
+    box-shadow var(--dur-hover),
+    border-color var(--dur-hover),
+    background-color var(--dur-hover);
 }
 .zoomable.is-dim {
   opacity: 0;
@@ -113,7 +358,7 @@ body::before {
   pointer-events: none;
 }
 .text-glow {
-  text-shadow: 0 0 10px color-mix(in srgb, currentColor 70%, transparent);
+  text-shadow: var(--text-glow);
 }
 
 /* ---------- Terminal cursor ---------- */
@@ -199,6 +444,7 @@ body::before {
 /* ---------- Flicker ---------- */
 .flicker {
   animation: flicker 6s linear infinite;
+  animation-play-state: var(--fx);
 }
 @keyframes flicker {
   0%, 89%, 100% { opacity: 1; }
@@ -212,14 +458,14 @@ body::before {
 .crt-lines {
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.03) 0,
-    rgba(255, 255, 255, 0.03) 1px,
+    var(--crt-line) 0,
+    var(--crt-line) 1px,
     transparent 1px,
     transparent 3px
   );
 }
 .crt-vignette {
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 55%, var(--crt-vignette) 100%);
 }
 .crt-sweep {
   position: absolute;
@@ -227,7 +473,7 @@ body::before {
   right: 0;
   top: -160px;
   height: 160px;
-  background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.05), transparent);
+  background: linear-gradient(to bottom, transparent, var(--crt-sweep), transparent);
   animation: sweep 9s linear infinite;
 }
 @keyframes sweep {
@@ -236,12 +482,12 @@ body::before {
   }
 }
 
-/* ---------- Locked-sector hatch ---------- */
+/* ---------- Locked / pending hatch ---------- */
 .hatch {
   background: repeating-linear-gradient(
     -45deg,
-    rgba(255, 183, 0, 0.06) 0,
-    rgba(255, 183, 0, 0.06) 8px,
+    var(--hatch) 0,
+    var(--hatch) 8px,
     transparent 8px,
     transparent 16px
   );
@@ -249,23 +495,24 @@ body::before {
 
 /* ---------- Blueprint ---------- */
 .blueprint-grid {
-  background-color: #08121a;
+  background-color: var(--color-blueprint);
   background-image:
-    linear-gradient(rgba(0, 240, 255, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.09) 1px, transparent 1px),
-    linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(var(--blueprint-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--blueprint-major) 1px, transparent 1px),
+    linear-gradient(var(--blueprint-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--blueprint-minor) 1px, transparent 1px);
   background-size: 96px 96px, 96px 96px, 16px 16px, 16px 16px;
 }
 .rack-rail {
-  background-color: #14171e;
-  background-image: radial-gradient(circle, #000 2px, transparent 2.6px);
+  background-color: var(--rail-bg);
+  background-image: radial-gradient(circle, var(--rail-hole) 2px, transparent 2.6px);
   background-size: 100% 18px;
   background-position: center 4px;
 }
 .trace {
   stroke-dasharray: 5 7;
   animation: dash 1.2s linear infinite;
+  animation-play-state: var(--fx);
 }
 @keyframes dash {
   to {
@@ -277,9 +524,10 @@ body::before {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: var(--led, #00ff66);
-  box-shadow: 0 0 6px var(--led, #00ff66);
+  background: var(--led, var(--color-matrix));
+  box-shadow: 0 0 6px var(--led, var(--color-matrix));
   animation: led 2.4s ease-in-out infinite;
+  animation-play-state: var(--fx);
 }
 @keyframes led {
   0%, 100% { opacity: 1; }
@@ -290,14 +538,7 @@ body::before {
 /* Holographic sheen: the gradient position follows the pointer via --mx / --my
    (set from JS on pointermove, 0..1). */
 .holo {
-  background: linear-gradient(
-    115deg,
-    transparent 15%,
-    rgba(0, 240, 255, 0.3) 35%,
-    rgba(255, 46, 151, 0.24) 50%,
-    rgba(0, 255, 102, 0.28) 65%,
-    transparent 85%
-  );
+  background: var(--holo);
   background-size: 260% 260%;
   background-position: calc(var(--mx, 0.5) * 100%) calc(var(--my, 0.5) * 100%);
   mix-blend-mode: screen;
@@ -305,17 +546,17 @@ body::before {
 .folder-lines {
   background: repeating-linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--accent, #00f0ff) 9%, transparent) 0,
-    color-mix(in srgb, var(--accent, #00f0ff) 9%, transparent) 1px,
+    color-mix(in srgb, var(--accent, var(--color-cyber)) var(--texture-lines), transparent) 0,
+    color-mix(in srgb, var(--accent, var(--color-cyber)) var(--texture-lines), transparent) 1px,
     transparent 1px,
     transparent 4px
   );
 }
-/* Black redaction bar; the text only sets its width. */
+/* Redaction bar; the text only sets its width. */
 .redact {
-  background: #000;
+  background: var(--redact);
   color: transparent;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 1px var(--redact-edge);
   user-select: none;
 }
 
@@ -335,18 +576,19 @@ body::before {
 /* ---------- Onboarding tour ---------- */
 .tour-ring {
   animation: tour-pulse 1.6s ease-in-out infinite;
+  animation-play-state: var(--fx);
 }
 @keyframes tour-pulse {
   0%,
   100% {
     box-shadow:
-      0 0 0 0 color-mix(in srgb, var(--accent, #ffb700) 55%, transparent),
-      0 0 18px color-mix(in srgb, var(--accent, #ffb700) 35%, transparent);
+      0 0 0 0 color-mix(in srgb, var(--glow-accent) 55%, transparent),
+      0 0 18px color-mix(in srgb, var(--glow-accent) 35%, transparent);
   }
   50% {
     box-shadow:
-      0 0 0 10px color-mix(in srgb, var(--accent, #ffb700) 0%, transparent),
-      0 0 30px color-mix(in srgb, var(--accent, #ffb700) 55%, transparent);
+      0 0 0 10px color-mix(in srgb, var(--glow-accent) 0%, transparent),
+      0 0 30px color-mix(in srgb, var(--glow-accent) 55%, transparent);
   }
 }
 
@@ -355,19 +597,122 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border: 1px solid rgba(0, 240, 255, 0.45);
-  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
   color: var(--color-cyber);
   padding: 0.5rem 0.9rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  transition: all 0.2s;
+  letter-spacing: calc(0.12em * var(--track));
+  transition: all var(--dur-hover);
 }
 .btn-cyber:hover {
-  background: rgba(0, 240, 255, 0.16);
-  box-shadow: 0 0 18px rgba(0, 240, 255, 0.4);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+  background: var(--btn-bg-hover);
+  box-shadow: var(--btn-glow);
+  text-shadow: var(--btn-text-glow);
+}
+
+/* ---------- Theme switch (components/ThemeToggle.jsx) ---------- */
+.theme-toggle {
+  display: inline-flex;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  letter-spacing: calc(0.1em * var(--track));
+}
+.theme-toggle button {
+  padding: var(--toggle-pad);
+  color: var(--toggle-off-fg);
+  transition:
+    background-color var(--dur-hover),
+    color var(--dur-hover);
+}
+.theme-toggle button:first-child {
+  border-radius: max(0px, var(--radius) - 1px) 0 0 max(0px, var(--radius) - 1px);
+}
+.theme-toggle button + button {
+  border-left: 1px solid var(--btn-border);
+  border-radius: 0 max(0px, var(--radius) - 1px) max(0px, var(--radius) - 1px) 0;
+}
+.theme-toggle button:hover {
+  color: var(--toggle-on-fg);
+  background: var(--btn-bg-hover);
+}
+.theme-toggle button[aria-pressed="true"] {
+  background: var(--toggle-on-bg);
+  color: var(--toggle-on-fg);
+}
+.theme-toggle button:focus-visible {
+  position: relative; /* keeps the focus ring above the neighbouring button */
+}
+
+/* =====================================================================
+   PROFESSIONAL: rules that a token value alone cannot express
+   ===================================================================== */
+/* No terminal cursor, no glitch layers, no LED glow, no HUD corner ticks. */
+[data-theme="professional"] .cursor-block,
+[data-theme="professional"] .corner-tick {
+  display: none;
+}
+[data-theme="professional"] .glitch::before,
+[data-theme="professional"] .glitch::after {
+  content: none;
+}
+[data-theme="professional"] .led {
+  box-shadow: none;
+}
+/* Cards: a soft shadow where the cyberpunk theme has a glow. */
+[data-theme="professional"] .accent-glow {
+  box-shadow: var(--shadow-card);
+}
+[data-theme="professional"] .hover-glow:hover,
+[data-theme="professional"] .hover-glow:focus-visible,
+[data-theme="professional"] .hover-glow[data-hot="true"] {
+  box-shadow: var(--shadow-card-hover);
+}
+/* Modal boards and the report reader float above the page. */
+[data-theme="professional"] [role="dialog"].accent-glow {
+  box-shadow: var(--shadow-board);
+}
+
+/* Contrast floor (WCAG AA). The markup dims secondary text with an alpha
+   (`text-white/40`, `text-cyber/70`, ...). On a light page those blends fall
+   below 4.5:1, so in this theme dim ink becomes --color-muted and tinted status
+   text returns to its full colour. Decorative text marked aria-hidden (stamps,
+   watermarks) keeps its tint. In the utilities layer and :where() so hover and
+   focus colour utilities still win. */
+@layer utilities {
+  :where([data-theme="professional"]) :is(
+    .text-white\/25,
+    .text-white\/30,
+    .text-white\/35,
+    .text-white\/40,
+    .text-white\/45,
+    .text-white\/50,
+    .text-white\/55,
+    .text-white\/60
+  ) {
+    color: var(--color-muted);
+  }
+  :where([data-theme="professional"]) [class*="text-cyber/"]:not([aria-hidden="true"]) {
+    color: var(--color-cyber);
+  }
+  :where([data-theme="professional"]) [class*="text-matrix/"]:not([aria-hidden="true"]) {
+    color: var(--color-matrix);
+  }
+  :where([data-theme="professional"]) [class*="text-warn/"]:not([aria-hidden="true"]) {
+    color: var(--color-warn);
+  }
+  :where([data-theme="professional"]) [class*="text-danger/"]:not([aria-hidden="true"]) {
+    color: var(--color-danger);
+  }
+  :where([data-theme="professional"]) [class*="text-pihole/"]:not([aria-hidden="true"]) {
+    color: var(--color-pihole);
+  }
 }
 
 /* ---------- Reduced motion ---------- */

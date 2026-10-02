@@ -4,14 +4,15 @@ import { X } from 'lucide-react';
 import CornerBrackets from '../ui/CornerBrackets';
 import Meter from '../ui/Meter';
 import { sfx } from '../../lib/sound';
+import { useMotion } from '../../theme/motion';
 
 const STATUS_TONE = { ok: 'text-matrix', warn: 'text-warn' };
 
 function Section({ title, children, className = '' }) {
   return (
     <section className={className}>
-      <h3 className="accent-text mb-3 flex items-center gap-2 font-mono text-xs font-bold tracking-[0.3em]">
-        <span aria-hidden className="h-3 w-1 bg-current shadow-[0_0_8px_currentColor]" />
+      <h3 className="accent-text mb-3 flex items-center gap-2 font-ui text-xs font-bold track-30">
+        <span aria-hidden className="h-3 w-1 bg-current shadow-[0_0_8px_var(--glow-current)]" />
         {title}
       </h3>
       {children}
@@ -25,6 +26,7 @@ function Section({ title, children, className = '' }) {
 //   optional: status/tone, uptime, role, ports[][], load, and the `eyebrow` prop.
 export default function DataHUD({ service, onClose, eyebrow }) {
   const closeRef = useRef(null);
+  const { board } = useMotion();
   const Icon = service.icon;
 
   useEffect(() => {
@@ -60,11 +62,8 @@ export default function DataHUD({ service, onClose, eyebrow }) {
           aria-modal="true"
           aria-labelledby="hud-title"
           style={{ '--accent': service.accent, '--led': service.accent }}
-          className="accent-border accent-glow pointer-events-auto relative max-h-[calc(100vh-1.5rem)] w-full max-w-4xl overflow-y-auto border bg-[rgba(7,11,17,0.66)] shadow-[0_30px_120px_rgba(0,0,0,0.7)] backdrop-blur-2xl backdrop-saturate-150 sm:max-h-[calc(100vh-4rem)]"
-          initial={{ opacity: 0, scale: 0.86, y: 28 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.94, y: 12 }}
-          transition={{ type: 'spring', damping: 26, stiffness: 260 }}
+          className="accent-border accent-glow pointer-events-auto relative max-h-[calc(100vh-1.5rem)] w-full max-w-4xl overflow-y-auto border bg-glass/66 shadow-[var(--shadow-board)] backdrop-blur-2xl backdrop-saturate-150 sm:max-h-[calc(100vh-4rem)]"
+          {...board}
         >
           {/* glass sheen + scanline texture + top accent bar */}
           <div
@@ -73,7 +72,7 @@ export default function DataHUD({ service, onClose, eyebrow }) {
             style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent 38%)' }}
           />
           <div aria-hidden className="folder-lines pointer-events-none absolute inset-0 opacity-60" />
-          <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'var(--accent)', boxShadow: '0 0 16px var(--accent)' }} />
+          <div aria-hidden className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'var(--accent)', boxShadow: '0 0 16px var(--glow-accent)' }} />
           <span className="accent-text">
             <CornerBrackets className="h-4 w-4" />
           </span>
@@ -85,8 +84,8 @@ export default function DataHUD({ service, onClose, eyebrow }) {
                 <div className="accent-text accent-bg-soft accent-glow accent-border flex h-14 w-14 shrink-0 items-center justify-center border sm:h-[72px] sm:w-[72px]">
                   <Icon size={32} strokeWidth={1.4} aria-hidden />
                 </div>
-                <div className="min-w-0 font-mono">
-                  <p className="text-[10px] tracking-[0.3em] text-white/50 sm:text-[11px]">
+                <div className="min-w-0 font-ui">
+                  <p className="text-[10px] track-30 text-white/50 sm:text-[11px]">
                     {eyebrow ?? `DATA_HUD // NODE ${service.slot}`}
                   </p>
                   <h2 id="hud-title" className="accent-text text-glow break-words text-xl font-bold leading-tight tracking-wide sm:text-3xl">
@@ -98,7 +97,7 @@ export default function DataHUD({ service, onClose, eyebrow }) {
                     </p>
                   ) : (
                     <p className="mt-1 flex items-center gap-2 text-xs text-matrix">
-                      <span className="led" style={{ '--led': '#00ff66' }} aria-hidden /> ONLINE · UPTIME {service.uptime}
+                      <span className="led" style={{ '--led': 'var(--color-matrix)' }} aria-hidden /> ONLINE · UPTIME {service.uptime}
                     </p>
                   )}
                 </div>
@@ -130,7 +129,7 @@ export default function DataHUD({ service, onClose, eyebrow }) {
                 <ul className="space-y-3 text-[15px] leading-relaxed text-white/85">
                   {service.architecture.map((line) => (
                     <li key={line} className="flex gap-3">
-                      <span className="accent-text mt-[3px] shrink-0 font-mono text-sm">▸</span>
+                      <span className="accent-text mt-[3px] shrink-0 font-ui text-sm">▸</span>
                       <span>{line}</span>
                     </li>
                   ))}
@@ -139,7 +138,7 @@ export default function DataHUD({ service, onClose, eyebrow }) {
 
               <div className="space-y-7">
                 <Section title="CONFIGURATION">
-                  <dl className="accent-border divide-y divide-white/10 border bg-black/25 font-mono text-[12.5px]">
+                  <dl className="accent-border divide-y divide-white/10 border bg-black/25 font-ui text-[12.5px]">
                     {service.config.map(([k, v]) => (
                       <div key={k} className="flex justify-between gap-4 px-3 py-2">
                         <dt className="text-white/50">{k}</dt>
@@ -151,7 +150,7 @@ export default function DataHUD({ service, onClose, eyebrow }) {
 
                 {service.ports && (
                   <Section title="PORTS">
-                    <ul className="accent-border divide-y divide-white/10 border bg-black/25 font-mono text-[12.5px]">
+                    <ul className="accent-border divide-y divide-white/10 border bg-black/25 font-ui text-[12.5px]">
                       {service.ports.map(([port, desc]) => (
                         <li key={port} className="flex justify-between gap-4 px-3 py-2">
                           <span className="accent-text font-medium">{port}</span>
@@ -173,7 +172,7 @@ export default function DataHUD({ service, onClose, eyebrow }) {
             <Section title="TECH_STACK" className="mt-8">
               <ul className="flex flex-wrap gap-2">
                 {service.stack.map((tech) => (
-                  <li key={tech} className="accent-border accent-text accent-bg-soft border px-2.5 py-1 font-mono text-xs font-medium tracking-wider">
+                  <li key={tech} className="accent-border accent-text accent-bg-soft border px-2.5 py-1 font-ui text-xs font-medium tracking-wider">
                     {tech}
                   </li>
                 ))}

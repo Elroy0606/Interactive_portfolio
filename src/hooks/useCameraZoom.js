@@ -30,12 +30,12 @@ export function measurePose(cameraEl, targetEl, { scale, pan = true, toViewport 
 }
 
 /**
- * Camera zoom for a "stage" (Proxmox blueprint, dossier grid, hub sector cards).
+ * Camera zoom for a "stage" (Proxmox blueprint, dossier grid).
  *
  *   phase : ZOOM.* value (none / entering / inside / exiting)
  *   pose  : from measurePose, captured at click time and kept by the parent so
  *           the reverse zoom can start from the same place
- *   ms    : { entering, exiting } durations in ms
+ *   ms    : { entering, exiting } durations in ms (motion tokens `zoom` / `dossier`)
  *
  * Returns:
  *   dim         : true while everything except the target should fade/blur

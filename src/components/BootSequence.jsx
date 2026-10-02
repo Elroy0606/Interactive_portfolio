@@ -38,11 +38,11 @@ export default function BootSequence() {
       transition={{ duration: 0.35 }}
     >
       <div className="w-full max-w-2xl">
-        <div className="mb-4 font-mono text-xs tracking-[0.3em] text-cyber/70">// SYSTEM BOOT</div>
-        <div className="min-h-[300px] border border-cyber/25 bg-panel/70 p-4 shadow-[0_0_30px_rgba(0,240,255,0.08)] sm:p-6">
+        <div className="mb-4 font-ui text-xs track-30 text-cyber/70">// SYSTEM BOOT</div>
+        <div className="min-h-[300px] border border-cyber/25 bg-panel/70 p-4 shadow-[0_0_30px_color-mix(in_srgb,var(--glow-cyber)_8%,transparent)] sm:p-6">
           <TerminalOutput lines={LINES} pos={pos} prompt={false} />
         </div>
-        <div className="mt-3 text-right font-mono text-[11px] tracking-widest text-white/30">
+        <div className="mt-3 text-right font-ui text-[11px] tracking-widest text-white/30">
           {done ? 'LAUNCHING…' : '[ PRESS ANY KEY OR CLICK TO SKIP ]'}
         </div>
       </div>

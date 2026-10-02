@@ -1,11 +1,13 @@
-import { Server, Code2, ShieldAlert } from 'lucide-react';
+import { Server, Code2, ShieldAlert, NotebookPen } from 'lucide-react';
 
 // The districts shown on the Mainframe hub. To unlock a new sector:
 //  1. set `locked: false`, 2. add a VIEWS entry + world component,
 //  3. map it in SECTOR_VIEWS (state/AppContext.jsx) and VIEW_COMPONENTS (App.jsx).
 //
-// `host` is only flavour text for the handshake log; `cta` overrides the card's
-// call-to-action (default INITIATE_CONNECTION).
+// `cta` overrides the card's call-to-action (default INITIATE_CONNECTION).
+// `accent` is an identity colour token (src/index.css): each sector has its own
+// colour in the cyberpunk theme, and they all resolve to the one accent in the
+// professional theme.
 export const SECTORS = [
   {
     id: '01',
@@ -16,22 +18,19 @@ export const SECTORS = [
     status: 'ACTIVE',
     locked: false,
     icon: Server,
-    accent: '#00f0ff',
-    target: 'proxmox_server',
-    host: 'pve.local',
+    accent: 'var(--color-id-cyan)',
     tags: ['PROXMOX', 'DOCKER', 'HAOS', 'KALI', 'OLLAMA'],
   },
   {
     id: '02',
     code: 'PROJECTS',
-    label: 'Full-Stack Applications',
-    blurb: 'Web apps, APIs and tooling built end-to-end. Deployment in progress.',
-    status: 'LOCKED',
-    locked: true,
+    label: 'Websites and Apps',
+    blurb: 'Websites and apps I have made. Each card links to the live version so you can try it.',
+    status: 'ACTIVE',
+    locked: false,
     icon: Code2,
-    accent: '#ffb700',
-    target: 'dev_district',
-    tags: ['REACT', 'NODE', 'APIS'],
+    accent: 'var(--color-id-amber)',
+    tags: ['WEBSITES', 'APPS', 'LIVE DEMOS'],
   },
   {
     id: '03',
@@ -42,10 +41,20 @@ export const SECTORS = [
     status: 'ACTIVE',
     locked: false,
     icon: ShieldAlert,
-    accent: '#00ff66',
-    target: 'sec_ops_grid',
-    host: 'vault.local',
+    accent: 'var(--color-id-green)',
     cta: 'SECURE_ACCESS',
     tags: ['BUG BOUNTY', 'DISCLOSURE', 'OWASP'],
+  },
+  {
+    id: '04',
+    code: 'WRITE-UPS',
+    label: 'Build Reports and Write-ups',
+    blurb: 'Reports that explain how I built my labs and projects. Open one to read it on the site.',
+    status: 'ACTIVE',
+    locked: false,
+    icon: NotebookPen,
+    accent: 'var(--color-id-violet)',
+    cta: 'OPEN_ARCHIVE',
+    tags: ['HOME LAB', 'ARTICLES', 'PDF'],
   },
 ];

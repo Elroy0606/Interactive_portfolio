@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { DOSSIERS } from '../../data/dossiers';
-import { DOSSIER_MS, ZOOM } from '../../state/AppContext';
+import { ZOOM } from '../../state/AppContext';
+import { useMotion } from '../../theme/motion';
 import useCameraZoom, { measurePose } from '../../hooks/useCameraZoom';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { cn } from '../../lib/cn';
@@ -16,17 +17,18 @@ import DossierFolder from './DossierFolder';
 // activeId (folder being opened), onOpen(id, pose).
 export default function DossierGrid({ phase, pose, activeId, onOpen }) {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const m = useMotion();
   const cameraRef = useRef(null);
   const folderEls = useRef({});
   const [hovered, setHovered] = useState(null); // index
 
-  const { dim, cameraProps } = useCameraZoom({ phase, pose, ms: DOSSIER_MS });
+  const { dim, cameraProps } = useCameraZoom({ phase, pose, ms: m.dossier });
 
   const open = (id) => {
     const cam = cameraRef.current;
     const el = folderEls.current[id];
     if (!cam || !el) return;
-    onOpen(id, measurePose(cam, el, { scale: isDesktop ? 2.1 : 1.1, pan: isDesktop }));
+    onOpen(id, measurePose(cam, el, { scale: isDesktop ? m.zoomScale.dossier : Math.min(1.1, m.zoomScale.dossier), pan: isDesktop && m.pan }));
   };
 
   const hoveredDossier = hovered !== null ? DOSSIERS[hovered] : null;
@@ -34,20 +36,18 @@ export default function DossierGrid({ phase, pose, activeId, onOpen }) {
   return (
     <motion.div
       className={cn(
-        'relative overflow-hidden border border-matrix/25 shadow-[0_0_50px_rgba(0,255,102,0.07)]',
+        'relative overflow-hidden border border-id-green/25 shadow-[0_0_50px_color-mix(in_srgb,var(--glow-matrix)_7%,transparent)]',
         phase !== ZOOM.NONE && 'pointer-events-none',
       )}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6, delay: 0.1 }}
+      {...m.fadeProps}
     >
       <motion.div ref={cameraRef} className="blueprint-grid relative px-4 pb-8 pt-6 sm:px-8 lg:flex lg:min-h-[66vh] lg:flex-col lg:justify-center lg:px-10 lg:py-12"
         {...cameraProps}
       >
-        <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-mono text-[10px] tracking-[0.25em] text-matrix/60">
+        <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25 text-id-green/60">
           VAULT // SEC_OPS_GRID
         </div>
-        <div aria-hidden className="pointer-events-none absolute right-3 top-2 hidden font-mono text-[10px] tracking-[0.25em] text-matrix/60 sm:block">
+        <div aria-hidden className="pointer-events-none absolute right-3 top-2 hidden font-ui text-[10px] track-25 text-id-green/60 sm:block">
           {DOSSIERS.length} FOLDERS · SEALED
         </div>
 
@@ -59,6 +59,7 @@ export default function DossierGrid({ phase, pose, activeId, onOpen }) {
                 key={d.id}
                 dossier={d}
                 shift={shift}
+                lively={m.tilt}
                 hovered={hovered === i || activeId === d.id}
                 dim={dim && d.id !== activeId}
                 wrapRef={(el) => {

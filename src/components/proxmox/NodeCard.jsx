@@ -46,12 +46,12 @@ export default function NodeCard({ service, registerNode, hot, dim = false, onHo
         <div className="accent-text accent-bg-soft flex h-11 w-11 shrink-0 items-center justify-center border accent-border">
           <Icon size={22} strokeWidth={1.5} aria-hidden />
         </div>
-        <div className="min-w-0 font-mono">
+        <div className="min-w-0 font-ui">
           <div className="accent-text truncate text-[13px] font-bold tracking-wide text-glow">{service.name}</div>
           <div className="text-[11px] text-white/50">{service.short}</div>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2 font-mono text-[10px] tracking-widest">
+      <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2 font-ui text-[10px] tracking-widest">
         <span className="flex items-center gap-1.5 text-white/50">
           <span className="led" aria-hidden /> {service.state ?? 'ONLINE'} · {service.slot}
         </span>

@@ -26,13 +26,13 @@ export default function FlowNode({ nodeRef, tag, title, caption, icon: Icon, acc
       <span className="accent-text">
         <CornerBrackets className="h-2.5 w-2.5" />
       </span>
-      <div className="font-mono text-[10px] tracking-[0.25em] text-white/40">{tag}</div>
+      <div className="font-ui text-[10px] track-25 text-white/40">{tag}</div>
       <div className="mt-2 flex items-start gap-3">
         <div className="accent-text accent-bg-soft accent-border flex h-11 w-11 shrink-0 items-center justify-center border">
           <Icon size={22} strokeWidth={1.5} aria-hidden />
         </div>
         <div className="min-w-0">
-          <div className="accent-text text-glow font-mono text-[12px] font-bold leading-snug tracking-wide">
+          <div className="accent-text text-glow font-ui text-[12px] font-bold leading-snug tracking-wide">
             {softBreaks(title)}
           </div>
           <p className="mt-1 text-[12px] leading-snug text-white/50">{caption}</p>

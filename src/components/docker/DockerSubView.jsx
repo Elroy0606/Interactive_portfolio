@@ -13,6 +13,7 @@ import Tip from '../ui/Tip';
 import DataHUD from '../proxmox/DataHUD';
 import ContainerCard from './ContainerCard';
 import { sfx } from '../../lib/sound';
+import { useMotion } from '../../theme/motion';
 
 const MANIFEST_LINE = [
   { text: `> CONTAINER_OVERVIEW: This panel indexes 4 core services running in my Docker environment, including my local AI models and security testing tools.`, pause: 0 }, 
@@ -26,6 +27,7 @@ export default function DockerSubView() {
   const active = getContainer(state.activeContainerId);
   const [hoveredId, setHoveredId] = useState(null);
   const { pos } = useTerminal(MANIFEST_LINE, { speed: 14 });
+  const { subView } = useMotion();
 
   const stageRef = useRef(null);
   const hubRef = useRef(null);
@@ -76,17 +78,15 @@ export default function DockerSubView() {
     <>
       <motion.section
         aria-label="Docker container substrate manifest"
-        initial={{ opacity: 0, scale: 1.06 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        {...subView}
       >
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <button type="button" className="btn-cyber mb-4" onClick={exit}>
               <ArrowLeft size={14} aria-hidden /> [RETURN_TO_PROXMOX]
             </button>
-            <p className="font-mono text-xs tracking-[0.3em] text-matrix">[SECTOR 01 ▸ NODE {docker.slot}] // ACCESS_GRANTED</p>
-            <h1 className="mt-1 break-words font-mono text-xl font-bold leading-tight text-cyber text-glow sm:text-3xl">
+            <p className="font-ui text-xs track-30 text-matrix">[SECTOR 01 ▸ NODE {docker.slot}] // ACCESS_GRANTED</p>
+            <h1 className="mt-1 break-words font-ui text-xl font-bold leading-tight text-cyber text-glow sm:text-3xl">
               <GlitchText auto>DOCKER_INFRASTRUCTURE</GlitchText>
             </h1>
             <p className="mt-2 min-h-[1.5em] font-mono text-xs text-white/50">
@@ -95,7 +95,7 @@ export default function DockerSubView() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-widest">
+          <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
             <Tip label="CONTAINER HOST" side="bottom">
               <span className="flex items-center gap-2 border border-cyber/30 bg-cyber/5 px-2.5 py-1.5 text-cyber">
                 <ContainerIcon size={13} aria-hidden /> HOST: {docker.slot}
@@ -109,15 +109,15 @@ export default function DockerSubView() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_rgba(0,240,255,0.07)]">
+        <div className="relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_color-mix(in_srgb,var(--glow-cyber)_7%,transparent)]">
           <div ref={stageRef} className="blueprint-grid relative p-4 sm:p-6 lg:flex lg:min-h-[66vh] lg:flex-col lg:justify-center lg:px-10 lg:py-14">
-            <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
+            <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25 text-cyber/50">
               SUBSTRATE // DOCKER_ENGINE
             </div>
-            <div aria-hidden className="pointer-events-none absolute right-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
+            <div aria-hidden className="pointer-events-none absolute right-3 top-2 font-ui text-[10px] track-25 text-cyber/50">
               NET: docker0 · BRIDGE
             </div>
-            <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-mono text-[10px] tracking-[0.25em] text-cyber/40">
+            <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-ui text-[10px] track-25 text-cyber/40">
               FIG.02 — CONTAINER_TOPOLOGY
             </div>
 
@@ -127,20 +127,20 @@ export default function DockerSubView() {
               {/* Engine hub */}
               <div
                 ref={hubRef}
-                style={{ '--accent': '#00f0ff', '--led': '#00f0ff' }}
+                style={{ '--accent': 'var(--color-id-cyan)', '--led': 'var(--color-id-cyan)' }}
                 className="accent-glow accent-border relative border bg-panel/90 p-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center"
               >
                 <div className="flex items-center gap-3">
                   <div className="accent-text accent-border flex h-12 w-12 shrink-0 items-center justify-center border bg-cyber/[0.06]">
                     <ContainerIcon size={24} strokeWidth={1.5} aria-hidden />
                   </div>
-                  <div className="min-w-0 font-mono">
+                  <div className="min-w-0 font-ui">
                     <div className="accent-text text-glow text-[13px] font-bold tracking-wide">DOCKER_ENGINE</div>
                     <div className="text-[10px] tracking-widest text-white/45">{docker.slot} · COMPOSE STACKS</div>
                   </div>
                   <span className="led ml-auto" aria-hidden />
                 </div>
-                <dl className="mt-3 divide-y divide-white/5 border border-white/10 font-mono text-[11px]">
+                <dl className="mt-3 divide-y divide-white/5 border border-white/10 font-ui text-[11px]">
                   {docker.config.slice(1, 5).map(([k, v]) => (
                     <div key={k} className="flex justify-between gap-3 px-2.5 py-1">
                       <dt className="text-white/40">{k}</dt>
@@ -152,7 +152,7 @@ export default function DockerSubView() {
                   <Meter label="CPU" value={34} />
                   <Meter label="MEM" value={52} range={4} />
                 </div>
-                <div className="mt-3 flex items-center gap-2 font-mono text-[10px] tracking-widest text-white/40">
+                <div className="mt-3 flex items-center gap-2 font-ui text-[10px] tracking-widest text-white/40">
                   <Network size={12} aria-hidden /> BRIDGE NETWORK · {CONTAINERS.length} ATTACHED
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function DockerSubView() {
           </div>
         </div>
 
-        <p className="mt-4 text-center font-mono text-[11px] tracking-[0.2em] text-white/30">
+        <p className="mt-4 text-center font-ui text-[11px] track-20 text-white/30">
           [ CLICK A SERVICE TO OPEN ITS DATA_HUD · ESC TO RETURN ]
         </p>
       </motion.section>

@@ -2,13 +2,16 @@ import { ArrowDown, ArrowUp, Cpu, Volume2, VolumeX } from 'lucide-react';
 import { useApp } from '../state/AppContext';
 import useTelemetry from '../hooks/useTelemetry';
 import Tip from './ui/Tip';
+import ThemeToggle from './ThemeToggle';
+import { THEME } from '../theme/theme';
 import { sfx } from '../lib/sound';
 
 const PATHS = {
   hub: '~/mainframe',
-  handshake: '~/mainframe/connecting…',
   proxmox: '~/sector01/infrastructure_lab',
+  dev: '~/sector02/dev_district',
   vulns: '~/sector03/sec_ops_grid',
+  writeups: '~/sector04/write_ups',
 };
 
 // Breadcrumb for the current view, including drill-downs.
@@ -20,6 +23,7 @@ function currentPath(state) {
     if (state.activeReportId) p += `/${state.activeReportId}.pdf`;
     return p;
   }
+  if (state.view === 'writeups' && state.activeWriteupId) return `${PATHS.writeups}/${state.activeWriteupId}`;
   return PATHS[state.view];
 }
 
@@ -34,7 +38,7 @@ export default function TelemetryBar() {
   const cpuHot = t.cpu > 65;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-cyber/20 bg-void/85 font-mono text-[11px] tracking-wider backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-cyber/20 bg-void/85 font-ui text-[11px] tracking-wider backdrop-blur">
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-5 gap-y-1 px-4 py-2 sm:px-8">
         <div className="flex items-center gap-2 text-cyber text-glow">
           <Cpu size={14} aria-hidden />
@@ -82,22 +86,27 @@ export default function TelemetryBar() {
             </span>
           </Tip>
 
-          <Tip label={state.soundOn ? 'AUDIO: ON' : 'AUDIO: OFF'} side="bottom">
-            <button
-              type="button"
-              aria-pressed={state.soundOn}
-              aria-label="Toggle sound effects"
-              onClick={() => {
-                dispatch({ type: 'TOGGLE_SOUND' });
-                // Toggling ON: cue plays once the context exists (next tick).
-                if (!state.soundOn) setTimeout(sfx.confirm, 30);
-              }}
-              className="flex items-center gap-1.5 text-white/50 transition-colors hover:text-cyber"
-            >
-              {state.soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
-              <span className="hidden sm:inline">SFX</span>
-            </button>
-          </Tip>
+          <ThemeToggle />
+
+          {/* Sound effects are part of the cyberpunk theme only. */}
+          {state.theme === THEME.CYBERPUNK && (
+            <Tip label={state.soundOn ? 'AUDIO: ON' : 'AUDIO: OFF'} side="bottom">
+              <button
+                type="button"
+                aria-pressed={state.soundOn}
+                aria-label="Toggle sound effects"
+                onClick={() => {
+                  dispatch({ type: 'TOGGLE_SOUND' });
+                  // Toggling ON: cue plays once the context exists (next tick).
+                  if (!state.soundOn) setTimeout(sfx.confirm, 30);
+                }}
+                className="flex items-center gap-1.5 text-white/50 transition-colors hover:text-cyber"
+              >
+                {state.soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
+                <span className="hidden sm:inline">SFX</span>
+              </button>
+            </Tip>
+          )}
         </div>
       </div>
     </header>

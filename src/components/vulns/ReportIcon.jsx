@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
 import { SEVERITY } from '../../data/dossiers';
 import { sfx } from '../../lib/sound';
+import { useMotion } from '../../theme/motion';
 
 // Miniature PDF-page icon for one report. The thumbnail carries the
 // `layoutId` that the viewer panel shares, so opening a report morphs this
 // thumbnail into the full reader.
 export default function ReportIcon({ report, index, accent, onOpen }) {
   const sev = SEVERITY[report.severity];
+  const { morph } = useMotion();
   return (
     <motion.button
       type="button"
@@ -23,12 +25,12 @@ export default function ReportIcon({ report, index, accent, onOpen }) {
       className="group/doc block w-full text-left"
     >
       <motion.div
-        layoutId={`rpt-${report.id}`}
-        className="accent-border relative aspect-[3/4] overflow-hidden border bg-[#0d1117] shadow-[0_0_18px_color-mix(in_srgb,var(--accent)_16%,transparent)] transition-[translate,box-shadow,border-color] duration-200 group-hover/doc:-translate-y-1.5 group-hover/doc:border-[var(--accent)] group-hover/doc:shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_45%,transparent)] group-focus-visible/doc:-translate-y-1.5"
+        layoutId={morph ? `rpt-${report.id}` : undefined}
+        className="accent-border relative aspect-[3/4] overflow-hidden border bg-folder shadow-[0_0_18px_color-mix(in_srgb,var(--glow-accent)_16%,transparent)] transition-[translate,box-shadow,border-color] duration-200 group-hover/doc:-translate-y-1.5 group-hover/doc:border-[var(--accent)] group-hover/doc:shadow-[0_0_28px_color-mix(in_srgb,var(--glow-accent)_45%,transparent)] group-focus-visible/doc:-translate-y-1.5"
         style={{ borderRadius: 2 }}
       >
-        <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: sev.color, boxShadow: `0 0 10px ${sev.color}` }} />
-        <div className="flex items-center justify-between px-2.5 pt-3.5 font-mono text-[8px] tracking-[0.2em]">
+        <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: sev.color, boxShadow: '0 0 10px var(--glow-accent)' }} />
+        <div className="flex items-center justify-between px-2.5 pt-3.5 font-ui text-[8px] track-20">
           <span className="border border-white/20 px-1 text-white/60">PDF</span>
           <span style={{ color: sev.color }}>{report.severity}</span>
         </div>
@@ -38,7 +40,7 @@ export default function ReportIcon({ report, index, accent, onOpen }) {
             <div key={i} className="h-[3px] bg-white/10" style={{ width: `${w}%` }} />
           ))}
         </div>
-        <div className="absolute inset-x-2.5 bottom-2 flex items-end justify-between font-mono text-[8px] tracking-widest text-white/40">
+        <div className="absolute inset-x-2.5 bottom-2 flex items-end justify-between font-ui text-[8px] tracking-widest text-white/40">
           <span>{report.id.toUpperCase()}</span>
           <span>CVSS {report.cvss}</span>
         </div>
@@ -53,7 +55,7 @@ export default function ReportIcon({ report, index, accent, onOpen }) {
 
       <div className="mt-2.5">
         <div className="text-[13px] font-medium leading-snug text-white/85 transition-colors group-hover/doc:text-white">{report.title}</div>
-        <div className="mt-1 font-mono text-[10px] tracking-widest text-white/35">{report.file}</div>
+        <div className="mt-1 font-ui text-[10px] tracking-widest text-white/35">{report.file}</div>
       </div>
     </motion.button>
   );

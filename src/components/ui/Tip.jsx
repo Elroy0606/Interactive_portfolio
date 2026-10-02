@@ -9,8 +9,8 @@ export default function Tip({ label, children, side = 'top', block = false, clas
         role="tooltip"
         className={cn(
           'pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 whitespace-nowrap rounded-sm',
-          'border border-cyber/40 bg-void/95 px-2 py-1 font-mono text-[10px] tracking-widest text-cyber',
-          'opacity-0 shadow-[0_0_12px_rgba(0,240,255,0.25)] transition-opacity duration-150',
+          'border border-cyber/40 bg-void/95 px-2 py-1 font-ui text-[10px] tracking-widest text-cyber',
+          'opacity-0 shadow-[0_0_12px_color-mix(in_srgb,var(--glow-cyber)_25%,transparent)] transition-opacity duration-150',
           'group-hover/tip:opacity-100 group-focus-within/tip:opacity-100',
           side === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2',
         )}

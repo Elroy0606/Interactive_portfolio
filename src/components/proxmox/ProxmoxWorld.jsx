@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Boxes, HardDrive, MousePointerClick } from 'lucide-react';
-import { useApp, ZOOM, ZOOM_MS } from '../../state/AppContext';
+import { useApp, ZOOM } from '../../state/AppContext';
+import { useMotion } from '../../theme/motion';
 import { HOST, SERVICES, getService } from '../../data/services';
 import GlitchText from '../ui/GlitchText';
 import Tip from '../ui/Tip';
@@ -24,6 +25,7 @@ const SUB_VIEWS = {
 export default function ProxmoxWorld() {
   const { state, dispatch } = useApp();
   const { zoom, zoomTarget, tourStep } = state;
+  const { zoom: ZOOM_MS, viewProps } = useMotion();
   const [hoveredId, setHoveredId] = useState(null);
   // Camera pose captured when a node is clicked; kept here (not in Blueprint)
   // because Blueprint unmounts while a sub-view is showing and the reverse
@@ -45,7 +47,7 @@ export default function ProxmoxWorld() {
       return () => clearTimeout(t);
     }
     return undefined;
-  }, [zoom, dispatch]);
+  }, [zoom, dispatch, ZOOM_MS]);
 
   const closeBoard = useCallback(() => dispatch({ type: 'ZOOM_EXIT' }), [dispatch]);
   const zoomTo = useCallback(
@@ -64,11 +66,8 @@ export default function ProxmoxWorld() {
     <motion.main
       key="proxmox"
       className="mx-auto max-w-[1600px] px-4 pb-16 pt-6 sm:px-8 sm:pt-8"
-      // opacity/translate only: clip-path or filter on this element would clip / re-anchor the fixed info board
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      // opacity/scale only: clip-path or filter on this element would clip / re-anchor the fixed info board
+      {...viewProps}
     >
       {showHeader && (
         <div
@@ -88,21 +87,21 @@ export default function ProxmoxWorld() {
             >
               <ArrowLeft size={14} aria-hidden /> RETURN TO HOME
             </button>
-            <p className="font-mono text-xs tracking-[0.3em] text-matrix">[SECTOR 01] // ACCESS_GRANTED</p>
-            <h1 className="mt-1 font-mono text-3xl font-bold leading-tight text-cyber text-glow sm:text-4xl">
+            <p className="font-ui text-xs track-30 text-matrix">[SECTOR 01] // ACCESS_GRANTED</p>
+            <h1 className="mt-1 font-ui text-3xl font-bold leading-tight text-cyber text-glow sm:text-4xl">
               <GlitchText auto>Home Lab</GlitchText>
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
-              <span className="font-mono text-cyan-400">&gt; INFRA_OVERVIEW:</span> I built this home lab by repurposing my old laptop into a Proxmox hypervisor. 
+              <span className="font-ui text-cyan-400">&gt; INFRA_OVERVIEW:</span> I built this home lab by repurposing my old laptop into a Proxmox hypervisor. 
               Connected globally via <span className="text-white font-semibold">Tailscale</span>, this lab runs a suite of containers I use to practice penetration testing, 
               orchestrate security exercises with <span className="text-white font-semibold">Kali Linux</span>, and run a local AI that controls my smart devices. 
-              <span className="block mt-1 text-emerald-400 font-mono text-xs">
+              <span className="block mt-1 text-emerald-400 font-ui text-xs">
                 [ACTION REQUIRED]: Click any module to focus the view. <br></br>Dive into DOCKER, PI-HOLE or WINDOWS_AD_LAB to ENTER the internal architecture.
               </span>
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-widest">
+          <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
             <Tip label={tourStep ? 'HIDE THE GUIDE CURSOR' : 'SHOW THE GUIDE CURSOR'} side="bottom">
               <button
                 type="button"
@@ -147,7 +146,7 @@ export default function ProxmoxWorld() {
       )}
 
       {zoom === ZOOM.NONE && (
-        <p className="mt-4 text-center font-mono text-[11px] tracking-[0.2em] text-white/35">
+        <p className="mt-4 text-center font-ui text-[11px] track-20 text-white/35">
           [ CLICK A MODULE · DOCKER_CONTAINERS, PI-HOLE_DNS AND WINDOWS_AD_LAB OPEN THEIR INTERNAL VIEWS ]
         </p>
       )}

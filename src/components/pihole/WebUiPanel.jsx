@@ -5,9 +5,9 @@ const fmt = (n) => n.toLocaleString('en-US');
 function Tile({ label, value, tone, sub }) {
   return (
     <div className={`border bg-black/30 p-3 ${tone.border}`}>
-      <div className={`font-mono text-[9px] tracking-[0.2em] ${tone.label}`}>{label}</div>
-      <div className={`mt-1 font-mono text-2xl font-bold tabular-nums leading-none sm:text-3xl xl:text-2xl 2xl:text-3xl ${tone.value}`}>{value}</div>
-      <div className="mt-1.5 font-mono text-[9px] tracking-widest text-white/35">{sub}</div>
+      <div className={`font-ui text-[9px] track-20 ${tone.label}`}>{label}</div>
+      <div className={`mt-1 font-ui text-2xl font-bold tabular-nums leading-none sm:text-3xl xl:text-2xl 2xl:text-3xl ${tone.value}`}>{value}</div>
+      <div className="mt-1.5 font-ui text-[9px] tracking-widest text-white/35">{sub}</div>
     </div>
   );
 }
@@ -20,10 +20,10 @@ export default function WebUiPanel({ sim }) {
   return (
     <section
       aria-label="Simulated Pi-hole web interface telemetry"
-      className="relative flex flex-col border border-cyber/30 bg-panel/50 shadow-[0_0_40px_rgba(77,163,255,0.1)] backdrop-blur-md"
+      className="relative flex flex-col border border-cyber/30 bg-panel/50 shadow-[0_0_40px_color-mix(in_srgb,var(--glow-pihole)_10%,transparent)] backdrop-blur-md"
     >
       {/* window chrome */}
-      <div className="flex items-center gap-3 border-b border-cyber/20 bg-black/30 px-3 py-2 font-mono text-[10px] tracking-widest">
+      <div className="flex items-center gap-3 border-b border-cyber/20 bg-black/30 px-3 py-2 font-ui text-[10px] tracking-widest">
         <span className="flex gap-1" aria-hidden>
           <span className="h-2 w-2 rounded-full bg-danger/70" />
           <span className="h-2 w-2 rounded-full bg-warn/70" />
@@ -42,7 +42,7 @@ export default function WebUiPanel({ sim }) {
             label="TOTAL QUERIES"
             value={fmt(sim.total)}
             sub="LAST 24H"
-            tone={{ border: 'border-[#4da3ff]/40', label: 'text-[#4da3ff]/80', value: 'text-[#4da3ff]' }}
+            tone={{ border: 'border-pihole/40', label: 'text-pihole/80', value: 'text-pihole' }}
           />
           <Tile
             label="QUERIES BLOCKED"
@@ -60,16 +60,16 @@ export default function WebUiPanel({ sim }) {
 
         {/* stacked mini chart: allowed (blue) + blocked (red) per tick */}
         <div>
-          <div className="mb-1 flex justify-between font-mono text-[9px] tracking-[0.2em] text-white/40">
+          <div className="mb-1 flex justify-between font-ui text-[9px] track-20 text-white/40">
             <span>QUERIES OVER TIME</span>
             <span>
-              <span className="text-[#4da3ff]">■</span> ALLOWED <span className="text-danger">■</span> BLOCKED
+              <span className="text-pihole">■</span> ALLOWED <span className="text-danger">■</span> BLOCKED
             </span>
           </div>
           <div className="flex h-16 items-end gap-[2px] border border-white/10 bg-black/30 p-1" aria-hidden>
             {sim.history.map(([allowed, blocked], i) => (
               <div key={i} className="flex h-full flex-1 flex-col-reverse">
-                <div className="bg-[#4da3ff]/80" style={{ height: `${(allowed / maxBucket) * 100}%` }} />
+                <div className="bg-pihole/80" style={{ height: `${(allowed / maxBucket) * 100}%` }} />
                 <div className="bg-danger/90" style={{ height: `${(blocked / maxBucket) * 100}%` }} />
               </div>
             ))}
@@ -78,7 +78,7 @@ export default function WebUiPanel({ sim }) {
 
         {/* live log */}
         <div>
-          <div className="mb-1 font-mono text-[9px] tracking-[0.2em] text-white/40">QUERY_LOG // LIVE</div>
+          <div className="mb-1 font-ui text-[9px] track-20 text-white/40">QUERY_LOG // LIVE</div>
           <ul role="log" aria-live="off" className="flex h-[188px] flex-col justify-end overflow-hidden border border-white/10 bg-black/40 p-2 font-mono text-[10.5px]">
             {recent.map((q) => (
               <motion.li

@@ -1,8 +1,9 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ListChecks, Server } from 'lucide-react';
+import { ArrowLeft, FileText, ListChecks, Server } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { getService } from '../../data/services';
+import { getWriteupFor } from '../../data/writeups';
 import {
   BUILT,
   DECISIONS,
@@ -25,11 +26,15 @@ import Tip from '../ui/Tip';
 import CornerBrackets from '../ui/CornerBrackets';
 import { cn } from '../../lib/cn';
 import { sfx } from '../../lib/sound';
+import { useMotion } from '../../theme/motion';
 
-const CYAN = '#00f0ff';
-const GREEN = '#00ff66';
-const AMBER = '#ffb700';
-const VIOLET = '#a78bfa';
+// Section headings use identity tokens; the traces reuse each traffic path's own colour (FLOWS in data/adlab.js).
+const CYAN = 'var(--color-id-cyan)';
+const GREEN = 'var(--color-id-green)';
+const AMBER = 'var(--color-id-amber)';
+const VIOLET = 'var(--color-id-violet)';
+const RED = 'var(--color-id-red)';
+const flowColor = (id) => FLOWS.find((f) => f.id === id).accent;
 
 const MANIFEST_LINE = [{ text: '> mapping lab.local ... 2 networks, 1 firewall between them, every rule named', pause: 0 }];
 
@@ -59,8 +64,8 @@ const softBreaks = (text) =>
 function Section({ id, title, accent = CYAN, intro, children }) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} style={{ '--accent': accent }} className="scroll-mt-20">
-      <h2 id={`${id}-title`} className="accent-text flex items-center gap-2 font-mono text-sm font-bold tracking-[0.3em]">
-        <span aria-hidden className="h-4 w-1 bg-current shadow-[0_0_8px_currentColor]" />
+      <h2 id={`${id}-title`} className="accent-text flex items-center gap-2 font-ui text-sm font-bold track-30">
+        <span aria-hidden className="h-4 w-1 bg-current shadow-[0_0_8px_var(--glow-current)]" />
         {title}
       </h2>
       {intro && <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/60">{intro}</p>}
@@ -100,7 +105,7 @@ function LabNode({ node, registerNode, hot, pinned, onHover, onPin, className = 
         <div className="accent-text accent-bg-soft accent-border flex h-9 w-9 shrink-0 items-center justify-center border">
           <Icon size={18} strokeWidth={1.5} aria-hidden />
         </div>
-        <div className="min-w-0 font-mono">
+        <div className="min-w-0 font-ui">
           <div className="accent-text text-glow text-[12px] font-bold leading-snug tracking-wide">{softBreaks(node.name)}</div>
           <div className="mt-0.5 text-[10.5px] leading-snug text-white/50">{node.tag}</div>
         </div>
@@ -118,9 +123,9 @@ function Inspector({ node, panelRef }) {
       ref={panelRef}
       aria-label="Node inspector"
       aria-live="polite"
-      className="relative flex scroll-mb-4 flex-col self-start border border-cyber/30 bg-panel/50 shadow-[0_0_40px_rgba(0,240,255,0.08)] backdrop-blur-md"
+      className="relative flex scroll-mb-4 flex-col self-start border border-cyber/30 bg-panel/50 shadow-[0_0_40px_color-mix(in_srgb,var(--glow-cyber)_8%,transparent)] backdrop-blur-md"
     >
-      <div className="flex items-center gap-3 border-b border-cyber/20 bg-black/30 px-3 py-2 font-mono text-[10px] tracking-widest">
+      <div className="flex items-center gap-3 border-b border-cyber/20 bg-black/30 px-3 py-2 font-ui text-[10px] tracking-widest">
         <span className="flex gap-1" aria-hidden>
           <span className="h-2 w-2 rounded-full bg-danger/70" />
           <span className="h-2 w-2 rounded-full bg-warn/70" />
@@ -144,8 +149,8 @@ function Inspector({ node, panelRef }) {
             <div className="accent-text accent-bg-soft accent-glow accent-border flex h-12 w-12 shrink-0 items-center justify-center border">
               <Icon size={24} strokeWidth={1.5} aria-hidden />
             </div>
-            <div className="min-w-0 font-mono">
-              <p className="text-[10px] tracking-[0.25em] text-white/45">{ZONES[node.zone].label}</p>
+            <div className="min-w-0 font-ui">
+              <p className="text-[10px] track-25 text-white/45">{ZONES[node.zone].label}</p>
               <h3 className="accent-text text-glow break-words text-lg font-bold leading-tight tracking-wide">{node.name}</h3>
             </div>
           </div>
@@ -154,18 +159,18 @@ function Inspector({ node, panelRef }) {
             {node.role}
           </p>
 
-          <h4 className="accent-text mb-2 mt-5 font-mono text-[11px] font-bold tracking-[0.3em]">WHAT_I_CONFIGURED</h4>
+          <h4 className="accent-text mb-2 mt-5 font-ui text-[11px] font-bold track-30">WHAT_I_CONFIGURED</h4>
           <ul className="space-y-2 text-[13.5px] leading-relaxed text-white/80">
             {node.configured.map((line) => (
               <li key={line} className="flex gap-2.5">
-                <span className="accent-text mt-[2px] shrink-0 font-mono text-xs">▸</span>
+                <span className="accent-text mt-[2px] shrink-0 font-ui text-xs">▸</span>
                 <span>{line}</span>
               </li>
             ))}
           </ul>
 
-          <h4 className="accent-text mb-2 mt-5 font-mono text-[11px] font-bold tracking-[0.3em]">TRAFFIC_PATHS</h4>
-          <ul className="space-y-1.5 font-mono text-[11px]">
+          <h4 className="accent-text mb-2 mt-5 font-ui text-[11px] font-bold track-30">TRAFFIC_PATHS</h4>
+          <ul className="space-y-1.5 font-ui text-[11px]">
             {node.flows.map((id) => {
               const f = flowById(id);
               return (
@@ -188,11 +193,13 @@ function Inspector({ node, panelRef }) {
 export default function AdLabSubView() {
   const { dispatch } = useApp();
   const lab = getService('adlab');
+  const report = getWriteupFor('lab', 'adlab'); // the write-up about this lab (Sector 04), if listed
   const isLg = useMediaQuery('(min-width: 1024px)');
   const { pos } = useTerminal(MANIFEST_LINE, { speed: 14 });
   const [hovered, setHovered] = useState(null); // node under the pointer / keyboard focus
   const [pinned, setPinned] = useState('fw'); // node kept in the inspector
   const [flowHover, setFlowHover] = useState(null); // traffic rule hovered in the legend
+  const { subView } = useMotion();
 
   const stageRef = useRef(null);
   const extRef = useRef(null);
@@ -223,25 +230,25 @@ export default function AdLabSubView() {
 
     return [
       {
-        id: 'rdp', accent: CYAN, packetColor: CYAN, packets: 3, dur: 4.2,
+        id: 'rdp', accent: flowColor('rdp'), packetColor: flowColor('rdp'), packets: 3, dur: 4.2,
         x1: l.cx, y1: l.bottom, x2: r.cx, y2: r.top,
         d: `M${l.cx} ${l.bottom} V${yUp} H${xRdp} V${yRdp} H${r.cx} V${r.top}`,
         label: 'RDP ONLY · DNAT', lx: (l.cx + xRdp) / 2, ly: yUp - 8,
       },
       {
-        id: 'web', accent: GREEN, packetColor: GREEN, packets: 3, dur: 3.4,
+        id: 'web', accent: flowColor('web'), packetColor: flowColor('web'), packets: 3, dur: 3.4,
         x1: f.cx, y1: zone.top, x2: i.cx, y2: i.bottom,
         d: `M${f.cx} ${zone.top} V${yUp} H${i.cx} V${i.bottom}`,
         label: 'DNS · HTTP · HTTPS', lx: Math.min(f.cx, i.cx) - 10, ly: yUp + 3, anchor: 'end',
       },
       {
-        id: 'backup', accent: VIOLET, packetColor: VIOLET, packets: 3, dur: 4.2,
+        id: 'backup', accent: flowColor('backup'), packetColor: flowColor('backup'), packets: 3, dur: 4.2,
         x1: v.cx, y1: v.top, x2: h.cx, y2: h.bottom,
         d: `M${v.cx} ${v.top} V${yBackup} H${xBackup} V${yUp} H${h.cx} V${h.bottom}`,
         label: 'MGMT PORTS ONLY · BACKUPS', lx: (xBackup + h.cx) / 2, ly: yUp - 8,
       },
       {
-        id: 'backup-w', accent: VIOLET, packetColor: VIOLET, packets: 2, dur: 2.6,
+        id: 'backup-w', accent: flowColor('backup'), packetColor: flowColor('backup'), packets: 2, dur: 2.6,
         x1: w.cx, y1: w.top, x2: xWorker, y2: f.bottom,
         d: `M${w.cx} ${w.top} V${yWorker} H${xWorker} V${f.bottom}`,
       },
@@ -286,17 +293,15 @@ export default function AdLabSubView() {
   return (
     <motion.section
       aria-label="Windows Server and Active Directory lab"
-      initial={{ opacity: 0, scale: 1.06 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      {...subView}
     >
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <button type="button" className="btn-cyber mb-4" onClick={exit}>
             <ArrowLeft size={14} aria-hidden /> [RETURN_TO_PROXMOX_LAB]
           </button>
-          <p className="font-mono text-xs tracking-[0.3em] text-matrix">[SECTOR 01 ▸ NODE {lab.slot}] // ACCESS_GRANTED</p>
-          <h1 className="mt-1 break-words font-mono text-xl font-bold leading-tight text-cyber text-glow sm:text-3xl">
+          <p className="font-ui text-xs track-30 text-matrix">[SECTOR 01 ▸ NODE {lab.slot}] // ACCESS_GRANTED</p>
+          <h1 className="mt-1 break-words font-ui text-xl font-bold leading-tight text-cyber text-glow sm:text-3xl">
             <GlitchText auto>WINDOWS_SERVER::ACTIVE_DIRECTORY_LAB</GlitchText>
           </h1>
           <p className="mt-2 min-h-[1.5em] font-mono text-xs text-white/50">
@@ -305,7 +310,7 @@ export default function AdLabSubView() {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-widest">
+        <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
           <Tip label="USED IN PLACE OF HYPER-V" side="bottom">
             <span className="flex items-center gap-2 border border-cyber/30 bg-cyber/5 px-2.5 py-1.5 text-cyber">
               <Server size={13} aria-hidden /> HYPERVISOR: PROXMOX VE
@@ -316,20 +321,34 @@ export default function AdLabSubView() {
               <ListChecks size={13} aria-hidden /> HANDS-ON: {TASKS.handsOn}/{TASKS.total} TASKS
             </span>
           </Tip>
+          {report && (
+            <Tip label={report.published ? 'HOW I BUILT THIS LAB' : 'NOT PUBLISHED YET'} side="bottom">
+              <button
+                type="button"
+                onClick={() => {
+                  sfx.click();
+                  dispatch({ type: 'WRITEUP_OPEN', id: report.id });
+                }}
+                className="flex items-center gap-2 border border-id-violet/40 bg-id-violet/10 px-2.5 py-1.5 text-id-violet transition-colors hover:bg-id-violet/20"
+              >
+                <FileText size={13} aria-hidden /> {report.published ? 'READ_LAB_REPORT' : 'LAB_REPORT: COMING_SOON'}
+              </button>
+            </Tip>
+          )}
         </div>
       </div>
 
       {/* ---- overview + honest task progress ---- */}
       <div className="mb-6 grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <p className="max-w-3xl text-sm leading-relaxed text-white/75">
-          <span className="font-mono text-cyan-400">&gt; LAB_OVERVIEW:</span> I built a small business-style Windows network on my
+          <span className="font-ui text-cyan-400">&gt; LAB_OVERVIEW:</span> I built a small business-style Windows network on my
           Proxmox home lab server, working through a structured {TASKS.total}-task lab sheet. The sheet specified Hyper-V;{' '}
           <span className="font-semibold text-white">I used Proxmox VE as the equivalent</span>. This is a home lab project, not
           professional experience. I built it to learn how the pieces fit together and to practise fixing them when they break.
         </p>
 
         <div className="border border-white/10 bg-black/25 p-3">
-          <div className="mb-2 flex justify-between font-mono text-[10px] tracking-[0.2em] text-white/45">
+          <div className="mb-2 flex justify-between font-ui text-[10px] track-20 text-white/45">
             <span>LAB_SHEET_PROGRESS</span>
             <span>{TASKS.total} TASKS</span>
           </div>
@@ -344,7 +363,7 @@ export default function AdLabSubView() {
                 className={cn(
                   'h-2.5 flex-1',
                   k < TASKS.handsOn
-                    ? 'bg-matrix shadow-[0_0_6px_rgba(0,255,102,0.5)]'
+                    ? 'bg-matrix shadow-[0_0_6px_color-mix(in_srgb,var(--glow-matrix)_50%,transparent)]'
                     : k < TASKS.handsOn + TASKS.study
                       ? 'bg-warn/80'
                       : 'border border-white/30 bg-transparent',
@@ -352,7 +371,7 @@ export default function AdLabSubView() {
               />
             ))}
           </div>
-          <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] tracking-widest text-white/55">
+          <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-ui text-[10px] tracking-widest text-white/55">
             <li><span className="text-matrix">■</span> {TASKS.handsOn} HANDS-ON</li>
             <li><span className="text-warn">■</span> {TASKS.study} STUDY TOPICS</li>
             <li><span className="text-white/50">□</span> {TASKS.notCompleted} NOT COMPLETED ({TASKS.notCompletedName.toUpperCase()})</li>
@@ -360,7 +379,7 @@ export default function AdLabSubView() {
         </div>
       </div>
 
-      <nav aria-label="Sections of this project" className="mb-6 flex flex-wrap gap-2 font-mono text-[10px] tracking-widest">
+      <nav aria-label="Sections of this project" className="mb-6 flex flex-wrap gap-2 font-ui text-[10px] tracking-widest">
         {JUMPS.map(([id, label]) => (
           <button
             key={id}
@@ -376,15 +395,15 @@ export default function AdLabSubView() {
       {/* ---- interactive network diagram ---- */}
       <div id="adlab-map" className="grid scroll-mt-20 gap-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)]">
         <div className="min-w-0">
-          <div className="relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_rgba(0,240,255,0.07)]">
+          <div className="relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_color-mix(in_srgb,var(--glow-cyber)_7%,transparent)]">
             <div ref={stageRef} className="blueprint-grid relative p-4 pb-9 pt-8 sm:p-6 sm:pb-10 sm:pt-9 lg:flex lg:min-h-[66vh] lg:flex-col lg:justify-center lg:px-8 lg:py-12">
-              <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
+              <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25 text-cyber/50">
                 NETWORK_MAP // lab.local
               </div>
-              <div aria-hidden className="pointer-events-none absolute right-3 top-2 hidden font-mono text-[10px] tracking-[0.25em] text-cyber/50 sm:block">
+              <div aria-hidden className="pointer-events-none absolute right-3 top-2 hidden font-ui text-[10px] track-25 text-cyber/50 sm:block">
                 ADDRESSES WITHHELD
               </div>
-              <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-mono text-[10px] tracking-[0.25em] text-cyber/40">
+              <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-ui text-[10px] track-25 text-cyber/40">
                 FIG.04 — WINDOWS_AD_LAB_TOPOLOGY
               </div>
 
@@ -393,7 +412,7 @@ export default function AdLabSubView() {
               <div className="relative grid gap-y-3 lg:gap-y-16">
                 {/* Home network (external) */}
                 <div ref={extRef} role="group" aria-label={ZONES.external.short} className="relative border border-dashed border-cyber/35 bg-cyber/[0.03] p-3 pt-8">
-                  <div className="absolute left-3 top-2.5 font-mono text-[10px] font-bold tracking-[0.25em] text-cyber/80">{ZONES.external.label}</div>
+                  <div className="absolute left-3 top-2.5 font-ui text-[10px] font-bold track-25 text-cyber/80">{ZONES.external.label}</div>
                   <div className="grid gap-3 sm:grid-cols-3 lg:gap-8">
                     {nodesIn('external').map((n) => (
                       <LabNode key={n.id} {...nodeProps(n)} />
@@ -401,21 +420,21 @@ export default function AdLabSubView() {
                   </div>
                 </div>
 
-                <p aria-hidden className="text-center font-mono text-[10px] tracking-[0.2em] text-white/35 lg:hidden">▲ ▼ ONLY ROUTE IN OR OUT ▲ ▼</p>
+                <p aria-hidden className="text-center font-ui text-[10px] track-20 text-white/35 lg:hidden">▲ ▼ ONLY ROUTE IN OR OUT ▲ ▼</p>
 
                 {/* Firewall between the two networks */}
                 <LabNode {...nodeProps(getNode('fw'))} className="accent-glow lg:mx-auto lg:max-w-[460px]">
-                  <div className="mt-2.5 flex flex-wrap justify-between gap-x-3 gap-y-1 border-t border-white/10 pt-2 font-mono text-[9.5px] tracking-widest">
+                  <div className="mt-2.5 flex flex-wrap justify-between gap-x-3 gap-y-1 border-t border-white/10 pt-2 font-ui text-[9.5px] tracking-widest">
                     <span className="text-matrix/80">ALLOWED ▸ NAMED SERVICES ONLY</span>
                     <span className="text-danger/80">EVERYTHING ELSE ▸ BLOCKED</span>
                   </div>
                 </LabNode>
 
-                <p aria-hidden className="text-center font-mono text-[10px] tracking-[0.2em] text-white/35 lg:hidden">▲ ▼ ONLY ROUTE IN OR OUT ▲ ▼</p>
+                <p aria-hidden className="text-center font-ui text-[10px] track-20 text-white/35 lg:hidden">▲ ▼ ONLY ROUTE IN OR OUT ▲ ▼</p>
 
                 {/* Lab network (internal, isolated) */}
                 <div ref={labRef} role="group" aria-label={ZONES.internal.short} className="relative border border-dashed border-matrix/35 bg-matrix/[0.03] p-3 pt-8">
-                  <div className="absolute left-3 top-2.5 font-mono text-[10px] font-bold tracking-[0.25em] text-matrix/80">{ZONES.internal.label}</div>
+                  <div className="absolute left-3 top-2.5 font-ui text-[10px] font-bold track-25 text-matrix/80">{ZONES.internal.label}</div>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                     {nodesIn('internal').map((n) => (
                       <LabNode key={n.id} {...nodeProps(n)} />
@@ -427,7 +446,7 @@ export default function AdLabSubView() {
           </div>
 
           {/* Traffic rules: the same paths as the traces, readable at every screen size. */}
-          <ul className="mt-3 grid gap-2 font-mono text-[11px] sm:grid-cols-2 xl:grid-cols-4" aria-label="Traffic allowed through the firewall">
+          <ul className="mt-3 grid gap-2 font-ui text-[11px] sm:grid-cols-2 xl:grid-cols-4" aria-label="Traffic allowed through the firewall">
             {FLOWS.map((f) => (
               <li
                 key={f.id}
@@ -468,14 +487,14 @@ export default function AdLabSubView() {
                     <div className="accent-text accent-bg-soft accent-border flex h-10 w-10 shrink-0 items-center justify-center border">
                       <Icon size={20} strokeWidth={1.5} aria-hidden />
                     </div>
-                    <div className="min-w-0 font-mono">
-                      <div className="text-[9px] tracking-[0.25em] text-white/40">BUILD_{pad(k + 1)}</div>
+                    <div className="min-w-0 font-ui">
+                      <div className="text-[9px] track-25 text-white/40">BUILD_{pad(k + 1)}</div>
                       <h3 className="accent-text text-[13px] font-bold leading-snug tracking-wide">{item.title}</h3>
                     </div>
                   </div>
                   <p className="mt-3 text-[13.5px] leading-relaxed text-white/75">{item.text}</p>
                   {item.stats && (
-                    <dl className="accent-border mt-3 divide-y divide-white/10 border bg-black/25 font-mono text-[11.5px]">
+                    <dl className="accent-border mt-3 divide-y divide-white/10 border bg-black/25 font-ui text-[11.5px]">
                       {item.stats.map(([label, value]) => (
                         <div key={label} className="flex justify-between gap-4 px-2.5 py-1.5">
                           <dt className="text-white/50">{label}</dt>
@@ -497,11 +516,11 @@ export default function AdLabSubView() {
               const Icon = item.icon;
               return (
                 <li key={item.title} className="accent-border accent-bg-soft border border-l-4 p-4" style={{ borderLeftColor: 'var(--accent)' }}>
-                  <h3 className="accent-text flex items-center gap-2 font-mono text-[13px] font-bold tracking-wide">
+                  <h3 className="accent-text flex items-center gap-2 font-ui text-[13px] font-bold tracking-wide">
                     <Icon size={16} strokeWidth={1.6} aria-hidden /> {item.title}
                   </h3>
                   <p className="mt-2 text-[13.5px] leading-relaxed text-white/80">
-                    <span className="font-mono text-[10px] tracking-widest text-white/40">WHY ▸ </span>
+                    <span className="font-ui text-[10px] tracking-widest text-white/40">WHY ▸ </span>
                     {item.text}
                   </p>
                 </li>
@@ -523,23 +542,23 @@ export default function AdLabSubView() {
                 <span className="accent-text">
                   <CornerBrackets className="h-2.5 w-2.5" />
                 </span>
-                <div className="font-mono">
-                  <div className="text-[9px] tracking-[0.25em] text-white/40">CASE_{pad(k + 1)}</div>
+                <div className="font-ui">
+                  <div className="text-[9px] track-25 text-white/40">CASE_{pad(k + 1)}</div>
                   <h3 className="accent-text text-glow text-[14px] font-bold leading-snug tracking-wide">{t.title}</h3>
                 </div>
                 <dl className="mt-3 space-y-2.5 text-[13.5px] leading-relaxed">
                   <div>
-                    <dt className="font-mono text-[10px] tracking-[0.25em] text-danger/90">SYMPTOM</dt>
+                    <dt className="font-ui text-[10px] track-25 text-danger/90">SYMPTOM</dt>
                     <dd className="text-white/80">{t.symptom}</dd>
                   </div>
                   {t.evidence && (
                     <div>
-                      <dt className="font-mono text-[10px] tracking-[0.25em] text-warn/90">HOW_I_FOUND_IT</dt>
+                      <dt className="font-ui text-[10px] track-25 text-warn/90">HOW_I_FOUND_IT</dt>
                       <dd className="text-white/80">{t.evidence}</dd>
                     </div>
                   )}
                   <div>
-                    <dt className="font-mono text-[10px] tracking-[0.25em] text-matrix/90">CAUSE / FIX</dt>
+                    <dt className="font-ui text-[10px] track-25 text-matrix/90">CAUSE / FIX</dt>
                     <dd className="text-white/90">{t.fix}</dd>
                   </div>
                 </dl>
@@ -549,25 +568,25 @@ export default function AdLabSubView() {
         </Section>
 
         {/* ---- limitations ---- */}
-        <Section id="adlab-limits" title="LIMITATIONS" accent="#ff3b5c" intro="What this lab is not.">
+        <Section id="adlab-limits" title="LIMITATIONS" accent={RED} intro="What this lab is not.">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="border border-danger/30 bg-black/25 p-4">
-              <h3 className="font-mono text-[11px] font-bold tracking-[0.3em] text-danger">KNOWN_LIMITS</h3>
+              <h3 className="font-ui text-[11px] font-bold track-30 text-danger">KNOWN_LIMITS</h3>
               <ul className="mt-3 space-y-2 text-[13.5px] leading-relaxed text-white/80">
                 {LIMITS.map((line) => (
                   <li key={line} className="flex gap-2.5">
-                    <span className="mt-[2px] shrink-0 font-mono text-xs text-danger">▸</span>
+                    <span className="mt-[2px] shrink-0 font-ui text-xs text-danger">▸</span>
                     <span>{line}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="border border-matrix/30 bg-black/25 p-4">
-              <h3 className="font-mono text-[11px] font-bold tracking-[0.3em] text-matrix">{softBreaks('WHAT_I_WOULD_DO_DIFFERENTLY_IN_PRODUCTION')}</h3>
+              <h3 className="font-ui text-[11px] font-bold track-30 text-matrix">{softBreaks('WHAT_I_WOULD_DO_DIFFERENTLY_IN_PRODUCTION')}</h3>
               <ul className="mt-3 space-y-2 text-[13.5px] leading-relaxed text-white/80">
                 {IN_PRODUCTION.map((line) => (
                   <li key={line} className="flex gap-2.5">
-                    <span className="mt-[2px] shrink-0 font-mono text-xs text-matrix">▸</span>
+                    <span className="mt-[2px] shrink-0 font-ui text-xs text-matrix">▸</span>
                     <span>{line}</span>
                   </li>
                 ))}
@@ -580,7 +599,7 @@ export default function AdLabSubView() {
         <Section id="adlab-stack" title="TECH_STACK" accent={VIOLET}>
           <ul className="flex flex-wrap gap-2">
             {TAGS.map((tech) => (
-              <li key={tech} className="accent-border accent-text accent-bg-soft border px-2.5 py-1 font-mono text-xs font-medium tracking-wider">
+              <li key={tech} className="accent-border accent-text accent-bg-soft border px-2.5 py-1 font-ui text-xs font-medium tracking-wider">
                 {tech}
               </li>
             ))}
@@ -592,7 +611,7 @@ export default function AdLabSubView() {
         <button type="button" className="btn-cyber" onClick={exit}>
           <ArrowLeft size={14} aria-hidden /> [RETURN_TO_PROXMOX_LAB]
         </button>
-        <p className="text-center font-mono text-[11px] tracking-[0.2em] text-white/30">
+        <p className="text-center font-ui text-[11px] track-20 text-white/30">
           [ ESC TO EXIT · HOME LAB PROJECT · NO ADDRESSES SHOWN ]
         </p>
       </div>

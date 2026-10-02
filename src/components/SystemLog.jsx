@@ -3,7 +3,7 @@ const TONE = { info: 'text-white/55', ok: 'text-matrix', warn: 'text-warn', dang
 export default function SystemLog({ entries }) {
   return (
     <section aria-label="System log" className="border border-cyber/20 bg-panel/70 p-3 font-mono text-[11.5px] sm:p-4">
-      <div className="mb-2 flex items-center justify-between text-[10px] tracking-[0.25em] text-cyber/70">
+      <div className="mb-2 flex items-center justify-between text-[10px] track-25 text-cyber/70">
         <span>// SYSTEM_LOG</span>
         <span className="text-white/30">tail -f /var/log/mainframe</span>
       </div>

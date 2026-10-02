@@ -106,7 +106,7 @@ export default function TourGuide() {
   }, [visible, hasRect, step, dispatch]);
 
   const service = getService(step);
-  const accent = service?.accent ?? '#ffb700';
+  const accent = service?.accent ?? 'var(--color-id-amber)';
   const vw = typeof window === 'undefined' ? 1440 : window.innerWidth;
   const vh = typeof window === 'undefined' ? 900 : window.innerHeight;
   const onScreen = rect && rect.top + rect.height > 60 && rect.top < vh - 24;
@@ -166,22 +166,22 @@ export default function TourGuide() {
                 <motion.div
                   animate={{ x: [16, 0, 0, 16], y: [22, 0, 0, 22], scale: [1, 0.92, 0.92, 1] }}
                   transition={{ duration: 1.8, times: [0, 0.35, 0.55, 1], repeat: Infinity, ease: 'easeInOut' }}
-                  style={{ color: accent, filter: `drop-shadow(0 0 8px ${accent}) drop-shadow(0 0 18px ${accent})` }}
+                  style={{ color: accent, filter: 'drop-shadow(0 0 8px var(--glow-accent)) drop-shadow(0 0 18px var(--glow-accent))' }}
                 >
-                  <Pointer size={46} strokeWidth={1.6} fill="rgba(8,12,18,0.85)" />
+                  <Pointer size={46} strokeWidth={1.6} style={{ fill: 'var(--pointer-fill)' }} />
                 </motion.div>
               </motion.div>
 
               {/* caption + skip */}
               <motion.div
                 role="note"
-                className="absolute border bg-[rgba(7,11,17,0.82)] p-3 backdrop-blur-md"
-                style={{ width: LABEL_W, borderColor: `${accent}99`, boxShadow: `0 0 24px ${accent}44` }}
+                className="absolute border bg-glass/82 p-3 backdrop-blur-md"
+                style={{ width: LABEL_W, borderColor: `color-mix(in srgb, ${accent} 60%, transparent)`, boxShadow: '0 0 24px color-mix(in srgb, var(--glow-accent) 26.7%, transparent)' }}
                 initial={false}
                 animate={{ left: labelLeft, top: labelTop }}
                 transition={{ type: 'spring', stiffness: 90, damping: 17 }}
               >
-                <div className="flex items-center justify-between font-mono text-[10px] tracking-[0.25em]">
+                <div className="flex items-center justify-between font-ui text-[10px] track-25">
                   <span style={{ color: accent }}>GUIDE {STEPS[step].n}/2</span>
                   <button
                     type="button"
@@ -213,8 +213,8 @@ export default function TourGuide() {
               onClick={() =>
                 document.querySelector(`[data-tour="${step}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
               }
-              className="pointer-events-auto absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 border bg-[rgba(7,11,17,0.9)] px-3 py-2 font-mono text-[11px] tracking-widest backdrop-blur-md"
-              style={{ borderColor: `${accent}99`, color: accent, boxShadow: `0 0 20px ${accent}55` }}
+              className="pointer-events-auto absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 border bg-glass/90 px-3 py-2 font-ui text-[11px] tracking-widest backdrop-blur-md"
+              style={{ borderColor: `color-mix(in srgb, ${accent} 60%, transparent)`, color: accent, boxShadow: '0 0 20px color-mix(in srgb, var(--glow-accent) 33.3%, transparent)' }}
             >
               <ChevronDown size={14} aria-hidden /> GUIDE // SCROLL TO {service?.name ?? step.toUpperCase()}
             </button>

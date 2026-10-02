@@ -73,11 +73,11 @@ export default function FilterVisual({ inRef, outRef }) {
       <div
         aria-hidden
         className={`absolute left-1/2 w-[2px] -translate-x-1/2 transition-colors duration-200 ${
-          burning ? 'bg-danger shadow-[0_0_10px_#ff3b5c]' : verdict === 'allow' ? 'bg-matrix shadow-[0_0_10px_#00ff66]' : 'bg-cyber/60 shadow-[0_0_8px_rgba(0,240,255,0.5)]'
+          burning ? 'bg-danger shadow-[0_0_10px_var(--glow-danger)]' : verdict === 'allow' ? 'bg-matrix shadow-[0_0_10px_var(--glow-matrix)]' : 'bg-cyber/60 shadow-[0_0_8px_color-mix(in_srgb,var(--glow-cyber)_50%,transparent)]'
         }`}
         style={{ top: 14, height: LANE_Y + 28 }}
       />
-      <div aria-hidden className="absolute left-1/2 top-1 -translate-x-1/2 font-mono text-[8px] tracking-[0.25em] text-white/40">
+      <div aria-hidden className="absolute left-1/2 top-1 -translate-x-1/2 font-ui text-[8px] track-25 text-white/40">
         BLOCKLIST
       </div>
 
@@ -88,7 +88,7 @@ export default function FilterVisual({ inRef, outRef }) {
             key={`${query.domain}-${verdict}`}
             aria-hidden
             className={`absolute left-1/2 flex h-6 w-6 -translate-x-1/2 items-center justify-center rounded-full border ${
-              verdict === 'block' ? 'border-danger bg-danger/20 text-danger shadow-[0_0_14px_#ff3b5c]' : 'border-matrix bg-matrix/20 text-matrix shadow-[0_0_14px_#00ff66]'
+              verdict === 'block' ? 'border-danger bg-danger/20 text-danger shadow-[0_0_14px_var(--glow-danger)]' : 'border-matrix bg-matrix/20 text-matrix shadow-[0_0_14px_var(--glow-matrix)]'
             }`}
             style={{ top: LANE_Y + 22 }}
             initial={{ scale: 0, opacity: 0 }}
@@ -109,7 +109,7 @@ export default function FilterVisual({ inRef, outRef }) {
           </li>
         ))}
       </ul>
-      <div aria-hidden className="absolute bottom-1.5 right-2 font-mono text-[8.5px] tracking-widest text-matrix/50">
+      <div aria-hidden className="absolute bottom-1.5 right-2 font-ui text-[8.5px] tracking-widest text-matrix/50">
         PASS ▸
       </div>
 
@@ -117,11 +117,11 @@ export default function FilterVisual({ inRef, outRef }) {
       <div
         aria-hidden
         className={`absolute bottom-1.5 left-1/2 flex -translate-x-1/2 flex-col items-center transition-all duration-200 ${
-          burning ? 'text-warn drop-shadow-[0_0_10px_#ffb700]' : 'text-warn/50'
+          burning ? 'text-warn drop-shadow-[0_0_10px_var(--glow-warn)]' : 'text-warn/50'
         }`}
       >
         <Flame size={burning ? 20 : 16} className={burning ? 'animate-pulse' : ''} />
-        <span className="font-mono text-[7px] tracking-[0.1em]">INCINERATOR</span>
+        <span className="font-ui text-[7px] track-10">INCINERATOR</span>
       </div>
 
       {/* travelling query */}

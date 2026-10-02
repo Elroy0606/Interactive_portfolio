@@ -16,10 +16,16 @@ import FlowNode from './FlowNode';
 import FilterVisual from './FilterVisual';
 import WebUiPanel from './WebUiPanel';
 import { sfx } from '../../lib/sound';
+import { useMotion } from '../../theme/motion';
 
-const CYAN = '#00f0ff';
-const GREEN = '#00ff66';
-const BLUE = '#4da3ff';
+// Diagram series (traces, legend): distinguishable in both themes.
+const CYAN = 'var(--color-cyber)';
+const GREEN = 'var(--color-matrix)';
+const BLUE = 'var(--color-pihole)';
+// Card colours are identity tokens (one accent in the professional theme).
+const ID_CYAN = 'var(--color-id-cyan)';
+const ID_GREEN = 'var(--color-id-green)';
+const ID_BLUE = 'var(--color-id-blue)';
 
 const MANIFEST_LINE = [{ text: '> tracing DNS_TRAFFIC_FLOW ... 5 stages, upstream resolver reachable', pause: 0 }];
 
@@ -33,6 +39,7 @@ export default function PiholeSubView() {
   const sim = useDnsSimulation();
   const { pos } = useTerminal(MANIFEST_LINE, { speed: 14 });
   const [showInfo, setShowInfo] = useState(false);
+  const { subView } = useMotion();
 
   const stageRef = useRef(null);
   const laptopRef = useRef(null);
@@ -86,17 +93,15 @@ export default function PiholeSubView() {
     <>
       <motion.section
         aria-label="Pi-hole DNS traffic flow"
-        initial={{ opacity: 0, scale: 1.06 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        {...subView}
       >
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <button type="button" className="btn-cyber mb-4" onClick={exit}>
               <ArrowLeft size={14} aria-hidden /> [RETURN_TO_PROXMOX_LAB]
             </button>
-            <p className="font-mono text-xs tracking-[0.3em] text-matrix">[SECTOR 01 ▸ NODE {pihole.slot}] // ACCESS_GRANTED</p>
-            <h1 className="mt-1 break-words font-mono text-xl font-bold leading-tight text-cyber text-glow sm:text-3xl">
+            <p className="font-ui text-xs track-30 text-matrix">[SECTOR 01 ▸ NODE {pihole.slot}] // ACCESS_GRANTED</p>
+            <h1 className="mt-1 break-words font-ui text-xl font-bold leading-tight text-cyber text-glow sm:text-3xl">
               <GlitchText auto>DNS_TRAFFIC_FLOW::AD_BLOCKING_PIPELINE</GlitchText>
             </h1>
             <p className="mt-2 min-h-[1.5em] font-mono text-xs text-white/50">
@@ -105,7 +110,7 @@ export default function PiholeSubView() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-widest">
+          <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
             <Tip label="PI-HOLE CONFIG, ARCHITECTURE, STACK" side="bottom">
               <button
                 type="button"
@@ -113,7 +118,7 @@ export default function PiholeSubView() {
                   sfx.open();
                   setShowInfo(true);
                 }}
-                className="flex items-center gap-2 border border-[#4da3ff]/40 bg-[#4da3ff]/5 px-2.5 py-1.5 text-[#4da3ff] transition-colors hover:bg-[#4da3ff]/15"
+                className="flex items-center gap-2 border border-pihole/40 bg-pihole/5 px-2.5 py-1.5 text-pihole transition-colors hover:bg-pihole/15"
               >
                 <Info size={13} aria-hidden /> NODE_INFO
               </button>
@@ -124,12 +129,12 @@ export default function PiholeSubView() {
         <div className="grid gap-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)]">
           {/* ---- DNS flow schematic ---- */}
           <div className="min-w-0">
-            <div className="relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_rgba(0,240,255,0.07)]">
+            <div className="relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_color-mix(in_srgb,var(--glow-cyber)_7%,transparent)]">
               <div ref={stageRef} className="blueprint-grid relative p-4 pb-9 sm:p-6 sm:pb-10 lg:flex lg:min-h-[66vh] lg:flex-col lg:justify-center lg:px-6 lg:py-10">
-                <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
+                <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25 text-cyber/50">
                   DNS_LIFECYCLE // 5 STAGES
                 </div>
-                <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-mono text-[10px] tracking-[0.25em] text-cyber/40">
+                <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-ui text-[10px] track-25 text-cyber/40">
                   FIG.03 — AD_BLOCKING_PIPELINE
                 </div>
 
@@ -142,35 +147,35 @@ export default function PiholeSubView() {
                     title="USER_LAPTOP_DNS_CONFIGURED_TO_PIHOLE"
                     caption="Every lookup is sent to the Pi-hole first."
                     icon={Laptop}
-                    accent={CYAN}
+                    accent={ID_CYAN}
                     className="lg:col-start-1 lg:row-start-1 lg:self-center"
                   />
 
                   {/* Pi-hole node hosting the filtering logic */}
                   <div
                     ref={piRef}
-                    style={{ '--accent': BLUE, '--led': BLUE }}
+                    style={{ '--accent': ID_BLUE, '--led': ID_BLUE }}
                     className="accent-glow accent-border relative border bg-panel/90 p-4 backdrop-blur-sm lg:col-start-2 lg:row-start-1"
                   >
                     <span className="accent-text">
                       <CornerBrackets className="h-2.5 w-2.5" />
                     </span>
-                    <div className="font-mono text-[10px] tracking-[0.25em] text-white/40">[PI-HOLE_INTERCEPT]</div>
+                    <div className="font-ui text-[10px] track-25 text-white/40">[PI-HOLE_INTERCEPT]</div>
                     <div className="mt-2 flex items-center gap-3">
                       <div className="accent-text accent-bg-soft accent-border flex h-11 w-11 shrink-0 items-center justify-center border">
                         <ShieldBan size={22} strokeWidth={1.5} aria-hidden />
                       </div>
                       <div className="min-w-0">
-                        <div className="accent-text text-glow font-mono text-[13px] font-bold tracking-wide">PI-HOLE // DNS_SINKHOLE</div>
+                        <div className="accent-text text-glow font-ui text-[13px] font-bold tracking-wide">PI-HOLE // DNS_SINKHOLE</div>
                         <p className="text-[12px] text-white/50">Checks each query against the blocklist.</p>
                       </div>
                       <span className="led ml-auto shrink-0" aria-hidden />
                     </div>
 
-                    <div className="mb-1.5 mt-4 font-mono text-[10px] tracking-[0.25em] text-white/40">[FILTERING_LOGIC]</div>
+                    <div className="mb-1.5 mt-4 font-ui text-[10px] track-25 text-white/40">[FILTERING_LOGIC]</div>
                     <FilterVisual inRef={inRef} outRef={outRef} />
 
-                    <div className="mt-2 flex flex-wrap justify-between gap-x-3 gap-y-1 font-mono text-[9.5px] tracking-widest">
+                    <div className="mt-2 flex flex-wrap justify-between gap-x-3 gap-y-1 font-ui text-[9.5px] tracking-widest">
                       <span className="text-danger/80">BLOCKED ▸ ANSWERED WITH 0.0.0.0</span>
                       <span className="text-matrix/80">SAFE ▸ FORWARDED UPSTREAM</span>
                     </div>
@@ -182,7 +187,7 @@ export default function PiholeSubView() {
                     title="EXTERNAL_DNS_PROVIDER (e.g., Quad9)"
                     caption="Only clean requests are forwarded here."
                     icon={Cloud}
-                    accent={GREEN}
+                    accent={ID_GREEN}
                     className="lg:col-start-3 lg:row-start-1 lg:self-center"
                   />
                   <FlowNode
@@ -191,14 +196,14 @@ export default function PiholeSubView() {
                     title="AD-FREE_WEBSITE_CONTENT"
                     caption="Delivered straight back to the laptop."
                     icon={Globe}
-                    accent={BLUE}
+                    accent={ID_BLUE}
                     className="lg:col-start-3 lg:row-start-2"
                   />
                 </div>
               </div>
             </div>
 
-            <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-[10px] tracking-widest text-white/45" aria-label="Legend">
+            <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-ui text-[10px] tracking-widest text-white/45" aria-label="Legend">
               <li><span style={{ color: CYAN }}>●</span> DNS QUERY</li>
               <li><span style={{ color: GREEN }}>●</span> ALLOWED / FORWARDED</li>
               <li><span className="text-danger">●</span> BLOCKED (SINKHOLED)</li>
@@ -210,7 +215,7 @@ export default function PiholeSubView() {
           <WebUiPanel sim={sim} />
         </div>
 
-        <p className="mt-4 text-center font-mono text-[11px] tracking-[0.2em] text-white/30">
+        <p className="mt-4 text-center font-ui text-[11px] track-20 text-white/30">
           [ ESC OR [RETURN_TO_PROXMOX_LAB] TO EXIT · ALL TRAFFIC SHOWN IS SIMULATED ]
         </p>
       </motion.section>

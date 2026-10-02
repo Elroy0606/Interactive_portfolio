@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ExternalLink, FileText, Minus, Plus, X } from 'lucide-react';
 import { SEVERITY } from '../../data/dossiers';
 import { sfx } from '../../lib/sound';
+import { useMotion } from '../../theme/motion';
 
 const ZOOMS = [0.85, 1, 1.15, 1.3];
 
@@ -17,7 +18,7 @@ const SECTIONS = [
 
 function Heading({ id, n, children }) {
   return (
-    <h3 id={id} className="mb-3 mt-9 scroll-mt-4 border-b border-white/10 pb-1.5 font-mono text-[12px] tracking-[0.25em] text-cyber">
+    <h3 id={id} className="mb-3 mt-9 scroll-mt-4 border-b border-white/10 pb-1.5 font-ui text-[12px] track-25 text-cyber">
       <span className="text-white/35">{String(n).padStart(2, '0')} // </span>
       {children}
     </h3>
@@ -28,7 +29,7 @@ const Bullets = ({ items }) => (
   <ul className="space-y-2 text-[14.5px] leading-relaxed text-white/75">
     {items.map((t) => (
       <li key={t} className="flex gap-2.5">
-        <span className="mt-[2px] shrink-0 font-mono text-xs text-cyber">▸</span>
+        <span className="mt-[2px] shrink-0 font-ui text-xs text-cyber">▸</span>
         <span>{t}</span>
       </li>
     ))}
@@ -38,8 +39,8 @@ const Bullets = ({ items }) => (
 function Meta({ label, children }) {
   return (
     <div className="border border-white/10 bg-black/30 px-3 py-2">
-      <div className="font-mono text-[9px] tracking-[0.2em] text-white/35">{label}</div>
-      <div className="mt-0.5 font-mono text-[12.5px] text-white/85">{children}</div>
+      <div className="font-ui text-[9px] track-20 text-white/35">{label}</div>
+      <div className="mt-0.5 font-ui text-[12.5px] text-white/85">{children}</div>
     </div>
   );
 }
@@ -51,6 +52,7 @@ function Meta({ label, children }) {
 export default function ReportViewer({ report, onClose }) {
   const sev = SEVERITY[report.severity];
   const closeRef = useRef(null);
+  const { morph } = useMotion();
   const [zoomIdx, setZoomIdx] = useState(1);
   const sample = report.placeholder && !report.pdf;
 
@@ -79,26 +81,28 @@ export default function ReportViewer({ report, onClose }) {
         onClick={close}
       />
       <motion.div
-        layoutId={`rpt-${report.id}`}
+        // With the `morph` motion token the panel grows out of the thumbnail; without it, it fades in.
+        layoutId={morph ? `rpt-${report.id}` : undefined}
+        {...(morph ? {} : { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } })}
         role="dialog"
         aria-modal="true"
         aria-labelledby="report-title"
         style={{ '--accent': sev.color, borderRadius: 2 }}
-        className="accent-border accent-glow fixed inset-2 z-[60] flex flex-col overflow-hidden border bg-[#080a0e] sm:inset-5 lg:inset-x-[10%] lg:inset-y-6"
-        transition={{ type: 'spring', damping: 30, stiffness: 240 }}
+        className="accent-border accent-glow fixed inset-2 z-[60] flex flex-col overflow-hidden border bg-shell sm:inset-5 lg:inset-x-[10%] lg:inset-y-6"
+        transition={morph ? { type: 'spring', damping: 30, stiffness: 240 } : { duration: 0.15 }}
       >
         {/* Content fades in after the panel has expanded so the morph stays clean. */}
         <motion.div
           className="flex min-h-0 flex-1 flex-col"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { delay: 0.28, duration: 0.25 } }}
+          animate={{ opacity: 1, transition: morph ? { delay: 0.28, duration: 0.25 } : { duration: 0.12 } }}
           exit={{ opacity: 0, transition: { duration: 0.08 } }}
         >
           {/* toolbar */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-white/10 bg-black/40 px-3 py-2 font-mono text-[11px] tracking-wider sm:px-4">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-white/10 bg-black/40 px-3 py-2 font-ui text-[11px] tracking-wider sm:px-4">
             <FileText size={14} className="text-cyber" aria-hidden />
             <span className="min-w-0 truncate text-white/80">{report.file}</span>
-            <span className="border px-1.5 py-0.5 text-[10px] tracking-widest" style={{ color: sev.color, borderColor: `${sev.color}88` }}>
+            <span className="border px-1.5 py-0.5 text-[10px] tracking-widest" style={{ color: sev.color, borderColor: `color-mix(in srgb, ${sev.color} 53.3%, transparent)` }}>
               {report.severity}
             </span>
             {sample && <span className="hidden border border-warn/50 px-1.5 py-0.5 text-[10px] tracking-widest text-warn sm:inline">SAMPLE</span>}
@@ -143,7 +147,7 @@ export default function ReportViewer({ report, onClose }) {
           ) : (
             <div className="flex min-h-0 flex-1">
               {/* table of contents */}
-              <nav aria-label="Report sections" className="hidden w-52 shrink-0 space-y-1 overflow-y-auto border-r border-white/10 bg-black/30 p-4 font-mono text-[10px] tracking-[0.18em] lg:block">
+              <nav aria-label="Report sections" className="hidden w-52 shrink-0 space-y-1 overflow-y-auto border-r border-white/10 bg-black/30 p-4 font-ui text-[10px] track-18 lg:block">
                 <div className="mb-3 text-white/30">// CONTENTS</div>
                 {SECTIONS.map(([id, label], i) => (
                   <a key={id} href={`#rpt-${report.id}-${id}`} onClick={(e) => {
@@ -159,18 +163,18 @@ export default function ReportViewer({ report, onClose }) {
               <div className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-8">
                 <article
                   style={{ zoom }}
-                  className="relative mx-auto max-w-3xl overflow-hidden border border-white/10 bg-[#0b0e13] p-5 sm:p-10"
+                  className="relative mx-auto max-w-3xl overflow-hidden border border-white/10 bg-paper p-5 sm:p-10"
                 >
                   {sample && (
                     <div
                       aria-hidden
-                      className="pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -rotate-[18deg] whitespace-nowrap border-4 border-warn/20 px-6 py-2 font-mono text-3xl font-bold tracking-[0.3em] text-warn/15 sm:text-5xl"
+                      className="pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -rotate-[18deg] whitespace-nowrap border-4 border-warn/20 px-6 py-2 font-ui text-3xl font-bold track-30 text-warn/15 sm:text-5xl"
                     >
                       SAMPLE_DOCUMENT
                     </div>
                   )}
 
-                  <div className="font-mono text-[10px] tracking-[0.25em] text-danger/80">
+                  <div className="font-ui text-[10px] track-25 text-danger/80">
                     CLASSIFICATION: CONFIDENTIAL // VULNERABILITY_DISCLOSURE
                   </div>
                   <h2 id="report-title" className="mt-2 font-sans text-2xl font-semibold leading-tight text-white sm:text-3xl">
@@ -212,7 +216,7 @@ export default function ReportViewer({ report, onClose }) {
                   <ol className="space-y-2 text-[14.5px] leading-relaxed text-white/75">
                     {report.steps.map((s, i) => (
                       <li key={s} className="flex gap-3">
-                        <span className="mt-[1px] w-5 shrink-0 font-mono text-xs text-cyber">{String(i + 1).padStart(2, '0')}</span>
+                        <span className="mt-[1px] w-5 shrink-0 font-ui text-xs text-cyber">{String(i + 1).padStart(2, '0')}</span>
                         <span>{s}</span>
                       </li>
                     ))}
@@ -225,7 +229,7 @@ export default function ReportViewer({ report, onClose }) {
                   <Bullets items={report.remediation} />
 
                   <Heading id={`rpt-${report.id}-timeline`} n={6}>DISCLOSURE_TIMELINE</Heading>
-                  <ul className="border border-white/10 font-mono text-[12px]">
+                  <ul className="border border-white/10 font-ui text-[12px]">
                     {report.timeline.map(([d, what]) => (
                       <li key={d + what} className="flex gap-4 border-b border-white/5 px-3 py-1.5 last:border-b-0">
                         <span className="shrink-0 text-cyber">{d}</span>
@@ -234,7 +238,7 @@ export default function ReportViewer({ report, onClose }) {
                     ))}
                   </ul>
 
-                  <div className="mt-10 border-t border-white/10 pt-3 font-mono text-[10px] tracking-[0.2em] text-white/30">
+                  <div className="mt-10 border-t border-white/10 pt-3 font-ui text-[10px] track-20 text-white/30">
                     END_OF_DOCUMENT // {report.file}
                   </div>
                 </article>

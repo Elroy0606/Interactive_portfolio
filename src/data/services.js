@@ -6,6 +6,15 @@ import { Container, Home, Skull, BrainCircuit, ShieldBan, Network } from 'lucide
 //
 // `side` decides which column the node sits in on desktop and which side of the
 // rack its blueprint trace leaves from.
+//
+// HIGHLIGHTS (home page): to feature a node, add these fields to its entry.
+// Remove `featured` (or set it to false) to take it off the home page again.
+//   featured: true,
+//   highlightOrder: 1,            // optional. Lowest number is shown first.
+//   highlightReason: '...',       // the "why this matters" line, in my own words
+//   highlightTags: ['A', 'B'],    // optional, two or three. Default: first three of `stack`
+//   title: 'Plain name',          // optional. Default: `name`
+// The same fields work in data/projects.js and data/writeups.js (see data/highlights.js).
 
 export const HOST = {
   name: 'HP_SPECTRE',
@@ -20,7 +29,7 @@ export const SERVICES = [
     short: 'Containerized service stack',
     slot: 'VM 101',
     icon: Container,
-    accent: '#00f0ff',
+    accent: 'var(--color-id-cyan)',
     drillable: true, // click zooms into DockerSubView instead of opening the Data HUD
     side: 'left',
     load: 34,
@@ -49,7 +58,7 @@ export const SERVICES = [
     short: 'Smart-home automation hub',
     slot: 'VM 102',
     icon: Home,
-    accent: '#ffb700',
+    accent: 'var(--color-id-amber)',
     side: 'right',
     load: 18,
     uptime: '99.8%',
@@ -77,7 +86,7 @@ export const SERVICES = [
     short: 'Security testing node',
     slot: 'VM 103',
     icon: Skull,
-    accent: '#00ff66',
+    accent: 'var(--color-id-green)',
     side: 'left',
     load: 9,
     uptime: 'ON-DEMAND',
@@ -105,7 +114,7 @@ export const SERVICES = [
     short: 'Local AI model runner',
     slot: 'CT 104',
     icon: BrainCircuit,
-    accent: '#ff2e97',
+    accent: 'var(--color-id-magenta)',
     side: 'right',
     load: 52,
     uptime: '99.5%',
@@ -133,7 +142,7 @@ export const SERVICES = [
     short: 'Network-wide ad blocker',
     slot: 'CT 105',
     icon: ShieldBan,
-    accent: '#4da3ff',
+    accent: 'var(--color-id-blue)',
     drillable: true, // click zooms into PiholeSubView (DNS_TRAFFIC_FLOW::AD_BLOCKING_PIPELINE)
     side: 'right',
     load: 14,
@@ -161,11 +170,17 @@ export const SERVICES = [
     // `state` replaces the ONLINE label on the node card: these VMs only run when needed.
     id: 'adlab',
     name: 'WINDOWS_AD_LAB',
+    title: 'Windows Server and Active Directory Lab',
+    featured: true,
+    highlightOrder: 1,
+    highlightReason:
+      'I built a working Active Directory environment from scratch in my home lab: domain controller, Group Policy, Remote Desktop Services, a firewall, backups and file services. I understand how Active Directory works because I have built it, broken it and fixed it.',
+    highlightTags: ['Active Directory', 'Group Policy', 'Sophos Firewall'],
     short: 'Windows domain network',
     slot: 'VM GROUP',
     state: 'ON-DEMAND',
     icon: Network,
-    accent: '#a78bfa',
+    accent: 'var(--color-id-violet)',
     drillable: true, // click zooms into AdLabSubView (WINDOWS_SERVER::ACTIVE_DIRECTORY_LAB)
     side: 'left',
     mission:

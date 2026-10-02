@@ -5,7 +5,7 @@ export default function Meter({ label, value, range = 8, className = '' }) {
   const v = useJitter(value, range);
   return (
     <div className={className}>
-      <div className="mb-1 flex justify-between font-mono text-[10px] tracking-widest text-white/50">
+      <div className="mb-1 flex justify-between font-ui text-[10px] tracking-widest text-white/50">
         <span>{label}</span>
         <span className="accent-text">{Math.round(v)}%</span>
       </div>
@@ -14,8 +14,8 @@ export default function Meter({ label, value, range = 8, className = '' }) {
           className="h-full transition-[width] duration-700 ease-out"
           style={{
             width: `${v}%`,
-            background: 'var(--accent, #00f0ff)',
-            boxShadow: '0 0 8px var(--accent, #00f0ff)',
+            background: 'var(--accent, var(--color-cyber))',
+            boxShadow: '0 0 8px var(--glow-accent)',
           }}
         />
       </div>

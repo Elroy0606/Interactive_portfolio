@@ -45,8 +45,8 @@ export default function ContainerCard({ container, registerNode, hot, onHover, o
         <div className="accent-text accent-bg-soft accent-border flex h-11 w-11 shrink-0 items-center justify-center border">
           <Icon size={22} strokeWidth={1.5} aria-hidden />
         </div>
-        <div className="min-w-0 font-mono">
-          <div className="text-[9px] tracking-[0.25em] text-white/40">{container.kind}</div>
+        <div className="min-w-0 font-ui">
+          <div className="text-[9px] track-25 text-white/40">{container.kind}</div>
           <div className="accent-text text-glow break-words text-[13px] font-bold leading-snug tracking-wide">
             {container.name}
           </div>
@@ -54,11 +54,11 @@ export default function ContainerCard({ container, registerNode, hot, onHover, o
       </div>
 
       <p className="mt-3 text-[12.5px] leading-relaxed text-white/60">
-        <span className="font-mono text-[10px] tracking-widest text-white/35">ROLE ▸ </span>
+        <span className="font-ui text-[10px] tracking-widest text-white/35">ROLE ▸ </span>
         {container.role}
       </p>
 
-      <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/10 pt-2 font-mono text-[10px] tracking-widest">
+      <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/10 pt-2 font-ui text-[10px] tracking-widest">
         <span className={`border px-1.5 py-0.5 ${STATUS_TONE[container.tone]}`}>{container.status}</span>
         <span className="accent-text flex shrink-0 items-center">
           INSPECT <ChevronRight size={12} aria-hidden />

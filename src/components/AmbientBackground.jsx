@@ -8,6 +8,8 @@ import { useEffect, useRef } from 'react';
 //   4. a faint central spotlight
 // It sits at z-index -10 inside #root's stacking context: above the body grid,
 // below all content, never intercepting input.
+// Cyberpunk-only: App.jsx does not mount it in the professional theme. Colours
+// still come from tokens (the canvas reads them once when it starts).
 
 const GLYPHS = '01ABCDEF<>/\\|=+*'.split('');
 
@@ -25,6 +27,11 @@ function HexCanvas() {
     const ctx = canvas.getContext('2d');
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const rand = (a, b) => a + Math.random() * (b - a);
+    const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const COLOR_A = token('--color-cyber');
+    const COLOR_B = token('--color-matrix');
+    const STREAM_HEAD = token('--ambient-stream-head');
+    const FONT = `12px ${token('--font-mono')}`;
     let w = 0;
     let h = 0;
     let raf = 0;
@@ -45,7 +52,7 @@ function HexCanvas() {
         vy: rand(-22, -6),
         rot: rand(0, Math.PI * 2),
         vr: rand(-0.2, 0.2),
-        c: Math.random() < 0.6 ? '0,240,255' : '0,255,102',
+        c: Math.random() < 0.6 ? COLOR_A : COLOR_B,
         filled: Math.random() < 0.18,
       }));
       const streamCount = small ? 4 : 14;
@@ -98,16 +105,18 @@ function HexCanvas() {
         if (hx.x > w + 40) hx.x = -40;
         const a = 0.04 + 0.3 * edgeFactor(hx.x, w);
         hexPath(hx.x, hx.y, hx.r, hx.rot);
-        ctx.strokeStyle = `rgba(${hx.c},${a})`;
+        ctx.strokeStyle = hx.c;
+        ctx.globalAlpha = a;
         ctx.lineWidth = 1;
         ctx.stroke();
         if (hx.filled) {
-          ctx.fillStyle = `rgba(${hx.c},${a * 0.25})`;
+          ctx.fillStyle = hx.c;
+          ctx.globalAlpha = a * 0.25;
           ctx.fill();
         }
       }
 
-      ctx.font = '12px "JetBrains Mono", ui-monospace, monospace';
+      ctx.font = FONT;
       ctx.textAlign = 'center';
       for (const s of streams) {
         s.y += s.speed * dt;
@@ -121,10 +130,12 @@ function HexCanvas() {
           if (y < -14 || y > h + 14) continue;
           if (Math.random() < 0.01) s.chars[i] = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
           const fade = 1 - i / s.len;
-          ctx.fillStyle = i === 0 ? `rgba(190,255,240,${0.5 * edge})` : `rgba(0,255,102,${0.26 * fade * edge})`;
+          ctx.fillStyle = i === 0 ? STREAM_HEAD : COLOR_B;
+          ctx.globalAlpha = i === 0 ? 0.5 * edge : 0.26 * fade * edge;
           ctx.fillText(s.chars[i], s.x, y);
         }
       }
+      ctx.globalAlpha = 1;
     }
 
     function frame(t) {
@@ -182,21 +193,20 @@ function CircuitLines() {
         <g key={String(flip)} transform={flip ? 'translate(100 0) scale(-1 1)' : undefined}>
           {CIRCUIT_LEFT.map((d) => (
             <g key={d}>
-              <path d={d} fill="none" stroke="rgba(0,240,255,0.1)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+              <path d={d} fill="none" strokeOpacity="0.1" strokeWidth="1.5" vectorEffect="non-scaling-stroke" style={{ stroke: 'var(--color-cyber)' }} />
               <path
                 d={d}
                 fill="none"
-                stroke="#00f0ff"
                 strokeOpacity="0.5"
                 strokeWidth="1"
                 vectorEffect="non-scaling-stroke"
                 className="trace"
-                style={{ filter: 'drop-shadow(0 0 3px #00f0ff)' }}
+                style={{ stroke: 'var(--color-cyber)', filter: 'drop-shadow(0 0 3px var(--color-cyber))' }}
               />
             </g>
           ))}
           {NODES_LEFT.map(([x, y]) => (
-            <circle key={`${x}-${y}`} cx={x} cy={y} r="0.45" fill="#00ff66" style={{ filter: 'drop-shadow(0 0 3px #00ff66)' }} />
+            <circle key={`${x}-${y}`} cx={x} cy={y} r="0.45" style={{ fill: 'var(--color-matrix)', filter: 'drop-shadow(0 0 3px var(--color-matrix))' }} />
           ))}
         </g>
       ))}
@@ -234,7 +244,7 @@ function Readouts({ side }) {
         maskImage: 'linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent)',
       }}
     >
-      <ul className={`ambient-drift space-y-4 font-mono text-[10px] tracking-widest text-cyber/[0.2] ${side === 'right' ? 'ambient-drift-slow' : ''}`}>
+      <ul className={`ambient-drift space-y-4 font-ui text-[10px] tracking-widest text-cyber/[0.2] ${side === 'right' ? 'ambient-drift-slow' : ''}`}>
         {(side === 'right' ? [...lines].reverse() : lines).map((l, i) => (
           <li key={i}>{l}</li>
         ))}
@@ -246,7 +256,7 @@ function Readouts({ side }) {
 export default function AmbientBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 55% 50% at 50% 48%, rgba(0,240,255,0.06), transparent 70%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 55% 50% at 50% 48%, color-mix(in srgb, var(--color-cyber) 6%, transparent), transparent 70%)' }} />
       <HexCanvas />
       <CircuitLines />
       <Readouts side="left" />

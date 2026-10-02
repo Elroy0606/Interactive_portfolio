@@ -1,13 +1,13 @@
-import { useRef } from 'react';
 import { motion, useAnimationControls } from 'framer-motion';
 import { ChevronRight, Lock } from 'lucide-react';
 import CornerBrackets from './ui/CornerBrackets';
 import GlitchText from './ui/GlitchText';
 import { sfx } from '../lib/sound';
+import { useMotion } from '../theme/motion';
 
-export default function SectorCard({ sector, index, dim = false, onConnect, onDenied, onHover }) {
+export default function SectorCard({ sector, index, onConnect, onDenied, onHover }) {
   const controls = useAnimationControls();
-  const rootRef = useRef(null);
+  const { itemProps } = useMotion();
   const Icon = sector.icon;
   const { locked } = sector;
 
@@ -18,18 +18,12 @@ export default function SectorCard({ sector, index, dim = false, onConnect, onDe
       onDenied(sector);
     } else {
       sfx.click();
-      onConnect(sector, rootRef.current); // element is measured by the hub to aim the camera
+      onConnect(sector);
     }
   };
 
   return (
-    <motion.div
-      ref={rootRef}
-      className={`zoomable h-full ${dim ? 'is-dim' : ''}`}
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 + index * 0.12, duration: 0.45 }}
-    >
+    <motion.div className="h-full" {...itemProps(index)}>
       <motion.button
         type="button"
         animate={controls}
@@ -55,13 +49,13 @@ export default function SectorCard({ sector, index, dim = false, onConnect, onDe
         </span>
 
         <div className="relative flex items-start justify-between">
-          <span className="font-mono text-[11px] tracking-[0.25em] text-white/45">[SECTOR {sector.id}]</span>
+          <span className="font-ui text-[11px] track-25 text-white/45">[SECTOR {sector.id}]</span>
           {locked ? (
-            <span className="flex items-center gap-1.5 border border-warn/50 bg-warn/10 px-2 py-0.5 font-mono text-[10px] tracking-widest text-warn">
+            <span className="flex items-center gap-1.5 border border-warn/50 bg-warn/10 px-2 py-0.5 font-ui text-[10px] tracking-widest text-warn">
               <Lock size={10} aria-hidden /> LOCKED
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 border border-matrix/50 bg-matrix/10 px-2 py-0.5 font-mono text-[10px] tracking-widest text-matrix">
+            <span className="flex items-center gap-1.5 border border-matrix/50 bg-matrix/10 px-2 py-0.5 font-ui text-[10px] tracking-widest text-matrix">
               <span className="led" aria-hidden /> ACTIVE
             </span>
           )}
@@ -72,7 +66,7 @@ export default function SectorCard({ sector, index, dim = false, onConnect, onDe
             <Icon size={28} strokeWidth={1.5} aria-hidden />
           </div>
           <div className="min-w-0">
-            <h2 className={`accent-text font-mono text-lg font-bold leading-tight tracking-wide sm:text-xl ${locked ? 'opacity-80' : 'text-glow'}`}>
+            <h2 className={`accent-text font-ui text-lg font-bold leading-tight tracking-wide sm:text-xl ${locked ? 'opacity-80' : 'text-glow'}`}>
               <GlitchText>{sector.code}</GlitchText>
             </h2>
             <p className="mt-0.5 text-sm text-white/60">{sector.label}</p>
@@ -83,13 +77,13 @@ export default function SectorCard({ sector, index, dim = false, onConnect, onDe
 
         <div className="relative mt-4 flex flex-wrap gap-1.5">
           {sector.tags.map((tag) => (
-            <span key={tag} className="border border-white/10 px-1.5 py-0.5 font-mono text-[10px] tracking-widest text-white/45">
+            <span key={tag} className="border border-white/10 px-1.5 py-0.5 font-ui text-[10px] tracking-widest text-white/45">
               {tag}
             </span>
           ))}
         </div>
 
-        <div className="relative mt-4 border-t border-white/10 pt-3 font-mono text-xs tracking-widest">
+        <div className="relative mt-4 border-t border-white/10 pt-3 font-ui text-xs tracking-widest">
           {locked ? (
             <span className="text-warn/80">ACCESS_RESTRICTED // COMING_SOON</span>
           ) : (

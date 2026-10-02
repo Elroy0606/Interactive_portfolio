@@ -16,11 +16,11 @@ export const ARCHIVE = {
 };
 
 export const SEVERITY = {
-  CRITICAL: { color: '#ff2e97' },
-  HIGH: { color: '#ff3b5c' },
-  MEDIUM: { color: '#ffb700' },
-  LOW: { color: '#00ff66' },
-  INFO: { color: '#00f0ff' },
+  CRITICAL: { color: 'var(--color-magenta)' },
+  HIGH: { color: 'var(--color-danger)' },
+  MEDIUM: { color: 'var(--color-warn)' },
+  LOW: { color: 'var(--color-matrix)' },
+  INFO: { color: 'var(--color-cyber)' },
 };
 
 const addDays = (iso, n) => {
@@ -47,7 +47,7 @@ export const DOSSIERS = [
     title: 'WEB_APPLICATION',
     blurb: 'Client-side and input-handling flaws in web front ends.',
     clearance: 'L3',
-    accent: '#00f0ff',
+    accent: 'var(--color-id-cyan)',
     reports: [
       sample({
         id: 'rpt-001',
@@ -129,7 +129,7 @@ export const DOSSIERS = [
     title: 'API_&_ACCESS_CONTROL',
     blurb: 'Authorization, rate-limiting and cross-origin issues in APIs.',
     clearance: 'L4',
-    accent: '#ffb700',
+    accent: 'var(--color-id-amber)',
     reports: [
       sample({
         id: 'rpt-004',
@@ -201,7 +201,7 @@ export const DOSSIERS = [
     title: 'INFRA_&_EXPOSURE',
     blurb: 'Exposed services, information leaks and DNS hygiene.',
     clearance: 'L5',
-    accent: '#00ff66',
+    accent: 'var(--color-id-green)',
     reports: [
       sample({
         id: 'rpt-007',

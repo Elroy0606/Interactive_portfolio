@@ -25,10 +25,14 @@ import {
 // PRIVACY: networks are named by role only. Never add addresses, subnets,
 // hardware identifiers or home-network details to this file.
 
-const CYAN = '#00f0ff';
-const GREEN = '#00ff66';
-const AMBER = '#ffb700';
-const VIOLET = '#a78bfa';
+// Node colours are identity tokens (one accent in the professional theme);
+// the traffic paths are diagram series and stay distinguishable in both themes.
+const CYAN = 'var(--color-id-cyan)';
+const GREEN = 'var(--color-id-green)';
+const AMBER = 'var(--color-id-amber)';
+const FLOW_WEB = 'var(--color-matrix)';
+const FLOW_RDP = 'var(--color-cyber)';
+const FLOW_BACKUP = 'var(--color-violet)';
 
 export const ZONES = {
   external: { label: 'HOME NETWORK (EXTERNAL)', short: 'Home network (external)' },
@@ -41,7 +45,7 @@ export const ZONES = {
 export const FLOWS = [
   {
     id: 'web',
-    accent: GREEN,
+    accent: FLOW_WEB,
     label: 'LAB → INTERNET',
     rule: 'DNS, HTTP and HTTPS only',
     detail: 'Web and name-resolution traffic only. Everything else is blocked.',
@@ -49,7 +53,7 @@ export const FLOWS = [
   },
   {
     id: 'rdp',
-    accent: CYAN,
+    accent: FLOW_RDP,
     label: 'LAPTOP → RD01',
     rule: 'Remote Desktop only',
     detail: 'Allowed from my home network only, forwarded through the firewall (DNAT).',
@@ -57,7 +61,7 @@ export const FLOWS = [
   },
   {
     id: 'backup',
-    accent: VIOLET,
+    accent: FLOW_BACKUP,
     label: 'VEEAM01 + WORKER → PROXMOX HOST',
     rule: 'Management ports only',
     detail: 'So the backup jobs can reach the hypervisor.',

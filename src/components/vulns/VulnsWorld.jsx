@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Folder, FileText } from 'lucide-react';
-import { useApp, DOSSIER_MS, ZOOM } from '../../state/AppContext';
+import { useApp, ZOOM } from '../../state/AppContext';
+import { useMotion } from '../../theme/motion';
 import { ARCHIVE, DOSSIERS, REPORT_COUNT, getDossier, getReport } from '../../data/dossiers';
 import GlitchText from '../ui/GlitchText';
 import Tip from '../ui/Tip';
@@ -20,6 +21,7 @@ export default function VulnsWorld() {
   const { state, dispatch } = useApp();
   const { dossier: phase, activeDossierId, activeReportId } = state;
   const [pose, setPose] = useState(null); // camera pose captured at folder click, reused for the reverse zoom
+  const { dossier: DOSSIER_MS, viewProps } = useMotion();
 
   const dossier = getDossier(activeDossierId);
   const report = getReport(activeReportId);
@@ -36,7 +38,7 @@ export default function VulnsWorld() {
       return () => clearTimeout(t);
     }
     return undefined;
-  }, [phase, dispatch]);
+  }, [phase, dispatch, DOSSIER_MS]);
 
   // Esc backs out one layer at a time: report -> dossier -> hub.
   useEffect(() => {
@@ -71,11 +73,8 @@ export default function VulnsWorld() {
     <motion.main
       key="vulns"
       className="mx-auto max-w-[1600px] px-4 pb-16 pt-6 sm:px-8 sm:pt-8"
-      // camera push-in from the hub. opacity/scale only: a filter or clip-path here would re-anchor the fixed report viewer
-      initial={{ opacity: 0, scale: 1.12 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.97 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      // opacity/scale only: a filter or clip-path here would re-anchor the fixed report viewer
+      {...viewProps}
     >
       {!inside && (
         <div
@@ -95,14 +94,14 @@ export default function VulnsWorld() {
             >
               <ArrowLeft size={14} aria-hidden /> [RETURN_TO_SECTOR_HUB]
             </button>
-            <p className="font-mono text-xs tracking-[0.3em] text-matrix">[SECTOR 03] // SEC_OPS_GRID // SECURE_ACCESS</p>
-            <h1 className="mt-1 break-words font-mono text-xl font-bold leading-tight text-matrix text-glow sm:text-4xl">
+            <p className="font-ui text-xs track-30 text-matrix">[SECTOR 03] // SEC_OPS_GRID // SECURE_ACCESS</p>
+            <h1 className="mt-1 break-words font-ui text-xl font-bold leading-tight text-id-green text-glow sm:text-4xl">
               <GlitchText auto>{ARCHIVE.code}</GlitchText>
             </h1>
             <p className="mt-2 max-w-xl text-sm text-white/55">{ARCHIVE.blurb}</p>
           </div>
 
-          <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-widest">
+          <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
             <Tip label="DOSSIER FOLDERS" side="bottom">
               <span className="flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
                 <Folder size={13} aria-hidden /> FOLDERS: {DOSSIERS.length}
@@ -124,7 +123,7 @@ export default function VulnsWorld() {
       )}
 
       {phase === ZOOM.NONE && (
-        <p className="mt-4 text-center font-mono text-[11px] tracking-[0.2em] text-white/30">
+        <p className="mt-4 text-center font-ui text-[11px] track-20 text-white/30">
           [ HOVER A FOLDER TO PEEK · CLICK TO OPEN · ESC TO RETURN ]
         </p>
       )}

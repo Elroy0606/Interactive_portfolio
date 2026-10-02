@@ -1,7 +1,8 @@
 import { useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { SERVICES } from '../../data/services';
-import { ZOOM, ZOOM_MS } from '../../state/AppContext';
+import { ZOOM } from '../../state/AppContext';
+import { useMotion } from '../../theme/motion';
 import useTraces from '../../hooks/useTraces';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import useCameraZoom, { measurePose } from '../../hooks/useCameraZoom';
@@ -27,6 +28,7 @@ import NodeCard from './NodeCard';
 // kept by the parent so the reverse zoom can start from the same place).
 export default function Blueprint({ hoveredId, activeId, onHover, onDrill, zoom, zoomTarget, pose }) {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const m = useMotion();
   const cameraRef = useRef(null);
   const rackRef = useRef(null);
   const slotEls = useRef({});
@@ -72,20 +74,18 @@ export default function Blueprint({ hoveredId, activeId, onHover, onDrill, zoom,
     const cam = cameraRef.current;
     const node = nodeEls.current[id];
     if (!cam || !node) return;
-    onDrill(id, measurePose(cam, node, { scale: isDesktop ? 2.4 : 1.12, pan: isDesktop }));
+    onDrill(id, measurePose(cam, node, { scale: isDesktop ? m.zoomScale.lab : Math.min(1.12, m.zoomScale.lab), pan: isDesktop && m.pan }));
   };
 
-  const { dim, cameraProps } = useCameraZoom({ phase: zoom, pose, ms: ZOOM_MS });
+  const { dim, cameraProps } = useCameraZoom({ phase: zoom, pose, ms: m.zoom });
 
   return (
     <motion.div
       className={cn(
-        'relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_rgba(0,240,255,0.07)]',
+        'relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_color-mix(in_srgb,var(--glow-cyber)_7%,transparent)]',
         zoom !== ZOOM.NONE && 'pointer-events-none',
       )}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6, delay: 0.1 }}
+      {...m.fadeProps}
     >
       <motion.div
         ref={cameraRef}
@@ -93,13 +93,13 @@ export default function Blueprint({ hoveredId, activeId, onHover, onDrill, zoom,
         {...cameraProps}
       >
         {/* blueprint chrome */}
-        <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
+        <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25 text-cyber/50">
           PVE Blueprint
         </div>
-        <div aria-hidden className="pointer-events-none absolute right-3 top-2 font-mono text-[10px] tracking-[0.25em] text-cyber/50">
+        <div aria-hidden className="pointer-events-none absolute right-3 top-2 font-ui text-[10px] track-25 text-cyber/50">
           SCALE 1:1 · SCHEMATIC
         </div>
-        <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-mono text-[10px] tracking-[0.25em] text-cyber/40">
+        <div aria-hidden className="pointer-events-none absolute bottom-2 left-3 font-ui text-[10px] track-25 text-cyber/40">
           FIG.01 — HOME_LAB_TOPOLOGY
         </div>
 

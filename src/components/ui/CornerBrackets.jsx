@@ -1,6 +1,6 @@
 // Decorative HUD corner ticks. Parent must be `relative`.
 export default function CornerBrackets({ className = 'h-3 w-3' }) {
-  const base = `pointer-events-none absolute border-current ${className}`;
+  const base = `corner-tick pointer-events-none absolute border-current ${className}`;
   return (
     <>
       <span aria-hidden className={`${base} left-0 top-0 border-l-2 border-t-2`} />
