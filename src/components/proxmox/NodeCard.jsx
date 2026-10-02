@@ -9,6 +9,7 @@ const POSITION = {
   kali: 'lg:col-start-1 lg:row-start-2',
   ollama: 'lg:col-start-3 lg:row-start-2',
   pihole: 'lg:col-start-3 lg:row-start-3',
+  adlab: 'lg:col-start-1 lg:row-start-3',
 };
 
 export default function NodeCard({ service, registerNode, hot, dim = false, onHover, onSelect }) {
@@ -52,7 +53,7 @@ export default function NodeCard({ service, registerNode, hot, dim = false, onHo
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2 font-mono text-[10px] tracking-widest">
         <span className="flex items-center gap-1.5 text-white/50">
-          <span className="led" aria-hidden /> ONLINE · {service.slot}
+          <span className="led" aria-hidden /> {service.state ?? 'ONLINE'} · {service.slot}
         </span>
         <span className="accent-text flex items-center">
           {service.drillable ? 'ENTER' : 'INSPECT'} <ChevronRight size={12} aria-hidden />

@@ -1,4 +1,4 @@
-import { Container, Home, Skull, BrainCircuit, ShieldBan } from 'lucide-react';
+import { Container, Home, Skull, BrainCircuit, ShieldBan, Network } from 'lucide-react';
 
 // NOTE: descriptions/architecture/config values below are TEMPLATE content
 // written from the general shape of each service. Edit them to match the real
@@ -155,6 +155,35 @@ export const SERVICES = [
       ['NETWORK', 'vmbr0 · static IP'],
     ],
     stack: ['Pi-hole', 'DNS', 'FTL (dnsmasq)', 'Gravity Blocklists', 'Quad9'],
+  },
+  {
+    // Real content (not template). The full write-up lives in data/adlab.js.
+    // `state` replaces the ONLINE label on the node card: these VMs only run when needed.
+    id: 'adlab',
+    name: 'WINDOWS_AD_LAB',
+    short: 'Windows domain network',
+    slot: 'VM GROUP',
+    state: 'ON-DEMAND',
+    icon: Network,
+    accent: '#a78bfa',
+    drillable: true, // click zooms into AdLabSubView (WINDOWS_SERVER::ACTIVE_DIRECTORY_LAB)
+    side: 'left',
+    mission:
+      'A small business-style Windows network I built on my Proxmox home lab server, working through a structured 14-task lab sheet.',
+    architecture: [
+      'An isolated lab network with a Sophos Firewall as the only route in or out.',
+      'A Windows Server 2025 domain controller for lab.local, with DNS, file and print services.',
+      'Remote Desktop Services on its own server, published through the firewall.',
+      'A Veeam backup server kept in a workgroup, outside the domain.',
+    ],
+    config: [
+      ['HYPERVISOR', 'Proxmox VE'],
+      ['DOMAIN', 'lab.local'],
+      ['SERVERS', 'DC01 · RD01 · VEEAM01'],
+      ['CLIENT', 'WIN11'],
+      ['GATEWAY', 'Sophos Firewall'],
+    ],
+    stack: ['Windows Server 2025', 'Active Directory', 'Group Policy', 'Sophos Firewall', 'Veeam Backup & Replication'],
   },
 ];
 

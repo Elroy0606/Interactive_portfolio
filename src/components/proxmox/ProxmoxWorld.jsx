@@ -9,6 +9,7 @@ import Blueprint from './Blueprint';
 import DataHUD from './DataHUD';
 import DockerSubView from '../docker/DockerSubView';
 import PiholeSubView from '../pihole/PiholeSubView';
+import AdLabSubView from '../adlab/AdLabSubView';
 import { cn } from '../../lib/cn';
 import { sfx } from '../../lib/sound';
 
@@ -17,6 +18,7 @@ import { sfx } from '../../lib/sound';
 const SUB_VIEWS = {
   docker: DockerSubView,
   pihole: PiholeSubView,
+  adlab: AdLabSubView,
 };
 
 export default function ProxmoxWorld() {
@@ -95,7 +97,7 @@ export default function ProxmoxWorld() {
               Connected globally via <span className="text-white font-semibold">Tailscale</span>, this lab runs a suite of containers I use to practice penetration testing, 
               orchestrate security exercises with <span className="text-white font-semibold">Kali Linux</span>, and run a local AI that controls my smart devices. 
               <span className="block mt-1 text-emerald-400 font-mono text-xs">
-                [ACTION REQUIRED]: Click any module to focus the view. <br></br>Dive into DOCKER or PI-HOLE to ENTER the internal architecture.
+                [ACTION REQUIRED]: Click any module to focus the view. <br></br>Dive into DOCKER, PI-HOLE or WINDOWS_AD_LAB to ENTER the internal architecture.
               </span>
             </p>
           </div>
@@ -146,7 +148,7 @@ export default function ProxmoxWorld() {
 
       {zoom === ZOOM.NONE && (
         <p className="mt-4 text-center font-mono text-[11px] tracking-[0.2em] text-white/35">
-          [ CLICK A MODULE · DOCKER_CONTAINERS AND PI-HOLE_DNS OPEN THEIR INTERNAL VIEWS ]
+          [ CLICK A MODULE · DOCKER_CONTAINERS, PI-HOLE_DNS AND WINDOWS_AD_LAB OPEN THEIR INTERNAL VIEWS ]
         </p>
       )}
 
