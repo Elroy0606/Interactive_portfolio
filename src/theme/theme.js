@@ -1,6 +1,12 @@
-// Theme switch. The visual tokens for each theme live in src/index.css
-// (:root = cyberpunk, [data-theme="professional"] = professional); the motion
-// tokens live in ./motion.js. This file only holds the names and persistence.
+// Theme switch: Night / Dim / Day. The visual tokens for each theme live in
+// src/index.css (:root = cyberpunk, then the [data-theme="dim"] and
+// [data-theme="professional"] blocks); the motion tokens live in ./motion.js.
+// This file only holds the names and persistence.
+//
+//   id (stored, and the data-theme value)   label on the switch
+//   cyberpunk                               Night  full cyberpunk look, the default
+//   dim                                     Dim    softer dark: no glow, no moving background
+//   professional                            Day    light page
 //
 // The attribute is first set by the inline script in index.html, before the
 // stylesheet paints, so there is no flash of the wrong theme on load. Keep the
@@ -10,10 +16,13 @@
 // follow the system light/dark setting. Only a click on the toggle is stored
 // (saveTheme), so changing the default later still reaches visitors who never chose.
 
-export const THEME = { CYBERPUNK: 'cyberpunk', PROFESSIONAL: 'professional' };
+export const THEME = { CYBERPUNK: 'cyberpunk', DIM: 'dim', PROFESSIONAL: 'professional' };
+// `icon` is a key of ICONS in components/ThemeToggle.jsx; `hint` is the tooltip
+// and the line the helper bot shows for the mode.
 export const THEMES = [
-  { id: THEME.CYBERPUNK, label: 'Cyberpunk' },
-  { id: THEME.PROFESSIONAL, label: 'Professional' },
+  { id: THEME.CYBERPUNK, label: 'Night', icon: 'night', hint: 'Dark cyberpunk look. This is the default.' },
+  { id: THEME.DIM, label: 'Dim', icon: 'dim', hint: 'Softer dark colours, with no glow or moving background.' },
+  { id: THEME.PROFESSIONAL, label: 'Day', icon: 'day', hint: 'Light page with dark text.' },
 ];
 export const DEFAULT_THEME = THEME.CYBERPUNK; // first-time visitors
 export const THEME_STORAGE_KEY = 'mainframe.theme';

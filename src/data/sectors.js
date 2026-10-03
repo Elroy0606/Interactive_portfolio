@@ -37,13 +37,13 @@ export const SECTORS = [
     code: 'REPORTS',
     label: 'Vulnerability Reports',
     blurb:
-      'Bug bounty and vulnerability disclosure write-ups, filed as encrypted dossiers. Open a folder to read the reports.',
+      'Penetration test reports from security practice labs, filed as encrypted dossiers. Open a folder to read the reports.',
     status: 'ACTIVE',
     locked: false,
     icon: ShieldAlert,
     accent: 'var(--color-id-green)',
     cta: 'SECURE_ACCESS',
-    tags: ['BUG BOUNTY', 'DISCLOSURE', 'OWASP'],
+    tags: ['PENTEST REPORTS', 'PRACTICE LABS', 'SQL INJECTION'],
   },
   {
     id: '04',

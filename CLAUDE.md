@@ -1,6 +1,6 @@
 # CLAUDE.md — MAINFRAME_OS Cyberpunk Portfolio
 
-Interactive portfolio styled as a cyberpunk mainframe / hacker terminal. The visitor lands on a hub: hero, a **Highlights** section, then the "sectors"; clicking one opens it straight away (a short view transition, no loading sequence). The site has **two themes**, Cyberpunk and Professional, switched by a toggle in the top bar (see "Themes"). **Sector 01** (`INFRASTRUCTURE_LAB`, Proxmox home lab) and **Sector 03** (`SEC_OPS_GRID`, vulnerability reports) are playable, as are the two card-based sectors: **Sector 02** (`DEV_DISTRICT`, websites and apps) and **Sector 04** (`WRITE-UPS`, build reports).
+Interactive portfolio styled as a cyberpunk mainframe / hacker terminal. The visitor lands on a hub: hero, a **Highlights** section, then the "sectors"; clicking one opens it straight away (a short view transition, no loading sequence). The site has **three themes**, shown to visitors as **Night** (cyberpunk, the default), **Dim** and **Day** (professional), switched by a toggle in the top bar (see "Themes"). A **helper bot** (a squirrel) gives first-time visitors tips (see "Helper bot"). **Sector 01** (`INFRASTRUCTURE_LAB`, Proxmox home lab) and **Sector 03** (`SEC_OPS_GRID`, vulnerability reports) are playable, as are the two card-based sectors: **Sector 02** (`DEV_DISTRICT`, websites and apps) and **Sector 04** (`WRITE-UPS`, build reports).
 
 - **Sector 01**: a blueprint of the lab. **Every node click flies the camera to that node.** Docker (`CONTAINER_SUBSTRATE_MANIFEST::DOCKER_INFRA`), Pi-hole (`DNS_TRAFFIC_FLOW::AD_BLOCKING_PIPELINE`) and the Windows AD lab (`WINDOWS_SERVER::ACTIVE_DIRECTORY_LAB`) then swap to a full sub-view; HAOS, Kali and Ollama show a **centered information board**. A guide cursor onboards first-time visitors (Pi-hole, then Docker).
 - **Sector 03**: `DOSSIER_ARCHIVE::BUNGE_OPS`, a shelf of dossier folders → camera-zoom into one → miniature report icons → PDF-style reader.
@@ -17,17 +17,32 @@ Interactive portfolio styled as a cyberpunk mainframe / hacker terminal. The vis
 - `npm run dev` — dev server (http://localhost:5173)
 - `npm run build` / `npm run preview` — production build / preview
 
-## Themes (one set of components, two sets of tokens)
-`<html data-theme="cyberpunk|professional">` picks the token set. An inline script in `index.html` sets it from `localStorage['mainframe.theme']` before the stylesheet paints (default for anyone without a saved choice: **cyberpunk**, never derived from the system light/dark setting; keep the key and default in sync with `src/theme/theme.js`). `ThemeToggle` (in `TelemetryBar`, and fixed top-right on the boot screen) calls `saveTheme` and dispatches `SET_THEME`; `AppProvider` then calls `applyTheme` (attribute, `theme-color` meta). **Only a toggle click is stored**: loading the page never writes the theme, so a changed default still reaches visitors who never chose. Reduced-motion users get the same default, without the animated effects.
-- **Visual tokens: `src/index.css`.** Cyberpunk values are the defaults (`@theme static` for colours/fonts, `:root` for effects); the `[data-theme="professional"]` block overrides them. Never hard-code a colour, glow, font or shadow in a component: add or reuse a token.
+## Themes (one set of components, three sets of tokens)
+Ids and labels (`src/theme/theme.js`): `cyberpunk` = **Night** (default), `dim` = **Dim**, `professional` = **Day**. The ids are what is stored and what the code checks; the labels are what the visitor sees. "Cyberpunk-only" below means Night only; Dim behaves like Professional (calm) but looks dark.
+`<html data-theme="cyberpunk|dim|professional">` picks the token set. An inline script in `index.html` sets it from `localStorage['mainframe.theme']` before the stylesheet paints (default for anyone without a saved choice: **cyberpunk**, never derived from the system light/dark setting; keep the key and default in sync with `src/theme/theme.js`). `ThemeToggle` (in `TelemetryBar`, and fixed top-right on the boot screen) calls `saveTheme` and dispatches `SET_THEME`; `AppProvider` then calls `applyTheme` (attribute, `theme-color` meta). **Only a toggle click is stored**: loading the page never writes the theme, so a changed default still reaches visitors who never chose. Reduced-motion users get the same default, without the animated effects.
+- **Visual tokens: `src/index.css`.** Cyberpunk values are the defaults (`@theme static` for colours/fonts, `:root` for effects); the `[data-theme="dim"]` and `[data-theme="professional"]` blocks override them. A new token must be checked in all three. Never hard-code a colour, glow, font or shadow in a component: add or reuse a token.
   - Surfaces `void panel edge shell paper sheet folder glass blueprint body`; ink = `white` (every `white/NN` utility), recess = `black` (`black/NN`). In Professional these are redefined (dark ink, light recess).
   - Semantic colours `cyber` (the accent) `matrix` (ok) `warn` `danger` `magenta` `violet` `pihole`; use these where colour carries meaning (status, severity, diagram series).
-  - Identity colours `id-cyan id-amber id-green id-magenta id-blue id-violet id-red`: the `accent` of a sector / node / container / folder in `src/data` (stored as `'var(--color-id-…)'`). Distinct hues in Cyberpunk, all equal to the accent in Professional.
+  - Identity colours `id-cyan id-amber id-green id-magenta id-blue id-violet id-red`: the `accent` of a sector / node / container / folder in `src/data` (stored as `'var(--color-id-…)'`). Distinct hues in Cyberpunk, the same hues softened in Dim, all equal to the accent in Professional.
   - Effects: `--glow-*` (+ per-element `--glow-accent`; `transparent` = glow off), `--text-glow`, `--shadow-board/card/card-hover`, `--track` (multiplier for `track-NN` letter-spacing utilities), `--fx` (running/paused for decorative CSS animations), `--dur-hover/dim`, textures (`--page-grid --blueprint-* --hatch --holo --texture-lines`), `--btn-*`, `--toggle-*`, `--radius`.
   - Colours passed from JS are CSS values (often `var(--color-…)`): apply them with `style`, mix alpha with `color-mix(in srgb, X N%, transparent)`, never by appending hex digits.
 - **Motion tokens: `src/theme/motion.js`** (`useMotion()`): `viewProps` (hub <-> sector switch), `itemProps(i)` / `fadeProps` (content entrance), `subView`, `page`, `board`, `zoom` / `dossier` (camera phase ms), `zoomScale`, `pan`, `tilt`, `morph`, `typing`. With `prefers-reduced-motion` the view and item transitions are 0.
+- **Dim** (`[data-theme="dim"]`): slate surfaces, pastel accents, no glow, `--fx: paused`, same mono typeface and corner ticks as Cyberpunk. It uses the Professional motion tokens (`TOKENS[THEME.DIM]` in `motion.js`), has no boot log, no ambient background, no scanlines and no sound. The "rules a token cannot express" block at the end of `index.css` applies to both Dim and Professional through `:is([data-theme="professional"], [data-theme="dim"])`, including the AA contrast floor (each theme has its own `--color-muted`).
 - **Professional-only behaviour** (small conditionals, not forked components): `AmbientBackground` and `Scanlines` are not mounted; typing shows text at once (`useTerminal`); the boot log is skipped; sound is off and the SFX toggle hidden; rack / folder tilt and the report morph are off. A short block at the end of `index.css` holds the rules a token cannot express (hide cursor / glitch layers / corner ticks, card shadows, and the **AA contrast floor** that maps dim `text-white/≤60` to `--color-muted` and tinted status text to its full colour).
 - **Change a token**: edit the value in the theme's block, e.g. the Professional accent is `--color-cyber` in `[data-theme="professional"]`; the Cyberpunk accent is `--color-cyber` in `@theme static` (and `--color-id-*` for per-sector colours).
+
+## Reading mode (reports)
+- Reports are read on `ui/ReadingSurface` (class `.reading-surface`: opaque `--color-paper`, own stacking context, board shadow). Used by the write-up article (`WriteupDetail`) and the vulnerability report reader (`ReportViewer`).
+- `hooks/useReadingMode.js` sets `data-reading` on `<html>` while a reader is mounted (counted, so nested readers are safe). CSS then fades out `.ambient-root` (AmbientBackground), `.crt-root` (Scanlines) and the body page grid. `ReadingSurface` calls it; `ReportViewer` and the write-up PDF viewer also call it directly so PDFs get the same quiet page.
+- Report body text is `text-white/85` (`Markdown.jsx`). Any new long-form reading view should use `ReadingSurface` rather than a bare `bg-paper` box.
+
+## Helper bot (`components/HelperBot.jsx`, `hooks/useHelper.js`, `data/helper.js`)
+A squirrel in the bottom-right corner that shows first-time visitors one tip at a time. Separate from the lab's `TourGuide`.
+- **Tips are data**: `HELPER_STEPS` in `data/helper.js` (the how-to is the comment block at the top of that file). Fields: `id`, `view` (page or list of pages, optional), `when(state)` (optional), `target` (CSS selector, by convention `[data-helper="<name>"]`), `title`, `text`, `callout` (key of `CALLOUTS` in `HelperBot.jsx`), `delay`, `duration`.
+- **Logic** (`useHelper`): the first unseen step whose trigger matches is shown after `delay` (default 1200 ms). It ends after `duration` (default 12000 ms), on the close / GOT IT button, when its trigger stops matching, or on the first `pointerdown` / `keydown` / `wheel` / `touchstart` outside the helper's own UI (elements marked `data-helper-ui`). Ending a tip stores its id in `localStorage['mainframe.helper']` (JSON array), so each tip shows once per browser. Reset while testing: `localStorage.removeItem('mainframe.helper')`.
+- **Drawing** (`HelperBot`): speech bubble + avatar (`src/assets/squirrel.webp`, a 224px crop of the root `squirel.png`; regenerate it if the source image changes), a pointer that flies from the squirrel to the target and taps, a pulsing ring (`.tour-ring`), and the optional close-up panel under the target. z-index 46 (above the top bar and `TourGuide`, below info boards and the report reader). `prefers-reduced-motion`: no flight, no cycling highlight.
+- **Current tip**: `theme-modes` on the hub, pointing at the theme switch (`data-helper="theme-toggle"` on `ThemeToggle`), with the `theme-modes` close-up listing Night / Dim / Day; clicking a row switches the theme.
+- **To add a tip**: add `data-helper="..."` to the element, add one object to `HELPER_STEPS`, and (only if it needs a close-up) add a component to `CALLOUTS`.
 
 ## Design tokens (src/index.css)
 Cyberpunk values: `void #0a0a0c` bg · `cyber #00f0ff` · `matrix #00ff66` · `warn #ffb700` · `danger #ff3b5c` · `magenta #ff2e97` · `violet #a78bfa` · `pihole #4da3ff`.
@@ -40,7 +55,8 @@ src/
   main.jsx                  React root
   App.jsx                   MotionConfig + AppProvider + Shell: AmbientBackground + Scanlines (cyberpunk only), TelemetryBar, view router (AnimatePresence mode="wait"), TourGuide
   index.css                 Tailwind import, both token sets, all custom CSS/keyframes
-  theme/theme.js            theme names, default, storage key, readTheme / applyTheme
+  theme/theme.js            theme ids + labels (Night / Dim / Day), default, storage key, readTheme / applyTheme
+  assets/squirrel.webp      helper bot avatar
   theme/motion.js           motion tokens per theme + useMotion()
   state/AppContext.jsx      useReducer store + useApp(); VIEWS, ZOOM enum, theme, tour persistence
   data/
@@ -48,13 +64,15 @@ src/
     services.js            HOST + SERVICES (Docker, HAOS, Kali, Ollama, Pi-hole): copy, architecture, config, stack; `drillable` = has a sub-view (only changes the ENTER/INSPECT label)
     containers.js           CONTAINERS inside Docker (J.A.R.V.I.S 1.0/2.0, Juice Shop, Nmap Visualizer): status, role, ports
     dns.js                  sample allowed/blocked domains + looping FLOW_SAMPLES for the Pi-hole visuals
-    dossiers.js             Sector 03: ARCHIVE, SEVERITY colours, DOSSIERS (3 folders x 3 SAMPLE reports)
+    dossiers.js             Sector 03: ARCHIVE, SEVERITY colours, DOSSIERS (folders of real reports), file lookup, reportImage
     projects.js             Sector 02: PROJECTS (one object per website / app) + STATUS colours
     writeups.js             Sector 04: WRITEUPS (one object per report), file lookup, getWriteupFor
+    helper.js               helper bot tips (HELPER_STEPS) + how to add one
     highlights.js           home page HIGHLIGHTS: collects entries flagged `featured` in services / projects / writeups (holds no content)
   content/
     projects/               optional project screenshots (referenced by file name)
     writeups/               report files (.md / .pdf) and their images; README = how to add one
+    reports/                Sector 03 report files (.md) and a sub-folder of images per report
   hooks/
     useTerminal.js          char-by-char typing engine
     useTelemetry.js         mock CPU/net/clock + useJitter
@@ -62,10 +80,13 @@ src/
     useTraces.js            DOM rects -> trace paths (Blueprint, DockerSubView, PiholeSubView)
     useCameraZoom.js        shared camera zoom: measurePose + phase -> animate props + dim flag (Blueprint, DossierGrid)
     useMediaQuery.js
+    useReadingMode.js       data-reading on <html> while a report is open
+    useHelper.js            which helper tip is showing (seen storage, timers, dismiss on interaction)
   lib/  cn.js  sound.js     class join; WebAudio sfx (off by default)
   components/
     AmbientBackground.jsx   canvas hexes + data streams, SVG circuit lines, drifting readouts
     TourGuide.jsx           onboarding pointer cursor (see "Guided tour")
+    HelperBot.jsx           squirrel helper: speech bubble, pointer, ring, close-up panels (see "Helper bot")
     BootSequence  Hub  Highlights  SectorCard  SystemLog  TelemetryBar  ThemeToggle  Scanlines  TerminalOutput
     ui/       CornerBrackets  GlitchText  Tip  Meter  TraceLayer
     proxmox/  ProxmoxWorld  Blueprint  Rack  NodeCard  DataHUD (the centered info board)
@@ -169,9 +190,9 @@ A glowing finger-pointer that teaches the two drill-downs.
 2. *Folder hover* (`DossierFolder` + `DossierGrid`): hovered folder variant `hover` glides up 16px, scale 1.04; front flap `rotateX -17°`, three papers slide out (child variants share the variant names); other folders get a `custom` sibling shift (±14px, desktop); pointer sets `--mx/--my` for the `.holo` sheen and springs a ±8° tilt; `sfx.hover` plus a terminal readout line (`> peek DOSSIER_0X ...`). The tab is `z-[5]` so papers slide out behind its label.
 3. *Folder open* (`useCameraZoom`, phase `state.dossier`, `DOSSIER_MS`): click → `measurePose` on the folder wrapper (scale 2.1) → `DOSSIER_START`; entering: pan/scale onto the folder, others dimmed, header fades; inside: `DossierArchive`; exiting: grid remounts zoomed and pulls back.
 4. *Report open* (`ReportIcon` → `ReportViewer`): thumbnail and viewer panel share `layoutId="rpt-<id>"`, so the thumbnail morphs into the fixed reader (spring); content fades in 0.28s after the morph starts so text is never distorted.
-- **Viewer content**: if `report.pdf` is set the real PDF is embedded (`<iframe>` + `OPEN_PDF`); otherwise the structured fields in `dossiers.js` render as a themed document (meta grid, redaction bars, sections, contents rail, zoom 85–130% via CSS `zoom`). `SAMPLE_DOCUMENT` watermark/badge while `placeholder` is true and no `pdf`.
-- **All report content is SAMPLE content**: generic vulnerability classes, redacted asset/program, made-up dates and CVSS; it deliberately names no company. To publish real work: PDFs in `public/reports/`, set `pdf`, set `placeholder: false`, and only publish what the program cleared for disclosure. The archive title is `ARCHIVE.code`.
-- **Adding a dossier/report**: append to `DOSSIERS` (folder: id `dossier_0N`, code, title, accent, clearance; report: `sample()` helper or the same fields). The shelf is `md:grid-cols-3`; more than 3 folders needs a wrapping grid (check the `shift` logic in `DossierGrid`).
+- **Viewer content**: if `report.pdf` is set the PDF is embedded (`<iframe>` + `OPEN_PDF`); otherwise the report's Markdown file (`report.doc`, in `src/content/reports/`, loaded lazily) is rendered with the shared `writeups/Markdown.jsx` (`resolveImage={reportImage}`) under a details grid (id, severity, weakness, optional CVSS, date, status, environment, target), zoom 85–130% via CSS `zoom`. Raw HTML in the file is not rendered, so images must be written in Markdown syntax.
+- **Report content is real** (the sample reports were removed). The two current reports are PortSwigger Web Security Academy practice-lab reports, labelled as practice labs; the lab provider is named because that is what was tested. No CVSS is shown unless the owner scored the finding. Only publish practice-lab reports or findings a program has cleared for disclosure, and check every file and screenshot first. The site copies are converted from the owner's GitHub READMEs (title block removed, headings moved up one level, HTML `<img>` turned into Markdown images, screenshots as WebP); the wording is the owner's and is not edited. The archive title is `ARCHIVE.code`.
+- **Adding a dossier/report**: how-to at the top of `data/dossiers.js` (folder: id `dossier_0N`, code, title, blurb, accent, clearance; report: id, file, `doc` or `pdf`, title, severity, cwe, date, status, target, environment, kind). The shelf uses as many columns as there are folders, up to 3 (`COLS` in `DossierGrid`); more than 3 folders needs a wrapping grid (check the `shift` logic in `DossierGrid`).
 - `TelemetryBar.currentPath` shows the breadcrumb (`~/sector03/sec_ops_grid/<dossier>/<report>.pdf`, `~/sector01/infrastructure_lab/<node>`).
 
 ## Home page highlights (`components/Highlights.jsx`, `data/highlights.js`)
@@ -193,13 +214,13 @@ A glowing finger-pointer that teaches the two drill-downs.
 
 ## Sector 04: reports and write-ups (`components/writeups/`)
 - **No upload form.** Publishing = drop a file in `src/content/writeups/`, add one entry to **`data/writeups.js`**, redeploy (how-to at the top of that file and in the folder's README).
-- `.md` files are loaded lazily (`?raw`) and rendered by `Markdown.jsx` (`react-markdown` + `remark-gfm`, lazy chunk; raw HTML is not rendered; headings shift down one level because the page title is the only `h1`; images only from the same folder). `.pdf` files get an `<iframe>` viewer plus `DOWNLOAD_PDF` / `OPEN_IN_NEW_TAB`.
+- `.md` files are loaded lazily (`?raw`) and rendered by `Markdown.jsx` (`react-markdown` + `remark-gfm`, lazy chunk; raw HTML is not rendered; headings shift down one level because the page title is the only `h1`; images only from the same folder or a sub-folder of it, one per report). `.pdf` files get an `<iframe>` viewer plus `DOWNLOAD_PDF` / `OPEN_IN_NEW_TAB`.
 - An entry is `published` only when its file exists **and** `privacyChecked: true`; otherwise the card and the detail page show `COMING_SOON` (dev shows a note if the file is there but unchecked). Everything in the folder is bundled regardless of the flag, so only clean files go in.
 - Entry fields: `id, title, date (YYYY-MM-DD | null), summary, tags, file, privacyChecked, related {kind: 'lab' | 'project', id, label}`. Sorted newest first, undated last. No tag filter (the site has no filter pattern).
 - Navigation: index (`WriteupCard`s) → detail (`WriteupDetail`) via `activeWriteupId`; Esc pops detail → index → hub.
 - **Cross-links**: `related` links a report to its project and back (`getWriteupFor(kind, id)`). `WRITEUP_OPEN{id}` opens a report from any sector (used by the chip in `AdLabSubView` and by `ProjectCard`); `JUMP_TO_LAB{id}` lands directly inside a lab node (`zoom: 'inside'`, no stored pose, so the exit is a plain fade-in of the blueprint); `JUMP_TO_PROJECTS` opens Sector 02. These go straight to the target view.
 - **Privacy rule (both sectors)**: no addresses, subnets, hardware identifiers, email, phone number, or names of companies or people, in files, alt text, data or comments. The original AD lab report PDF must never be added to the repo; only a checked, web-safe version with metadata stripped.
-- The first entry (`windows-ad-lab`) is a `COMING_SOON` placeholder: `date`, `summary`, `tags` and `file` are TODOs until the web-safe report is supplied.
+- The first entry (`windows-ad-lab`) is published: `windows-ad-lab.md` with its images (WebP, plus one SVG diagram) in `src/content/writeups/windows-ad-lab/`. The screenshots were checked and a few were redacted or cropped further for the site; if they are replaced, check the new ones the same way.
 
 ## Other notes
 - **Sound**: off by default; the AudioContext is created only after the SFX toggle click.
@@ -211,7 +232,7 @@ Add it to `sectors.js` (`locked:false`, an identity-token `accent`, optional `ct
 
 ## Future expansion
 1. Sector 02: fill in the Tetris description, tags and screenshot; repo links per project.
-2. Sector 03: real PDFs in `public/reports/`, filter/sort by severity, a stats strip, CTF write-ups as an extra dossier.
+2. Sector 03: more real reports, filter/sort by severity, a stats strip, CTF write-ups as an extra dossier.
 3. Tour: a hub-level step ("open a sector") and a Sector 03 step, reusing `data-tour` + `placeCaption`.
 4. Generalise the sector shell (header + return button) into a shared `SectorLayout`.
 5. Optional: real telemetry endpoint, deep-linkable views via URL hash, a resume/contact command palette, TypeScript migration.

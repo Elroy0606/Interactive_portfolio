@@ -13,6 +13,9 @@ import DossierFolder from './DossierFolder';
 // it centres and scales up while the other folders blur away, then the parent
 // swaps in the archive view.
 //
+// The shelf has as many columns as there are folders, up to 3.
+const COLS = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' };
+
 // Props: phase (ZOOM.*), pose (kept by the parent for the reverse zoom),
 // activeId (folder being opened), onOpen(id, pose).
 export default function DossierGrid({ phase, pose, activeId, onOpen }) {
@@ -51,7 +54,7 @@ export default function DossierGrid({ phase, pose, activeId, onOpen }) {
           {DOSSIERS.length} FOLDERS · SEALED
         </div>
 
-        <div className="grid gap-x-8 gap-y-2 md:grid-cols-3">
+        <div className={cn('grid gap-x-8 gap-y-2', COLS[Math.min(DOSSIERS.length, 3)])}>
           {DOSSIERS.map((d, i) => {
             const shift = !isDesktop || hovered === null || hovered === i ? 0 : i < hovered ? -14 : 14;
             return (

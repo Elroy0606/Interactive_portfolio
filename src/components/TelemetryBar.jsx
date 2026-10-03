@@ -20,7 +20,7 @@ function currentPath(state) {
   if (state.view === 'vulns') {
     let p = PATHS.vulns;
     if (state.activeDossierId) p += `/${state.activeDossierId}`;
-    if (state.activeReportId) p += `/${state.activeReportId}.pdf`;
+    if (state.activeReportId) p += `/${state.activeReportId}`;
     return p;
   }
   if (state.view === 'writeups' && state.activeWriteupId) return `${PATHS.writeups}/${state.activeWriteupId}`;

@@ -3,7 +3,7 @@ import { SEVERITY } from '../../data/dossiers';
 import { sfx } from '../../lib/sound';
 import { useMotion } from '../../theme/motion';
 
-// Miniature PDF-page icon for one report. The thumbnail carries the
+// Miniature document-page icon for one report. The thumbnail carries the
 // `layoutId` that the viewer panel shares, so opening a report morphs this
 // thumbnail into the full reader.
 export default function ReportIcon({ report, index, accent, onOpen }) {
@@ -31,7 +31,7 @@ export default function ReportIcon({ report, index, accent, onOpen }) {
       >
         <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: sev.color, boxShadow: '0 0 10px var(--glow-accent)' }} />
         <div className="flex items-center justify-between px-2.5 pt-3.5 font-ui text-[8px] track-20">
-          <span className="border border-white/20 px-1 text-white/60">PDF</span>
+          <span className="border border-white/20 px-1 text-white/60">{report.pdf ? 'PDF' : 'DOC'}</span>
           <span style={{ color: sev.color }}>{report.severity}</span>
         </div>
         <div aria-hidden className="mt-3 space-y-[5px] px-2.5">
@@ -42,7 +42,7 @@ export default function ReportIcon({ report, index, accent, onOpen }) {
         </div>
         <div className="absolute inset-x-2.5 bottom-2 flex items-end justify-between font-ui text-[8px] tracking-widest text-white/40">
           <span>{report.id.toUpperCase()}</span>
-          <span>CVSS {report.cvss}</span>
+          <span>{report.cwe}</span>
         </div>
         {/* folded corner */}
         <div aria-hidden className="absolute right-0 top-0 h-4 w-4 bg-void [clip-path:polygon(0_0,100%_100%,0_100%)]" />

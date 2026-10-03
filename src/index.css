@@ -254,6 +254,109 @@
   --glow-accent: transparent;
 }
 
+/* =====================================================================
+   DIM: the calm dark mode. Same layout and typeface as cyberpunk, on a
+   softer slate background with pastel accents, no glow and no decorative
+   animation (the moving background and CRT overlay are not mounted).
+   ===================================================================== */
+[data-theme="dim"] {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --color-void: #1a1f29;
+  --color-panel: #222835;
+  --color-edge: #343c4c;
+  --color-shell: #1d222d;
+  --color-paper: #242a37;
+  --color-sheet: #2b3241;
+  --color-folder: #262c3a;
+  --color-glass: #1f2530;
+  --color-blueprint: #1e2430;
+  --color-body: #cfd6e1;
+
+  /* Ink and recess */
+  --color-white: #e6ebf2;
+  --color-black: #10141b;
+  /* Dim secondary text is raised to this (see the contrast floor rules below). */
+  --color-muted: #a3aec0;
+
+  /* Accent, status and diagram series: pastel, all AA on the slate surfaces */
+  --color-cyber: #7cc7d6;
+  --color-matrix: #7fd4a0;
+  --color-warn: #e2b866;
+  --color-danger: #ef8f97;
+  --color-magenta: #e493bd;
+  --color-violet: #b5a8f0;
+  --color-pihole: #8fb6ee;
+  --color-cyan-400: var(--color-cyber);
+  --color-emerald-400: var(--color-matrix);
+
+  /* Identity colours keep their own hue, softened */
+  --color-id-cyan: #7cc7d6;
+  --color-id-amber: #e2b866;
+  --color-id-green: #7fd4a0;
+  --color-id-magenta: #e493bd;
+  --color-id-blue: #8fb6ee;
+  --color-id-violet: #b5a8f0;
+  --color-id-red: #ef8f97;
+
+  --track: 0.7;
+
+  /* Quiet motion */
+  --fx: paused;
+  --dur-hover: 0.15s;
+  --dur-dim: 0.2s;
+
+  /* No glows */
+  --glow-cyber: transparent;
+  --glow-matrix: transparent;
+  --glow-warn: transparent;
+  --glow-danger: transparent;
+  --glow-pihole: transparent;
+  --glow-current: transparent;
+  --text-glow: none;
+
+  /* Elevation */
+  --shadow-board: 0 24px 64px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.3);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-card-hover: 0 6px 18px rgb(0 0 0 / 0.35);
+
+  /* Backgrounds and textures */
+  --page-grid: transparent;
+  --blueprint-major: rgb(255 255 255 / 0.04);
+  --blueprint-minor: transparent;
+  --rail-bg: #2b3240;
+  --rail-hole: #10141b;
+  --hatch: rgb(255 255 255 / 0.03);
+  --holo: none;
+  --redact: #0c0f14;
+  --redact-edge: rgb(255 255 255 / 0.08);
+  --pointer-fill: #222835;
+
+  /* Chrome */
+  --selection-bg: color-mix(in srgb, var(--color-cyber) 35%, transparent);
+  --selection-fg: #ffffff;
+  --scrollbar-track: #1a1f29;
+  --scrollbar-thumb: #3a4354;
+
+  /* Buttons and the theme switch */
+  --btn-border: color-mix(in srgb, var(--color-cyber) 45%, transparent);
+  --btn-bg: color-mix(in srgb, var(--color-cyber) 7%, transparent);
+  --btn-bg-hover: color-mix(in srgb, var(--color-cyber) 16%, transparent);
+  --btn-glow: none;
+  --btn-text-glow: none;
+  --toggle-on-bg: color-mix(in srgb, var(--color-cyber) 22%, transparent);
+  --toggle-on-fg: var(--color-cyber);
+  --toggle-off-fg: #a9b4c4;
+  --radius: 3px;
+  --texture-lines: 0%;
+}
+[data-theme="dim"] *,
+[data-theme="dim"] ::before,
+[data-theme="dim"] ::after {
+  --glow-accent: transparent;
+}
+
 /* ---------- Letter-spacing utility: track-25 = 0.25em x the theme's --track ---------- */
 @utility track-* {
   letter-spacing: calc(--value(integer) * 0.01em * var(--track));
@@ -625,6 +728,9 @@ body::before {
   letter-spacing: calc(0.1em * var(--track));
 }
 .theme-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: var(--toggle-pad);
   color: var(--toggle-off-fg);
   transition:
@@ -636,6 +742,8 @@ body::before {
 }
 .theme-toggle button + button {
   border-left: 1px solid var(--btn-border);
+}
+.theme-toggle button:last-child {
   border-radius: 0 max(0px, var(--radius) - 1px) max(0px, var(--radius) - 1px) 0;
 }
 .theme-toggle button:hover {
@@ -651,42 +759,65 @@ body::before {
 }
 
 /* =====================================================================
-   PROFESSIONAL: rules that a token value alone cannot express
+   READING MODE: while a report is open (hooks/useReadingMode.js sets
+   data-reading on <html>) the moving background, the page grid and the CRT
+   overlay fade away, and the report sits on an opaque page.
    ===================================================================== */
-/* No terminal cursor, no glitch layers, no LED glow, no HUD corner ticks. */
-[data-theme="professional"] .cursor-block,
+.ambient-root,
+.crt-root,
+body::before {
+  transition: opacity 0.35s ease;
+}
+[data-reading] .ambient-root,
+[data-reading] .crt-root,
+[data-reading] body::before {
+  opacity: 0;
+}
+/* The page a report is read on: always opaque, in its own stacking context. */
+.reading-surface {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-paper);
+  box-shadow: var(--shadow-board);
+}
+
+/* =====================================================================
+   DIM and PROFESSIONAL: rules that a token value alone cannot express
+   ===================================================================== */
+/* No terminal cursor, no glitch layers, no LED glow. Dim keeps the HUD corner ticks. */
+:is([data-theme="professional"], [data-theme="dim"]) .cursor-block,
 [data-theme="professional"] .corner-tick {
   display: none;
 }
-[data-theme="professional"] .glitch::before,
-[data-theme="professional"] .glitch::after {
+:is([data-theme="professional"], [data-theme="dim"]) .glitch::before,
+:is([data-theme="professional"], [data-theme="dim"]) .glitch::after {
   content: none;
 }
-[data-theme="professional"] .led {
+:is([data-theme="professional"], [data-theme="dim"]) .led {
   box-shadow: none;
 }
 /* Cards: a soft shadow where the cyberpunk theme has a glow. */
-[data-theme="professional"] .accent-glow {
+:is([data-theme="professional"], [data-theme="dim"]) .accent-glow {
   box-shadow: var(--shadow-card);
 }
-[data-theme="professional"] .hover-glow:hover,
-[data-theme="professional"] .hover-glow:focus-visible,
-[data-theme="professional"] .hover-glow[data-hot="true"] {
+:is([data-theme="professional"], [data-theme="dim"]) .hover-glow:hover,
+:is([data-theme="professional"], [data-theme="dim"]) .hover-glow:focus-visible,
+:is([data-theme="professional"], [data-theme="dim"]) .hover-glow[data-hot="true"] {
   box-shadow: var(--shadow-card-hover);
 }
 /* Modal boards and the report reader float above the page. */
-[data-theme="professional"] [role="dialog"].accent-glow {
+:is([data-theme="professional"], [data-theme="dim"]) [role="dialog"].accent-glow {
   box-shadow: var(--shadow-board);
 }
 
 /* Contrast floor (WCAG AA). The markup dims secondary text with an alpha
-   (`text-white/40`, `text-cyber/70`, ...). On a light page those blends fall
-   below 4.5:1, so in this theme dim ink becomes --color-muted and tinted status
+   (`text-white/40`, `text-cyber/70`, ...). Without the cyberpunk glow those blends
+   fall below 4.5:1, so in the dim and professional themes dim ink becomes --color-muted and tinted status
    text returns to its full colour. Decorative text marked aria-hidden (stamps,
    watermarks) keeps its tint. In the utilities layer and :where() so hover and
    focus colour utilities still win. */
 @layer utilities {
-  :where([data-theme="professional"]) :is(
+  :where([data-theme="professional"], [data-theme="dim"]) :is(
     .text-white\/25,
     .text-white\/30,
     .text-white\/35,
@@ -698,19 +829,19 @@ body::before {
   ) {
     color: var(--color-muted);
   }
-  :where([data-theme="professional"]) [class*="text-cyber/"]:not([aria-hidden="true"]) {
+  :where([data-theme="professional"], [data-theme="dim"]) [class*="text-cyber/"]:not([aria-hidden="true"]) {
     color: var(--color-cyber);
   }
-  :where([data-theme="professional"]) [class*="text-matrix/"]:not([aria-hidden="true"]) {
+  :where([data-theme="professional"], [data-theme="dim"]) [class*="text-matrix/"]:not([aria-hidden="true"]) {
     color: var(--color-matrix);
   }
-  :where([data-theme="professional"]) [class*="text-warn/"]:not([aria-hidden="true"]) {
+  :where([data-theme="professional"], [data-theme="dim"]) [class*="text-warn/"]:not([aria-hidden="true"]) {
     color: var(--color-warn);
   }
-  :where([data-theme="professional"]) [class*="text-danger/"]:not([aria-hidden="true"]) {
+  :where([data-theme="professional"], [data-theme="dim"]) [class*="text-danger/"]:not([aria-hidden="true"]) {
     color: var(--color-danger);
   }
-  :where([data-theme="professional"]) [class*="text-pihole/"]:not([aria-hidden="true"]) {
+  :where([data-theme="professional"], [data-theme="dim"]) [class*="text-pihole/"]:not([aria-hidden="true"]) {
     color: var(--color-pihole);
   }
 }

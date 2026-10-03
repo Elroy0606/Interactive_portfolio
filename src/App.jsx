@@ -10,6 +10,7 @@ import VulnsWorld from './components/vulns/VulnsWorld';
 import WriteupsWorld from './components/writeups/WriteupsWorld';
 import AmbientBackground from './components/AmbientBackground';
 import TourGuide from './components/TourGuide';
+import HelperBot from './components/HelperBot';
 import ThemeToggle from './components/ThemeToggle';
 import { THEME } from './theme/theme';
 
@@ -27,7 +28,7 @@ function Shell() {
   const { state } = useApp();
   const View = VIEW_COMPONENTS[state.view];
   // The animated backdrop and the CRT overlay are cyberpunk-only decoration:
-  // they are not mounted in the professional theme (no canvas loop running).
+  // they are not mounted in the dim and professional themes (no canvas loop running).
   const cyberpunk = state.theme === THEME.CYBERPUNK;
   return (
     <>
@@ -44,6 +45,7 @@ function Shell() {
         <View key={state.view} />
       </AnimatePresence>
       <TourGuide />
+      <HelperBot />
       {cyberpunk && <Scanlines />}
     </>
   );

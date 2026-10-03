@@ -44,7 +44,8 @@
 //
 // Markdown notes: the page already shows the title, so start the file with
 // text or a `#` section heading (not the title again). Images: save them in the
-// same folder and write ![what it shows](file-name.png). Raw HTML is ignored.
+// same folder and write ![what it shows](file-name.png), or in a sub-folder per
+// report and write ![what it shows](my-report/file-name.png). Raw HTML is ignored.
 
 const DIR = '../content/writeups/';
 const articles = import.meta.glob(['../content/writeups/*.md', '!../content/writeups/README.md'], {
@@ -52,7 +53,7 @@ const articles = import.meta.glob(['../content/writeups/*.md', '!../content/writ
   import: 'default',
 }); // lazy: the text is fetched when the report is opened
 const pdfs = import.meta.glob('../content/writeups/*.pdf', { eager: true, query: '?url', import: 'default' });
-const images = import.meta.glob('../content/writeups/*.{png,jpg,jpeg,webp,avif,gif}', {
+const images = import.meta.glob('../content/writeups/**/*.{png,jpg,jpeg,webp,avif,gif,svg}', {
   eager: true,
   query: '?url',
   import: 'default',
@@ -61,12 +62,13 @@ const images = import.meta.glob('../content/writeups/*.{png,jpg,jpeg,webp,avif,g
 const list = [
   {
     id: 'windows-ad-lab',
-    title: 'Windows Server and Active Directory Lab Report',
-    date: null, // TODO: publication date, YYYY-MM-DD
-    summary: '', // TODO: one or two sentences
-    tags: [], // TODO: tags
-    file: null, // TODO: the web-safe report, e.g. 'windows-ad-lab.md' or 'windows-ad-lab.pdf'
-    privacyChecked: false, // set to true once the file has been checked (step 1 above)
+    title: 'Building a Windows Server and Active Directory Network from Scratch',
+    date: '2026-10-02',
+    summary:
+      'How I designed and built a small-business Windows network in my home lab: Active Directory, Group Policy, file and print services, Remote Desktop, a firewall, and backups I proved I could restore.',
+    tags: ['Active Directory', 'Windows Server 2025', 'Group Policy', 'Sophos Firewall', 'Remote Desktop Services', 'Veeam', 'Proxmox VE', 'PowerShell'],
+    file: 'windows-ad-lab.md', // images are in src/content/writeups/windows-ad-lab/
+    privacyChecked: true,
     related: { kind: 'lab', id: 'adlab', label: 'Windows Server and Active Directory Lab' },
   },
 ];

@@ -49,8 +49,8 @@ function readTourStep() {
   }
 }
 
-// The boot log is part of the cyberpunk treatment; the professional theme
-// starts on the hub.
+// The boot log is part of the cyberpunk treatment; the dim and professional
+// themes start on the hub.
 const firstView = (theme) => (theme === THEME.CYBERPUNK ? VIEWS.BOOT : VIEWS.HUB);
 
 const initialState = () => {

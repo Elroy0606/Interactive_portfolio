@@ -8,7 +8,8 @@ import { useEffect, useRef } from 'react';
 //   4. a faint central spotlight
 // It sits at z-index -10 inside #root's stacking context: above the body grid,
 // below all content, never intercepting input.
-// Cyberpunk-only: App.jsx does not mount it in the professional theme. Colours
+// Cyberpunk-only: App.jsx does not mount it in the dim and professional themes.
+// `.ambient-root` fades out while a report is being read (hooks/useReadingMode.js). Colours
 // still come from tokens (the canvas reads them once when it starts).
 
 const GLYPHS = '01ABCDEF<>/\\|=+*'.split('');
@@ -255,7 +256,7 @@ function Readouts({ side }) {
 
 export default function AmbientBackground() {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div aria-hidden className="ambient-root pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 55% 50% at 50% 48%, color-mix(in srgb, var(--color-cyber) 6%, transparent), transparent 70%)' }} />
       <HexCanvas />
       <CircuitLines />

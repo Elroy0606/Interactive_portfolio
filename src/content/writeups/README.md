@@ -8,7 +8,7 @@ Report files for Sector 04. This is the "upload" folder: there is no upload form
 2. **Drop it in this folder.**
    - `.md` is rendered as a styled article.
    - `.pdf` is shown in an embedded viewer with a download button.
-   - Images used by a Markdown report go in this folder too: `![what it shows](file-name.png)`.
+   - Images used by a Markdown report go in this folder too: `![what it shows](file-name.png)`, or in a sub-folder named after the report: `![what it shows](my-report/file-name.png)`.
 3. **Add one entry** to `src/data/writeups.js` (every field is explained at the top of that file) and set `privacyChecked: true`.
 4. Redeploy.
 

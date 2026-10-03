@@ -1,15 +1,18 @@
+import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { writeupImage } from '../../data/writeups';
 
-// Themed Markdown renderer for write-ups. Loaded lazily (WriteupDetail), so the
-// parser is only downloaded when an article is opened.
+// Themed Markdown renderer for write-ups (WriteupDetail) and vulnerability
+// reports (ReportViewer). Loaded lazily, so the parser is only downloaded when
+// an article is opened.
 // - Raw HTML in the file is not rendered (react-markdown default), so a report
 //   file cannot inject markup or scripts.
 // - Headings are shifted down one level: the page title is the only <h1>.
-// - Images must sit in src/content/writeups/ and are referenced by file name.
+// - Images are looked up by `resolveImage(name)` (default: src/content/writeups/);
+//   a name it does not know is not rendered.
 
-const text = 'text-[15px] leading-relaxed text-white/75';
+const text = 'text-[15px] leading-relaxed text-white/85';
 
 const components = {
   h1: ({ node, ...p }) => (
@@ -53,17 +56,20 @@ const components = {
     </div>
   ),
   th: ({ node, ...p }) => <th className="border border-white/10 bg-black/40 px-3 py-1.5 font-ui text-[11px] tracking-widest text-cyber" {...p} />,
-  td: ({ node, ...p }) => <td className="border border-white/10 px-3 py-1.5 text-white/75" {...p} />,
-  img: ({ node, src = '', alt = '' }) => {
-    const url = writeupImage(src.replace(/^\.\//, ''));
-    if (!url) return null; // only images saved next to the report are shown
-    return <img src={url} alt={alt} loading="lazy" className="my-4 max-w-full border border-white/10" />;
-  },
+  td: ({ node, ...p }) => <td className="border border-white/10 px-3 py-1.5 text-white/85" {...p} />,
 };
 
-export default function Markdown({ children }) {
+const imageFor = (resolveImage) =>
+  function MarkdownImage({ node, src = '', alt = '' }) {
+    const url = resolveImage(src.replace(/^\.\//, ''));
+    if (!url) return null; // only images saved next to the report are shown
+    return <img src={url} alt={alt} loading="lazy" className="my-4 max-w-full border border-white/10" />;
+  };
+
+export default function Markdown({ children, resolveImage = writeupImage }) {
+  const all = useMemo(() => ({ ...components, img: imageFor(resolveImage) }), [resolveImage]);
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={all}>
       {children}
     </ReactMarkdown>
   );

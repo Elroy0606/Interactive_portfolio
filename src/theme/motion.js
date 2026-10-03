@@ -58,6 +58,8 @@ const TOKENS = {
     typing: false,
   },
 };
+// Dim is the calm dark mode: it moves like the professional theme.
+TOKENS[THEME.DIM] = TOKENS[THEME.PROFESSIONAL];
 
 const REST = { opacity: 1, scale: 1 };
 

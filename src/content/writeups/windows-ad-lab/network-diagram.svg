@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" role="img" aria-label="Every lab server reaches the outside only through the Sophos firewall" font-family="Segoe UI, Calibri, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#6b7686"/>
+    </marker>
+  </defs>
+  <rect width="760" height="470" fill="#ffffff"/>
+  <text x="24" y="34" font-size="15" font-weight="600" fill="#1c2430">Every lab server reaches the outside only through the firewall</text>
+
+  <rect x="24" y="56" width="712" height="108" rx="8" fill="#f2f4f7" stroke="#c9d0da"/>
+  <text x="40" y="78" font-size="11.5" fill="#5b6574">Home network (external)</text>
+  <rect x="24" y="336" width="712" height="108" rx="8" fill="#f2f4f7" stroke="#c9d0da"/>
+  <text x="40" y="430" font-size="11.5" fill="#5b6574">Lab network (internal, isolated)</text>
+
+  <g fill="none" stroke="#6b7686" stroke-width="1.25">
+    <path d="M140 148V194H240V232" marker-end="url(#arrow)"/>
+    <path d="M380 232V148" marker-end="url(#arrow)"/>
+    <path d="M490 232V194H620V148" marker-end="url(#arrow)"/>
+    <path d="M240 296V316H102V352" marker-end="url(#arrow)"/>
+    <path d="M380 296V336"/>
+    <path d="M519 352V316H490V296" marker-end="url(#arrow)"/>
+  </g>
+
+  <g fill="none" stroke="#6b7686" stroke-width="1.25">
+    <rect x="40" y="92" width="200" height="56" rx="8"/>
+    <rect x="280" y="92" width="200" height="56" rx="8"/>
+    <rect x="520" y="92" width="200" height="56" rx="8"/>
+    <rect x="40" y="352" width="124" height="56" rx="8"/>
+    <rect x="179" y="352" width="124" height="56" rx="8"/>
+    <rect x="318" y="352" width="124" height="56" rx="8"/>
+    <rect x="457" y="352" width="124" height="56" rx="8"/>
+    <rect x="596" y="352" width="124" height="56" rx="8"/>
+  </g>
+  <rect x="220" y="232" width="320" height="64" rx="8" fill="#2f6fd6" fill-opacity="0.12" stroke="#2f6fd6" stroke-width="2"/>
+
+  <g text-anchor="middle" fill="#1c2430">
+    <text x="140" y="116" font-weight="600">My laptop</text>
+    <text x="140" y="134" font-size="11.5" fill="#5b6574">outside test client</text>
+    <text x="380" y="116" font-weight="600">Home router</text>
+    <text x="380" y="134" font-size="11.5" fill="#5b6574">internet</text>
+    <text x="620" y="116" font-weight="600">Proxmox VE host</text>
+    <text x="620" y="134" font-size="11.5" fill="#5b6574">hypervisor</text>
+    <text x="380" y="258" font-size="14" font-weight="600">Sophos Firewall</text>
+    <text x="380" y="278" font-size="11.5" fill="#5b6574">gateway, NAT, DHCP, web filter</text>
+    <text x="102" y="376" font-weight="600">RD01</text>
+    <text x="102" y="394" font-size="11.5" fill="#5b6574">Remote Desktop</text>
+    <text x="241" y="376" font-weight="600">DC01</text>
+    <text x="241" y="394" font-size="11.5" fill="#5b6574">AD, DNS, files, print</text>
+    <text x="380" y="376" font-weight="600">WIN11</text>
+    <text x="380" y="394" font-size="11.5" fill="#5b6574">domain client</text>
+    <text x="519" y="376" font-weight="600">VEEAM01</text>
+    <text x="519" y="394" font-size="11.5" fill="#5b6574">backup server</text>
+    <text x="658" y="376" font-weight="600">Veeam worker</text>
+    <text x="658" y="394" font-size="11.5" fill="#5b6574">backup proxy</text>
+  </g>
+
+  <g font-size="11.5" fill="#5b6574">
+    <text x="150" y="188">RDP in</text>
+    <text x="372" y="220" text-anchor="end">DNS, HTTP, HTTPS out</text>
+    <text x="500" y="188">management ports</text>
+    <text x="110" y="310">DNAT to RD01</text>
+    <text x="372" y="328" text-anchor="end">default gateway</text>
+    <text x="527" y="330">backups to Proxmox</text>
+  </g>
+</svg>

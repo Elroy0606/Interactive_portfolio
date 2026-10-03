@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Download, ExternalLink, Hourglass, Link2 } from 'lucide-react';
 import SectorHeader from '../ui/SectorHeader';
 import CornerBrackets from '../ui/CornerBrackets';
+import ReadingSurface from '../ui/ReadingSurface';
+import useReadingMode from '../../hooks/useReadingMode';
 import { FormatBadge, WriteupDate } from './WriteupCard';
 import { sfx } from '../../lib/sound';
 import { useMotion } from '../../theme/motion';
@@ -32,7 +34,7 @@ function Article({ writeup }) {
   }, [writeup]);
 
   return (
-    <article className="relative mx-auto max-w-3xl border border-white/10 bg-paper p-5 sm:p-10">
+    <ReadingSurface className="max-w-3xl">
       {failed ? (
         <p role="alert" className="font-mono text-xs text-danger">
           &gt; ERROR: the report could not be loaded. Reload the page to try again.
@@ -49,13 +51,14 @@ function Article({ writeup }) {
           END_OF_DOCUMENT // {writeup.file}
         </div>
       )}
-    </article>
+    </ReadingSurface>
   );
 }
 
 // PDF report: embedded viewer plus download / new-tab links (phones often
 // cannot show an embedded PDF, so the links are always there).
 function PdfReport({ writeup }) {
+  useReadingMode();
   return (
     <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-center gap-3 border border-b-0 border-white/10 bg-black/40 px-3 py-2 font-ui text-[11px] tracking-wider">

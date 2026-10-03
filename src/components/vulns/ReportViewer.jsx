@@ -1,52 +1,67 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink, FileText, Minus, Plus, X } from 'lucide-react';
-import { SEVERITY } from '../../data/dossiers';
+import { SEVERITY, reportImage } from '../../data/dossiers';
 import { sfx } from '../../lib/sound';
 import { useMotion } from '../../theme/motion';
+import useReadingMode from '../../hooks/useReadingMode';
+import ReadingSurface from '../ui/ReadingSurface';
+
+const Markdown = lazy(() => import('../writeups/Markdown'));
 
 const ZOOMS = [0.85, 1, 1.15, 1.3];
 
-const SECTIONS = [
-  ['summary', 'SUMMARY'],
-  ['details', 'VULNERABILITY_DETAILS'],
-  ['steps', 'STEPS_TO_REPRODUCE'],
-  ['impact', 'IMPACT'],
-  ['remediation', 'REMEDIATION'],
-  ['timeline', 'DISCLOSURE_TIMELINE'],
-];
-
-function Heading({ id, n, children }) {
+function Meta({ label, children, className = '' }) {
   return (
-    <h3 id={id} className="mb-3 mt-9 scroll-mt-4 border-b border-white/10 pb-1.5 font-ui text-[12px] track-25 text-cyber">
-      <span className="text-white/35">{String(n).padStart(2, '0')} // </span>
-      {children}
-    </h3>
-  );
-}
-
-const Bullets = ({ items }) => (
-  <ul className="space-y-2 text-[14.5px] leading-relaxed text-white/75">
-    {items.map((t) => (
-      <li key={t} className="flex gap-2.5">
-        <span className="mt-[2px] shrink-0 font-ui text-xs text-cyber">▸</span>
-        <span>{t}</span>
-      </li>
-    ))}
-  </ul>
-);
-
-function Meta({ label, children }) {
-  return (
-    <div className="border border-white/10 bg-black/30 px-3 py-2">
+    <div className={`border border-white/10 bg-black/30 px-3 py-2 ${className}`}>
       <div className="font-ui text-[9px] track-20 text-white/35">{label}</div>
       <div className="mt-0.5 font-ui text-[12.5px] text-white/85">{children}</div>
     </div>
   );
 }
 
-// Cyberpunk-skinned reader. If `report.pdf` is set the real PDF is embedded,
-// otherwise the structured write-up from data/dossiers.js is rendered as a document.
+const Loading = () => (
+  <p className="mt-8 font-mono text-xs text-white/50">
+    &gt; loading report<span className="cursor-block text-cyber" />
+  </p>
+);
+
+// The report text (Markdown in src/content/reports/), fetched when the reader opens.
+function ReportBody({ report }) {
+  const [text, setText] = useState(null);
+  const [failed, setFailed] = useState(!report.load);
+
+  useEffect(() => {
+    if (!report.load) return undefined;
+    let alive = true;
+    report
+      .load()
+      .then((t) => alive && setText(t))
+      .catch(() => alive && setFailed(true));
+    return () => {
+      alive = false;
+    };
+  }, [report]);
+
+  if (failed) {
+    return (
+      <p role="alert" className="mt-8 font-mono text-xs text-danger">
+        &gt; ERROR: the report could not be loaded. Reload the page to try again.
+      </p>
+    );
+  }
+  if (text === null) return <Loading />;
+  return (
+    <div className="mt-8">
+      <Suspense fallback={<Loading />}>
+        <Markdown resolveImage={reportImage}>{text}</Markdown>
+      </Suspense>
+    </div>
+  );
+}
+
+// Cyberpunk-skinned reader. If `report.pdf` is set the PDF is embedded, otherwise
+// the report's Markdown file is rendered as a document under a details grid.
 // The panel shares its layoutId with the report's thumbnail (ReportIcon), so it
 // expands out of the icon and collapses back into it.
 export default function ReportViewer({ report, onClose }) {
@@ -54,7 +69,7 @@ export default function ReportViewer({ report, onClose }) {
   const closeRef = useRef(null);
   const { morph } = useMotion();
   const [zoomIdx, setZoomIdx] = useState(1);
-  const sample = report.placeholder && !report.pdf;
+  useReadingMode(); // no moving background or CRT overlay while the reader is open (PDF reports too)
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -74,7 +89,7 @@ export default function ReportViewer({ report, onClose }) {
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm"
+        className="fixed inset-0 z-50 bg-void/90 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -105,7 +120,6 @@ export default function ReportViewer({ report, onClose }) {
             <span className="border px-1.5 py-0.5 text-[10px] tracking-widest" style={{ color: sev.color, borderColor: `color-mix(in srgb, ${sev.color} 53.3%, transparent)` }}>
               {report.severity}
             </span>
-            {sample && <span className="hidden border border-warn/50 px-1.5 py-0.5 text-[10px] tracking-widest text-warn sm:inline">SAMPLE</span>}
 
             <div className="ml-auto flex items-center gap-2">
               {!report.pdf && (
@@ -143,106 +157,39 @@ export default function ReportViewer({ report, onClose }) {
           </div>
 
           {report.pdf ? (
-            <iframe title={report.title} src={report.pdf} className="min-h-0 flex-1 bg-white" />
+            <>
+              <h2 id="report-title" className="sr-only">
+                {report.title}
+              </h2>
+              <iframe title={report.title} src={report.pdf} className="min-h-0 flex-1 bg-white" />
+            </>
           ) : (
-            <div className="flex min-h-0 flex-1">
-              {/* table of contents */}
-              <nav aria-label="Report sections" className="hidden w-52 shrink-0 space-y-1 overflow-y-auto border-r border-white/10 bg-black/30 p-4 font-ui text-[10px] track-18 lg:block">
-                <div className="mb-3 text-white/30">// CONTENTS</div>
-                {SECTIONS.map(([id, label], i) => (
-                  <a key={id} href={`#rpt-${report.id}-${id}`} onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById(`rpt-${report.id}-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }} className="block py-1 text-white/50 transition-colors hover:text-cyber">
-                    <span className="text-white/25">{String(i + 1).padStart(2, '0')} </span>
-                    {label}
-                  </a>
-                ))}
-              </nav>
+            <div className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-8">
+              <ReadingSurface style={{ zoom }} className="max-w-3xl">
+                {report.kind && <div className="font-ui text-[10px] track-25 text-cyber/80">{report.kind}</div>}
+                <h2 id="report-title" className="mt-2 font-sans text-2xl font-semibold leading-tight text-white sm:text-3xl">
+                  {report.title}
+                </h2>
 
-              <div className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-8">
-                <article
-                  style={{ zoom }}
-                  className="relative mx-auto max-w-3xl overflow-hidden border border-white/10 bg-paper p-5 sm:p-10"
-                >
-                  {sample && (
-                    <div
-                      aria-hidden
-                      className="pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -rotate-[18deg] whitespace-nowrap border-4 border-warn/20 px-6 py-2 font-ui text-3xl font-bold track-30 text-warn/15 sm:text-5xl"
-                    >
-                      SAMPLE_DOCUMENT
-                    </div>
-                  )}
+                <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <Meta label="REPORT_ID">{report.id.toUpperCase()}</Meta>
+                  <Meta label="SEVERITY">
+                    <span style={{ color: sev.color }}>{report.severity}</span>
+                  </Meta>
+                  {report.cwe && <Meta label="WEAKNESS">{report.cwe}</Meta>}
+                  {report.cvss && <Meta label="CVSS">{report.cvss}</Meta>}
+                  {report.date && <Meta label="DATE">{report.date}</Meta>}
+                  {report.status && <Meta label="STATUS" className="col-span-2">{report.status}</Meta>}
+                  {report.environment && <Meta label="ENVIRONMENT" className="col-span-2">{report.environment}</Meta>}
+                  {report.target && <Meta label="TARGET" className="col-span-2 sm:col-span-4">{report.target}</Meta>}
+                </div>
 
-                  <div className="font-ui text-[10px] track-25 text-danger/80">
-                    CLASSIFICATION: CONFIDENTIAL // VULNERABILITY_DISCLOSURE
-                  </div>
-                  <h2 id="report-title" className="mt-2 font-sans text-2xl font-semibold leading-tight text-white sm:text-3xl">
-                    {report.title}
-                  </h2>
+                <ReportBody report={report} />
 
-                  <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <Meta label="REPORT_ID">{report.id.toUpperCase()}</Meta>
-                    <Meta label="SEVERITY">
-                      <span style={{ color: sev.color }}>{report.severity}</span>
-                    </Meta>
-                    <Meta label="CVSS (SAMPLE)">{report.cvss}</Meta>
-                    <Meta label="WEAKNESS">{report.cwe}</Meta>
-                    <Meta label="STATUS">{report.status}</Meta>
-                    <Meta label="SUBMITTED">{report.date}</Meta>
-                    <Meta label="ASSET">
-                      <span className="redact px-1" aria-label="redacted">
-                        {report.asset}
-                      </span>
-                    </Meta>
-                    <Meta label="PROGRAM">
-                      <span className="redact px-1" aria-label="redacted">
-                        REDACTED
-                      </span>
-                    </Meta>
-                  </div>
-
-                  <Heading id={`rpt-${report.id}-summary`} n={1}>SUMMARY</Heading>
-                  <p className="text-[14.5px] leading-relaxed text-white/75">{report.summary}</p>
-
-                  <Heading id={`rpt-${report.id}-details`} n={2}>VULNERABILITY_DETAILS</Heading>
-                  <div className="space-y-3 text-[14.5px] leading-relaxed text-white/75">
-                    {report.details.map((p) => (
-                      <p key={p}>{p}</p>
-                    ))}
-                  </div>
-
-                  <Heading id={`rpt-${report.id}-steps`} n={3}>STEPS_TO_REPRODUCE</Heading>
-                  <ol className="space-y-2 text-[14.5px] leading-relaxed text-white/75">
-                    {report.steps.map((s, i) => (
-                      <li key={s} className="flex gap-3">
-                        <span className="mt-[1px] w-5 shrink-0 font-ui text-xs text-cyber">{String(i + 1).padStart(2, '0')}</span>
-                        <span>{s}</span>
-                      </li>
-                    ))}
-                  </ol>
-
-                  <Heading id={`rpt-${report.id}-impact`} n={4}>IMPACT</Heading>
-                  <Bullets items={report.impact} />
-
-                  <Heading id={`rpt-${report.id}-remediation`} n={5}>REMEDIATION</Heading>
-                  <Bullets items={report.remediation} />
-
-                  <Heading id={`rpt-${report.id}-timeline`} n={6}>DISCLOSURE_TIMELINE</Heading>
-                  <ul className="border border-white/10 font-ui text-[12px]">
-                    {report.timeline.map(([d, what]) => (
-                      <li key={d + what} className="flex gap-4 border-b border-white/5 px-3 py-1.5 last:border-b-0">
-                        <span className="shrink-0 text-cyber">{d}</span>
-                        <span className="text-white/65">{what}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="mt-10 border-t border-white/10 pt-3 font-ui text-[10px] track-20 text-white/30">
-                    END_OF_DOCUMENT // {report.file}
-                  </div>
-                </article>
-              </div>
+                <div className="mt-10 border-t border-white/10 pt-3 font-ui text-[10px] track-20 text-white/30">
+                  END_OF_DOCUMENT // {report.file}
+                </div>
+              </ReadingSurface>
             </div>
           )}
         </motion.div>
