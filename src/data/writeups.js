@@ -71,6 +71,16 @@ const list = [
     privacyChecked: true,
     related: { kind: 'lab', id: 'adlab', label: 'Windows Server and Active Directory Lab' },
   },
+  {
+    id: 'soc-l1-alert-triage',
+    title: 'SOC L1 Alert Triage: TryHackMe Notes',
+    date: '2026-11-04',
+    summary:
+      'My notes from the TryHackMe SOC L1 Alert Triage room: how events become alerts, what each alert field means, how an L1 analyst picks the next alert, and how I worked a practice queue in a simulated SIEM.',
+    tags: ['TryHackMe', 'SOC Level 1', 'Alert Triage', 'SIEM', 'True / False Positives'],
+    file: 'soc-l1-alert-triage.md',
+    privacyChecked: true,
+  },
 ];
 
 function resolve(w) {
