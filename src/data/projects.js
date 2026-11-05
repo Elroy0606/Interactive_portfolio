@@ -1,4 +1,4 @@
-// Sector 02: WEBSITES AND APPS (components/dev/DevDistrict.jsx)
+// Sector 04: WEBSITES AND APPS (components/dev/DevDistrict.jsx)
 //
 // HOW TO ADD A PROJECT
 // --------------------

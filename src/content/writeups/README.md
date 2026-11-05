@@ -1,6 +1,6 @@
 # Reports and write-ups
 
-Report files for Sector 04. This is the "upload" folder: there is no upload form on the site.
+Report files for Sector 02. This is the "upload" folder: there is no upload form on the site.
 
 ## Add a report
 

@@ -125,7 +125,7 @@ export default function WriteupDetail({ writeup, onBack, onOpenRelated }) {
         backLabel="[BACK_TO_WRITE-UPS]"
         backRef={backRef}
         onBack={onBack}
-        eyebrow={`[SECTOR 04 ▸ ${writeup.id.toUpperCase()}] // ${writeup.published ? 'DECRYPTED' : 'PENDING'}`}
+        eyebrow={`[SECTOR 02 ▸ ${writeup.id.toUpperCase()}] // ${writeup.published ? 'DECRYPTED' : 'PENDING'}`}
         title={writeup.title}
       >
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">

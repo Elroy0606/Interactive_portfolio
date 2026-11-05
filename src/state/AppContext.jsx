@@ -6,17 +6,17 @@ export const VIEWS = {
   BOOT: 'boot',
   HUB: 'hub',
   PROXMOX: 'proxmox', // Sector 01
-  DEV: 'dev', // Sector 02
+  DEV: 'dev', // Sector 04
   VULNS: 'vulns', // Sector 03
-  WRITEUPS: 'writeups', // Sector 04
+  WRITEUPS: 'writeups', // Sector 02
 };
 
 // Which view each hub sector opens.
 const SECTOR_VIEWS = {
   '01': VIEWS.PROXMOX,
-  '02': VIEWS.DEV,
+  '02': VIEWS.WRITEUPS,
   '03': VIEWS.VULNS,
-  '04': VIEWS.WRITEUPS,
+  '04': VIEWS.DEV,
 };
 
 // Camera phases, used by the Proxmox lab (`zoom`) and the Sector 03 dossier
@@ -67,7 +67,7 @@ const initialState = () => {
     dossier: ZOOM.NONE, // camera phase for opening a dossier folder
     activeDossierId: null,
     activeReportId: null, // report open in the PDF viewer
-    // Sector 04
+    // Sector 02
     activeWriteupId: null, // write-up whose detail page is open (null = index)
     // Onboarding
     tourStep: readTourStep(),
@@ -139,7 +139,7 @@ function reducer(state, action) {
     case 'REPORT_CLOSE':
       return { ...state, activeReportId: null };
 
-    // ---- Sector 04: write-ups (+ cross-links between a project and its write-up) ----
+    // ---- Sector 02: write-ups (+ cross-links between a project and its write-up) ----
     case 'WRITEUP_OPEN': // from the index, a related project in another sector, or a hub highlight
       return canJump(state) ? { ...state, ...RESET_SECTORS, view: VIEWS.WRITEUPS, activeWriteupId: action.id } : state;
     case 'WRITEUP_CLOSE':

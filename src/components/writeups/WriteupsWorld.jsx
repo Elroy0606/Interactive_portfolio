@@ -14,7 +14,7 @@ import { useMotion } from '../../theme/motion';
 const ACCENT = 'var(--color-id-violet)';
 const PUBLISHED = WRITEUPS.filter((w) => w.published).length;
 
-// Sector 04 (WRITE-UPS): reports on how I built things.
+// Sector 02 (WRITE-UPS): reports on how I built things.
 //   index (cards, newest first)  --click card-->  detail page (article / PDF / coming soon)
 // `activeWriteupId` lives in the app reducer so other sectors can link straight
 // to a report (WRITEUP_OPEN). Esc pops one layer: detail -> index -> hub.
@@ -67,7 +67,7 @@ export default function WriteupsWorld() {
             <SectorHeader
               backLabel="[RETURN_TO_SECTOR_HUB]"
               onBack={toHub}
-              eyebrow="[SECTOR 04] // BUILD_LOGS // ACCESS_GRANTED"
+              eyebrow="[SECTOR 02] // BUILD_LOGS // ACCESS_GRANTED"
               title="REPORTS_AND_WRITE-UPS"
               chips={
                 <>

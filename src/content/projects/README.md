@@ -1,6 +1,6 @@
 # Project screenshots
 
-Optional thumbnail images for the Websites and Apps cards (Sector 02).
+Optional thumbnail images for the Websites and Apps cards (Sector 04).
 
 1. Save the image here (png, jpg, webp, avif or gif). 16:9 works best.
 2. Set `thumbnail: '<file name>'` and `thumbnailAlt` on the project in `src/data/projects.js`.

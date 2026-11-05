@@ -1,4 +1,4 @@
-// Sector 04: REPORTS AND WRITE-UPS (components/writeups/)
+// Sector 02: REPORTS AND WRITE-UPS (components/writeups/)
 //
 // HOW TO ADD A REPORT
 // -------------------
@@ -28,7 +28,7 @@
 //                                  //   even if the file exists.
 //     related: {                   // optional. Links the report to a project,
 //                                  //   and the project back to the report.
-//       kind: 'lab',               // 'lab' = a home lab node, 'project' = a Sector 02 project
+//       kind: 'lab',               // 'lab' = a home lab node, 'project' = a Sector 04 project
 //       id: 'adlab',               // lab: node id in data/services.js
 //                                  //   project: id in data/projects.js
 //       label: 'Name of the project',  // text shown on the link

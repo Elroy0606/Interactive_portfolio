@@ -13,7 +13,7 @@ import { useMotion } from '../../theme/motion';
 const ACCENT = 'var(--color-id-amber)';
 const LIVE = PROJECTS.filter((p) => p.status === 'Live').length;
 
-// Sector 02 (DEV_DISTRICT): the websites and apps I have made, one card each.
+// Sector 04 (DEV_DISTRICT): the websites and apps I have made, one card each.
 // Everything shown comes from data/projects.js.
 export default function DevDistrict() {
   const { dispatch } = useApp();
@@ -37,7 +37,7 @@ export default function DevDistrict() {
       <SectorHeader
         backLabel="[RETURN_TO_SECTOR_HUB]"
         onBack={toHub}
-        eyebrow="[SECTOR 02] // DEV_DISTRICT // ACCESS_GRANTED"
+        eyebrow="[SECTOR 04] // DEV_DISTRICT // ACCESS_GRANTED"
         title="WEBSITES_AND_APPS"
         chips={
           <>

@@ -193,7 +193,7 @@ function Inspector({ node, panelRef }) {
 export default function AdLabSubView() {
   const { dispatch } = useApp();
   const lab = getService('adlab');
-  const report = getWriteupFor('lab', 'adlab'); // the write-up about this lab (Sector 04), if listed
+  const report = getWriteupFor('lab', 'adlab'); // the write-up about this lab (Sector 02), if listed
   const isLg = useMediaQuery('(min-width: 1024px)');
   const { pos } = useTerminal(MANIFEST_LINE, { speed: 14 });
   const [hovered, setHovered] = useState(null); // node under the pointer / keyboard focus

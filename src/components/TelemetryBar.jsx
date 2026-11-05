@@ -9,9 +9,9 @@ import { sfx } from '../lib/sound';
 const PATHS = {
   hub: '~/mainframe',
   proxmox: '~/sector01/infrastructure_lab',
-  dev: '~/sector02/dev_district',
+  dev: '~/sector04/dev_district',
   vulns: '~/sector03/sec_ops_grid',
-  writeups: '~/sector04/write_ups',
+  writeups: '~/sector02/write_ups',
 };
 
 // Breadcrumb for the current view, including drill-downs.

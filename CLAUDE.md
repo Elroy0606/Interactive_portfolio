@@ -1,6 +1,6 @@
 # CLAUDE.md — MAINFRAME_OS Cyberpunk Portfolio
 
-Interactive portfolio styled as a cyberpunk mainframe / hacker terminal. The visitor lands on a hub: hero, a **Highlights** section, then the "sectors"; clicking one opens it straight away (a short view transition, no loading sequence). The site has **three themes**, shown to visitors as **Night** (cyberpunk, the default), **Dim** and **Day** (professional), switched by a toggle in the top bar (see "Themes"). A **helper bot** (a squirrel) gives first-time visitors tips (see "Helper bot"). **Sector 01** (`INFRASTRUCTURE_LAB`, Proxmox home lab) and **Sector 03** (`SEC_OPS_GRID`, vulnerability reports) are playable, as are the two card-based sectors: **Sector 02** (`DEV_DISTRICT`, websites and apps) and **Sector 04** (`WRITE-UPS`, build reports).
+Interactive portfolio styled as a cyberpunk mainframe / hacker terminal. The visitor lands on a hub: hero, a **Highlights** section, then the "sectors"; clicking one opens it straight away (a short view transition, no loading sequence). The site has **three themes**, shown to visitors as **Night** (cyberpunk, the default), **Dim** and **Day** (professional), switched by a toggle in the top bar (see "Themes"). A **helper bot** (a squirrel) gives first-time visitors tips (see "Helper bot"). **Sector 01** (`INFRASTRUCTURE_LAB`, Proxmox home lab) and **Sector 03** (`SEC_OPS_GRID`, vulnerability reports) are playable, as are the two card-based sectors: **Sector 04** (`DEV_DISTRICT`, websites and apps) and **Sector 02** (`WRITE-UPS`, build reports).
 
 - **Sector 01**: a blueprint of the lab. **Every node click flies the camera to that node.** Docker (`CONTAINER_SUBSTRATE_MANIFEST::DOCKER_INFRA`), Pi-hole (`DNS_TRAFFIC_FLOW::AD_BLOCKING_PIPELINE`) and the Windows AD lab (`WINDOWS_SERVER::ACTIVE_DIRECTORY_LAB`) then swap to a full sub-view; HAOS, Kali and Ollama show a **centered information board**. A guide cursor onboards first-time visitors (Pi-hole, then Docker).
 - **Sector 03**: `DOSSIER_ARCHIVE::BUNGE_OPS`, a shelf of dossier folders → camera-zoom into one → miniature report icons → PDF-style reader.
@@ -65,8 +65,8 @@ src/
     containers.js           CONTAINERS inside Docker (J.A.R.V.I.S 1.0/2.0, Juice Shop, Nmap Visualizer): status, role, ports
     dns.js                  sample allowed/blocked domains + looping FLOW_SAMPLES for the Pi-hole visuals
     dossiers.js             Sector 03: ARCHIVE, SEVERITY colours, DOSSIERS (folders of real reports), file lookup, reportImage
-    projects.js             Sector 02: PROJECTS (one object per website / app) + STATUS colours
-    writeups.js             Sector 04: WRITEUPS (one object per report), file lookup, getWriteupFor
+    projects.js             Sector 04: PROJECTS (one object per website / app) + STATUS colours
+    writeups.js             Sector 02: WRITEUPS (one object per report), file lookup, getWriteupFor
     helper.js               helper bot tips (HELPER_STEPS) + how to add one
     highlights.js           home page HIGHLIGHTS: collects entries flagged `featured` in services / projects / writeups (holds no content)
   content/
@@ -126,14 +126,14 @@ Single reducer in `AppContext.jsx` (`initialState()` is a function: it reads the
   dossier: 'none'|'entering'|'inside'|'exiting',
   activeDossierId,            // 'dossier_01' ...
   activeReportId,             // 'rpt-001' ... (report open in the viewer)
-  // Sector 04
+  // Sector 02
   activeWriteupId,            // write-up detail page open (null = index)
   // Onboarding
   tourStep: 'pihole'|'docker'|null,
   soundOn }
 ```
 (`activeServiceId`, `OPEN_SERVICE` and `CLOSE_SERVICE` were removed: every node click is now a zoom.)
-Actions: `BOOT_DONE`, `SET_THEME{theme}`, `ENTER_SECTOR{sectorId}` (routes via `SECTOR_VIEWS`: '01' → proxmox, '02' → dev, '03' → vulns, '04' → writeups), `RETURN_TO_HUB` (resets zoom and dossier state), `ZOOM_START{id}`, `ZOOM_ENTERED`, `ZOOM_EXIT`, `ZOOM_EXITED`, `OPEN_CONTAINER{id}`, `CLOSE_CONTAINER`, `DOSSIER_START{id}`, `DOSSIER_ENTERED`, `DOSSIER_EXIT`, `DOSSIER_EXITED`, `REPORT_OPEN{id}`, `REPORT_CLOSE`, `WRITEUP_OPEN{id}`, `WRITEUP_CLOSE`, `JUMP_TO_LAB{id}`, `JUMP_TO_PROJECTS`, `TOUR_NEXT`, `TOUR_OFF`, `TOUR_ON`, `TOGGLE_SOUND`. Transitions are guarded (`ENTER_SECTOR` only from hub, `ZOOM_START` only in proxmox with `zoom==='none'`, `DOSSIER_START` only in vulns with `dossier==='none'`, …) so double-fires are harmless.
+Actions: `BOOT_DONE`, `SET_THEME{theme}`, `ENTER_SECTOR{sectorId}` (routes via `SECTOR_VIEWS`: '01' → proxmox, '02' → writeups, '03' → vulns, '04' → dev), `RETURN_TO_HUB` (resets zoom and dossier state), `ZOOM_START{id}`, `ZOOM_ENTERED`, `ZOOM_EXIT`, `ZOOM_EXITED`, `OPEN_CONTAINER{id}`, `CLOSE_CONTAINER`, `DOSSIER_START{id}`, `DOSSIER_ENTERED`, `DOSSIER_EXIT`, `DOSSIER_EXITED`, `REPORT_OPEN{id}`, `REPORT_CLOSE`, `WRITEUP_OPEN{id}`, `WRITEUP_CLOSE`, `JUMP_TO_LAB{id}`, `JUMP_TO_PROJECTS`, `TOUR_NEXT`, `TOUR_OFF`, `TOUR_ON`, `TOGGLE_SOUND`. Transitions are guarded (`ENTER_SECTOR` only from hub, `ZOOM_START` only in proxmox with `zoom==='none'`, `DOSSIER_START` only in vulns with `dossier==='none'`, …) so double-fires are harmless.
 Flows: (boot →) hub → (click sector) → proxmox | dev | vulns | writeups → `RETURN_TO_HUB`. Lab: `none` →(click node)→ `entering` →(950ms)→ `inside` →(close / `[RETURN_TO_PROXMOX_LAB]` / Esc)→ `exiting` →(800ms)→ `none`.
 Local UI state stays local: hub log (`Hub.jsx`), hovered ids and camera `pose` (`ProxmoxWorld.jsx`, `DockerSubView.jsx`, `DossierGrid.jsx`), Pi-hole `showInfo`, the DNS simulation (restarts on each entry to the Pi-hole view).
 
@@ -204,7 +204,7 @@ A glowing finger-pointer that teaches the two drill-downs.
 - Entrance uses `itemProps` (about 0.1 s, no delay before content). Colours come from tokens only, so it follows both themes.
 - **Wording rule**: `highlightReason` is written by the site owner, in first person and plain language. Do not write or reword it, and do not add claims, metrics or dates. These are home lab / personal projects.
 
-## Sector 02: websites and apps (`components/dev/`)
+## Sector 04: websites and apps (`components/dev/`)
 - `DevDistrict` renders one `ProjectCard` per entry of `PROJECTS` in **`data/projects.js`** (the only place to edit; the how-to is the comment block at the top of that file). Fields: `id, name, url, status ('Live' | 'In progress', colours in STATUS), description, tags, thumbnail, thumbnailAlt`.
 - Thumbnails are files in `src/content/projects/`, resolved by file name with `import.meta.glob`; a missing or null thumbnail draws the `PREVIEW_PENDING` placeholder.
 - Empty `description` / `tags` are hidden on the live site; a dashed `TODO` note shows in dev only (`import.meta.env.DEV`).
@@ -212,13 +212,13 @@ A glowing finger-pointer that teaches the two drill-downs.
 - The Visit link is `target="_blank" rel="noopener noreferrer"`. Esc returns to the hub.
 - **Honesty rule**: only real projects, with the tools actually used. These are personal projects; never describe them as professional or client work.
 
-## Sector 04: reports and write-ups (`components/writeups/`)
+## Sector 02: reports and write-ups (`components/writeups/`)
 - **No upload form.** Publishing = drop a file in `src/content/writeups/`, add one entry to **`data/writeups.js`**, redeploy (how-to at the top of that file and in the folder's README).
 - `.md` files are loaded lazily (`?raw`) and rendered by `Markdown.jsx` (`react-markdown` + `remark-gfm`, lazy chunk; raw HTML is not rendered; headings shift down one level because the page title is the only `h1`; images only from the same folder or a sub-folder of it, one per report). `.pdf` files get an `<iframe>` viewer plus `DOWNLOAD_PDF` / `OPEN_IN_NEW_TAB`.
 - An entry is `published` only when its file exists **and** `privacyChecked: true`; otherwise the card and the detail page show `COMING_SOON` (dev shows a note if the file is there but unchecked). Everything in the folder is bundled regardless of the flag, so only clean files go in.
 - Entry fields: `id, title, date (YYYY-MM-DD | null), summary, tags, file, privacyChecked, related {kind: 'lab' | 'project', id, label}`. Sorted newest first, undated last. No tag filter (the site has no filter pattern).
 - Navigation: index (`WriteupCard`s) → detail (`WriteupDetail`) via `activeWriteupId`; Esc pops detail → index → hub.
-- **Cross-links**: `related` links a report to its project and back (`getWriteupFor(kind, id)`). `WRITEUP_OPEN{id}` opens a report from any sector (used by the chip in `AdLabSubView` and by `ProjectCard`); `JUMP_TO_LAB{id}` lands directly inside a lab node (`zoom: 'inside'`, no stored pose, so the exit is a plain fade-in of the blueprint); `JUMP_TO_PROJECTS` opens Sector 02. These go straight to the target view.
+- **Cross-links**: `related` links a report to its project and back (`getWriteupFor(kind, id)`). `WRITEUP_OPEN{id}` opens a report from any sector (used by the chip in `AdLabSubView` and by `ProjectCard`); `JUMP_TO_LAB{id}` lands directly inside a lab node (`zoom: 'inside'`, no stored pose, so the exit is a plain fade-in of the blueprint); `JUMP_TO_PROJECTS` opens Sector 04. These go straight to the target view.
 - **Privacy rule (both sectors)**: no addresses, subnets, hardware identifiers, email, phone number, or names of companies or people, in files, alt text, data or comments. The original AD lab report PDF must never be added to the repo; only a checked, web-safe version with metadata stripped.
 - The first entry (`windows-ad-lab`) is published: `windows-ad-lab.md` with its images (WebP, plus one SVG diagram) in `src/content/writeups/windows-ad-lab/`. The screenshots were checked and a few were redacted or cropped further for the site; if they are replaced, check the new ones the same way.
 
@@ -231,7 +231,7 @@ A glowing finger-pointer that teaches the two drill-downs.
 Add it to `sectors.js` (`locked:false`, an identity-token `accent`, optional `cta`), add a `VIEWS.*` entry and world component, map it in `SECTOR_VIEWS` (`state/AppContext.jsx`) and `VIEW_COMPONENTS` (`App.jsx`), and add its breadcrumb in `TelemetryBar.jsx`. Spread `useMotion().viewProps` on its `motion.main` so it opens with the same short transition. The hub grid is `md:grid-cols-2 xl:grid-cols-4` (four sectors); a fifth needs a new layout. Card-based sectors can reuse `ui/SectorHeader` and `ui/CardStage`.
 
 ## Future expansion
-1. Sector 02: fill in the Tetris description, tags and screenshot; repo links per project.
+1. Sector 04: fill in the Tetris description, tags and screenshot; repo links per project.
 2. Sector 03: more real reports, filter/sort by severity, a stats strip, CTF write-ups as an extra dossier.
 3. Tour: a hub-level step ("open a sector") and a Sector 03 step, reusing `data-tour` + `placeCaption`.
 4. Generalise the sector shell (header + return button) into a shared `SectorLayout`.
