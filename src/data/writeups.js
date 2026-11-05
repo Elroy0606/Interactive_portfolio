@@ -81,6 +81,16 @@ const list = [
     file: 'soc-l1-alert-triage.md',
     privacyChecked: true,
   },
+  {
+    id: 'soc-l1-alert-reporting',
+    title: 'SOC L1 Alert Reporting: TryHackMe Notes',
+    date: '2026-11-05',
+    summary:
+      'My notes from the TryHackMe SOC L1 Alert Reporting room: how to write an alert report with the five Ws, when and how to escalate to L2, and how to communicate when things go wrong.',
+    tags: ['TryHackMe', 'SOC Level 1', 'Alert Reporting', 'Escalation', 'Five Ws'],
+    file: 'soc-l1-alert-reporting.md',
+    privacyChecked: true,
+  },
 ];
 
 function resolve(w) {

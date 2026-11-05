@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "notes": "node scripts/notes-import.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.4.2",
@@ -19,7 +20,10 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.1",
+    "mammoth": "^1.13.0",
     "tailwindcss": "^4.3.3",
+    "turndown": "^7.2.5",
+    "turndown-plugin-gfm": "^1.0.2",
     "vite": "^8.3.0"
   }
 }

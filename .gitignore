@@ -2,3 +2,7 @@ node_modules
 dist
 *.log
 .DS_Store
+
+# notes inbox: raw docs and drafts stay local
+notes-inbox/*.docx
+notes-inbox/.staging/
