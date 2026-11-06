@@ -3,5 +3,10 @@
     "sha256": "af303836ce8bc5ba41f26e3be1b0f95b36037b171f9fa9056e4fbf1f87aafb7a",
     "writeupId": "soc-l1-alert-reporting",
     "importedAt": "2026-11-05"
+  },
+  "SOC_WorkBooks_and_Lookups.docx": {
+    "sha256": "038bf35fe64458f74a907916070236ae473685f3516aa012249db3b55c413216",
+    "writeupId": "soc-workbooks-and-lookups",
+    "importedAt": "2026-11-06"
   }
 }

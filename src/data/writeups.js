@@ -91,6 +91,16 @@ const list = [
     file: 'soc-l1-alert-reporting.md',
     privacyChecked: true,
   },
+  {
+    id: 'soc-workbooks-and-lookups',
+    title: 'SOC Workbooks and Lookups: TryHackMe Notes',
+    date: '2026-11-06',
+    summary:
+      'My notes from the TryHackMe SOC Workbooks and Lookups room: using identity and asset inventories and network diagrams to add context to alerts, and following workbooks to triage email, PowerShell and network alerts.',
+    tags: ['TryHackMe', 'SOC Level 1', 'Workbooks', 'Asset Inventory', 'Network Diagrams'],
+    file: 'soc-workbooks-and-lookups.md',
+    privacyChecked: true,
+  },
 ];
 
 function resolve(w) {
