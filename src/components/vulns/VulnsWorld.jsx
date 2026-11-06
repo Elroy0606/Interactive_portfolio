@@ -103,12 +103,12 @@ export default function VulnsWorld() {
 
           <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
             <Tip label="DOSSIER FOLDERS" side="bottom">
-              <span className="flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
+              <span className="chip-stat flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
                 <Folder size={13} aria-hidden /> FOLDERS: {DOSSIERS.length}
               </span>
             </Tip>
             <Tip label="REPORTS IN THE ARCHIVE" side="bottom">
-              <span className="flex items-center gap-2 border border-cyber/30 bg-cyber/5 px-2.5 py-1.5 text-cyber">
+              <span className="chip-stat flex items-center gap-2 border border-cyber/30 bg-cyber/5 px-2.5 py-1.5 text-cyber">
                 <FileText size={13} aria-hidden /> REPORTS: {REPORT_COUNT}
               </span>
             </Tip>

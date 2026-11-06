@@ -73,6 +73,8 @@
   /* Transition speeds for hover feedback and the camera-zoom fade. */
   --dur-hover: 0.2s;
   --dur-dim: 0.55s;
+  /* How far a clickable card rises on hover / keyboard focus (.lift). */
+  --lift: -3px;
 
   /* Glow colours. `transparent` switches a glow off everywhere it is used. */
   --glow-cyber: var(--color-cyber);
@@ -202,6 +204,7 @@
   --fx: paused;
   --dur-hover: 0.12s;
   --dur-dim: 0.18s;
+  --lift: -1px;
 
   /* No glows */
   --glow-cyber: transparent;
@@ -306,6 +309,7 @@
   --fx: paused;
   --dur-hover: 0.15s;
   --dur-dim: 0.2s;
+  --lift: -1px;
 
   /* No glows */
   --glow-cyber: transparent;
@@ -397,9 +401,104 @@ body::before {
   background: var(--selection-bg);
   color: var(--selection-fg);
 }
+/* Tailwind v4 gives buttons the arrow cursor: every control gets the hand back. */
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  [role="tab"],
+  summary,
+  a[href] {
+    cursor: pointer;
+  }
+  :disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+/* Keyboard focus ring in the element's own accent. */
 :focus-visible {
-  outline: 2px solid var(--color-cyber);
+  outline: 2px solid var(--accent, var(--color-cyber));
   outline-offset: 2px;
+}
+
+/* ---------- Affordances: what is clickable and what is information ----------
+   Rule a visitor learns: solid accent border + icon = clickable;
+   dashed or borderless = information.
+   .lift    clickable card: rises by --lift on hover / keyboard focus, presses on click
+   .press   small control (buttons, tabs, tiles): presses on click
+   .link-ui text link: accent colour, underline that firms up on hover
+   .chip-static  tag (information): no border, faint fill
+   .chip-stat    stat readout (information): dashed border
+   .hint    micro-label telling the visitor how to use a component
+   `translate` / `scale` (not `transform`) so they combine with Framer Motion's transforms. */
+.lift {
+  transition:
+    translate var(--dur-hover) ease-out,
+    scale var(--dur-hover) ease-out,
+    box-shadow var(--dur-hover),
+    border-color var(--dur-hover),
+    background-color var(--dur-hover);
+}
+.lift:hover,
+.lift:focus-visible,
+.lift:has(:focus-visible) {
+  translate: 0 var(--lift);
+}
+.lift:active {
+  translate: 0 0;
+  scale: 0.985;
+}
+.press {
+  transition:
+    scale 0.08s ease-out,
+    background-color var(--dur-hover),
+    border-color var(--dur-hover),
+    color var(--dur-hover),
+    box-shadow var(--dur-hover);
+}
+.press:active:not(:disabled) {
+  scale: 0.96;
+}
+.link-ui {
+  color: var(--accent, var(--color-cyber));
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent, var(--color-cyber)) 40%, transparent);
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--dur-hover);
+}
+.link-ui:hover,
+.link-ui:focus-visible {
+  text-decoration-color: var(--accent, var(--color-cyber));
+}
+.chip-static {
+  display: inline-flex;
+  align-items: center;
+  background-color: color-mix(in srgb, var(--color-white) 6%, transparent);
+  padding: 0.125rem 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--color-white) 60%, transparent);
+}
+.chip-stat {
+  border-style: dashed !important;
+}
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: calc(0.2em * var(--track));
+  color: color-mix(in srgb, var(--accent, var(--color-cyber)) 80%, transparent);
+}
+/* CTA arrows nudge forward while their card is hovered. */
+.group:hover .cta-arrow,
+.group:focus-within .cta-arrow {
+  translate: 3px 0;
+}
+.cta-arrow {
+  transition: translate var(--dur-hover) ease-out;
 }
 ::-webkit-scrollbar {
   width: 8px;
@@ -637,6 +736,56 @@ body::before {
   50% { opacity: 0.3; }
 }
 
+/* ---------- Write-up diagrams (components/writeups/blocks) ----------
+   .flow-link joins two steps: vertical on phones, horizontal from md
+   (.flow-link-y keeps it vertical). Its ::after is the packet that travels
+   along it, Night only (paused by --fx, hidden in Dim / Day below). */
+.flow-link {
+  position: relative;
+  flex: none;
+  width: 1px;
+  height: 1.25rem;
+  margin-left: 1.5rem;
+  background: color-mix(in srgb, var(--accent, var(--color-cyber)) 45%, transparent);
+}
+.flow-link.mx-auto {
+  margin-left: auto;
+}
+.flow-link::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: var(--accent, var(--color-cyber));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--glow-accent) 80%, transparent);
+  animation: flow-y 1.8s linear infinite;
+  animation-delay: var(--flow-delay, 0s);
+  animation-play-state: var(--fx);
+}
+@media (min-width: 48rem) {
+  .flow-link:not(.flow-link-y) {
+    width: 1.5rem;
+    height: 1px;
+    margin-left: 0;
+  }
+  .flow-link:not(.flow-link-y)::after {
+    animation-name: flow-x;
+  }
+}
+@keyframes flow-y {
+  0% { transform: translateY(0); opacity: 0; }
+  20%, 80% { opacity: 1; }
+  100% { transform: translateY(1.25rem); opacity: 0; }
+}
+@keyframes flow-x {
+  0% { transform: translateX(0); opacity: 0; }
+  20%, 80% { opacity: 1; }
+  100% { transform: translateX(1.5rem); opacity: 0; }
+}
+
 /* ---------- Dossier folders (Sector 03) ---------- */
 /* Holographic sheen: the gradient position follows the pointer via --mx / --my
    (set from JS on pointermove, 0..1). */
@@ -696,6 +845,10 @@ body::before {
 }
 
 /* ---------- Buttons ---------- */
+.btn-cyber:active,
+.theme-toggle button:active {
+  scale: 0.96;
+}
 .btn-cyber {
   display: inline-flex;
   align-items: center;
@@ -793,6 +946,9 @@ body::before {
 :is([data-theme="professional"], [data-theme="dim"]) .glitch::after {
   content: none;
 }
+:is([data-theme="professional"], [data-theme="dim"]) .flow-link::after {
+  display: none;
+}
 :is([data-theme="professional"], [data-theme="dim"]) .led {
   box-shadow: none;
 }
@@ -800,10 +956,16 @@ body::before {
 :is([data-theme="professional"], [data-theme="dim"]) .accent-glow {
   box-shadow: var(--shadow-card);
 }
+:is([data-theme="professional"], [data-theme="dim"]) .lift:hover,
+:is([data-theme="professional"], [data-theme="dim"]) .lift:focus-visible,
 :is([data-theme="professional"], [data-theme="dim"]) .hover-glow:hover,
 :is([data-theme="professional"], [data-theme="dim"]) .hover-glow:focus-visible,
 :is([data-theme="professional"], [data-theme="dim"]) .hover-glow[data-hot="true"] {
   box-shadow: var(--shadow-card-hover);
+}
+/* Tags: muted ink so they keep AA contrast without the glow. */
+:is([data-theme="professional"], [data-theme="dim"]) .chip-static {
+  color: var(--color-muted);
 }
 /* Modal boards and the report reader float above the page. */
 :is([data-theme="professional"], [data-theme="dim"]) [role="dialog"].accent-glow {
@@ -848,12 +1010,28 @@ body::before {
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
+  .lift:hover,
+  .lift:focus-visible,
+  .lift:has(:focus-visible),
+  .lift:active,
+  .press:active:not(:disabled),
+  .btn-cyber:active,
+  .theme-toggle button:active,
+  .group:hover .cta-arrow,
+  .group:focus-within .cta-arrow {
+    translate: none;
+    scale: none;
+  }
+  .flow-link::after {
+    display: none;
+  }
   .flicker,
   .ambient-drift,
   .tour-ring,
   .crt-sweep,
   .trace,
   .led,
+
   .glitch-auto::before,
   .glitch-auto::after,
   .cursor-block {

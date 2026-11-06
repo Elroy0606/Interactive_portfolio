@@ -42,7 +42,7 @@ export default function ProjectCard({ project, index, featured = false, writeup,
       <article
         aria-labelledby={`project-${project.id}`}
         className={cn(
-          'group hover-glow accent-border relative flex w-full flex-col border bg-panel/90 backdrop-blur-sm',
+          'group accent-border relative flex w-full flex-col border bg-panel/90 backdrop-blur-sm',
           featured && 'md:flex-row',
         )}
       >
@@ -100,7 +100,7 @@ export default function ProjectCard({ project, index, featured = false, writeup,
           {project.tags.length > 0 ? (
             <ul aria-label="Built with" className="mt-4 flex flex-wrap gap-1.5">
               {project.tags.map((tag) => (
-                <li key={tag} className="border border-white/10 px-1.5 py-0.5 font-ui text-[10px] tracking-widest text-white/55">
+                <li key={tag} className="chip-static">
                   {tag.toUpperCase()}
                 </li>
               ))}
@@ -129,7 +129,7 @@ export default function ProjectCard({ project, index, featured = false, writeup,
             {writeup && (
               <button
                 type="button"
-                className="flex items-center gap-1.5 font-ui text-xs tracking-widest text-white/55 transition-colors hover:text-cyber"
+                className="link-ui flex items-center gap-1.5 font-ui text-xs tracking-widest"
                 onClick={() => {
                   sfx.click();
                   onOpenWriteup(writeup.id);

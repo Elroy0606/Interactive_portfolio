@@ -12,6 +12,7 @@ import { THEME } from './theme';
 //            stagger = extra delay per card).
 //   subView  entrance of a drill-down inside a sector (Docker, Pi-hole, AD lab, dossier).
 //   page     a detail page opened from a list (write-up).
+//   reveal   parts of a write-up diagram rising in as they scroll into view.
 //   board    centered info board (DataHUD).
 //   zoom / dossier   camera zoom phases in ms (lab node / dossier folder).
 //   zoomScale, pan   how far the camera pushes in, and whether it travels.
@@ -22,6 +23,7 @@ const TOKENS = {
   [THEME.CYBERPUNK]: {
     view: { exit: 0.06, enter: 0.11, from: { opacity: 0, scale: 1.03 }, ease: [0.22, 1, 0.36, 1] },
     item: { duration: 0.11, stagger: 0.012, y: 8 },
+    reveal: { duration: 0.4, stagger: 0.09, y: 14 },
     subView: { initial: { opacity: 0, scale: 1.06 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.5, ease: 'easeOut' } },
     page: { initial: { opacity: 0, scale: 1.04 }, animate: { opacity: 1, scale: 1 }, exit: { opacity: 0 }, transition: { duration: 0.35, ease: 'easeOut' } },
     board: {
@@ -41,6 +43,7 @@ const TOKENS = {
   [THEME.PROFESSIONAL]: {
     view: { exit: 0.04, enter: 0.08, from: { opacity: 0 }, ease: 'easeOut' },
     item: { duration: 0.08, stagger: 0, y: 0 },
+    reveal: { duration: 0.15, stagger: 0, y: 0 },
     subView: { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.15, ease: 'easeOut' } },
     page: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.12, ease: 'easeOut' } },
     board: {
@@ -91,6 +94,17 @@ export function useMotion() {
         animate: { opacity: 1, y: 0 },
         transition: { duration: item.duration, delay: Math.min(i, 8) * item.stagger },
       }),
+      // Spread on a part of a diagram (write-up visual blocks): it rises in once,
+      // when it first scrolls into view; i = position inside the diagram.
+      revealProps: (i = 0) =>
+        reduce
+          ? { initial: false }
+          : {
+              initial: { opacity: 0, y: t.reveal.y },
+              whileInView: { opacity: 1, y: 0 },
+              viewport: { once: true, margin: '0px 0px -8% 0px' },
+              transition: { duration: t.reveal.duration, delay: Math.min(i, 10) * t.reveal.stagger, ease: 'easeOut' },
+            },
     };
   }, [state.theme, reduce]);
 }

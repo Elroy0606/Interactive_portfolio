@@ -48,7 +48,7 @@ export default function WriteupCard({ writeup, index, single = false, onOpen }) 
       {...itemProps(index)}
     >
       <article
-        className="group hover-glow accent-border relative flex w-full flex-col border bg-panel/90 p-5 backdrop-blur-sm"
+        className="group lift hover-glow accent-border relative flex w-full flex-col border bg-panel/90 p-5 backdrop-blur-sm"
         onMouseEnter={() => sfx.hover()}
       >
         {!writeup.published && <div aria-hidden className="hatch pointer-events-none absolute inset-0" />}
@@ -57,7 +57,9 @@ export default function WriteupCard({ writeup, index, single = false, onOpen }) 
         </span>
 
         <div className="relative flex items-start justify-between gap-3">
-          <span className="font-ui text-[11px] track-25 text-white/45">[DOC {pad(index + 1)}]</span>
+          <span className="font-ui text-[11px] track-25 text-white/45">
+            {writeup.part ? `[PART ${pad(writeup.part)}]` : `[DOC ${pad(index + 1)}]`}
+          </span>
           <FormatBadge writeup={writeup} />
         </div>
 
@@ -89,7 +91,7 @@ export default function WriteupCard({ writeup, index, single = false, onOpen }) 
         {writeup.tags.length > 0 && (
           <ul aria-label="Tags" className="relative mt-4 flex flex-wrap gap-1.5">
             {writeup.tags.map((tag) => (
-              <li key={tag} className="border border-white/10 px-1.5 py-0.5 font-ui text-[10px] tracking-widest text-white/55">
+              <li key={tag} className="chip-static">
                 {tag.toUpperCase()}
               </li>
             ))}
@@ -99,7 +101,7 @@ export default function WriteupCard({ writeup, index, single = false, onOpen }) 
         <div aria-hidden className="relative mt-auto pt-5">
           <div className="border-t border-white/10 pt-3 font-ui text-xs tracking-widest">
             <span className="accent-text flex items-center gap-1 transition-[gap] group-hover:gap-2">
-              {writeup.published ? 'OPEN_REPORT' : 'VIEW_STATUS'} <ChevronRight size={14} />
+              {writeup.published ? 'OPEN_REPORT' : 'VIEW_STATUS'} <ChevronRight size={14} className="cta-arrow" />
             </span>
           </div>
         </div>

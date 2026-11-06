@@ -10,23 +10,24 @@ In the previous room I struggled to write a report. This room teaches how to wri
 
 L1 analysts receive alerts in a SIEM, an EDR or a ticketing platform. Most are closed as false positives or handled at L1. The complex and threatening ones go to L2, who remediate most breaches. Moving an alert along depends on three things:
 
-| Term | What it means |
-| --- | --- |
-| **Reporting** | Documenting the investigation before closing the alert or passing it on. For true positives that need escalation, a short comment is not enough: the report should include all relevant evidence. |
-| **Escalation** | Handing a true positive that needs more action or deeper investigation to L2, following the team's procedure. The report gives L2 the context so they don't start the analysis from scratch. |
-| **Communication** | Contacting other departments during or after the analysis, for example asking IT to confirm that a user was really granted admin rights, or asking HR about a new employee. |
+```cards
+kind: TERMS
+REPORTING | | Documenting the investigation before closing the alert or passing it on. For true positives that need escalation, a short comment is not enough: the report should include all relevant evidence.
+ESCALATION | | Handing a true positive that needs more action or deeper investigation to L2, following the team's procedure. The report gives L2 the context so they don't start the analysis from scratch.
+COMMUNICATION | | Contacting other departments during or after the analysis, for example asking IT to confirm that a user was really granted admin rights, or asking HR about a new employee.
+```
 
 # Writing the report: the five Ws
 
 Write for the person who reads it next: an L2 analyst, a DFIR responder or someone in IT. The room recommends covering at least the five Ws:
 
-| W | What it answers |
-| --- | --- |
-| **Who** | Which user logged in, ran the command or downloaded the file |
-| **What** | The exact action or sequence of events |
-| **When** | When the suspicious activity started and ended |
-| **Where** | Which device, IP address or website was involved |
-| **Why** | The reasoning behind the final verdict. This is the most important one |
+```fivews
+Who | Which user logged in, ran the command or downloaded the file
+What | The exact action or sequence of events
+When | When the suspicious activity started and ended
+Where | Which device, IP address or website was involved
+Why | The reasoning behind the final verdict. This is the most important one | key
+```
 
 The room's example of a good report met five checks, which I use as a checklist:
 
@@ -53,10 +54,12 @@ Either way, L2 reads the report and comes back with questions. Then they researc
 
 The room's example of an escalation flow:
 
-1. L1 messages L2 with a short summary of what happened and a link to the alert.
-2. L2 acknowledges it and starts investigating right away.
-3. L2 starts incident response with the DFIR team.
-4. L2 contacts team managers so the legal and PR teams are brought in.
+```flow
+L1 to L2 | L1 messages L2 with a short summary of what happened and a link to the alert.
+L2 acknowledges | L2 acknowledges it and starts investigating right away.
+Incident response | L2 starts incident response with the DFIR team.
+Managers | L2 contacts team managers so the legal and PR teams are brought in.
+```
 
 Asking L2 for help is normal, especially in the first months. It is better to discuss an alert and clarify the procedure than to close an alert you don't understand.
 
@@ -64,13 +67,13 @@ Asking L2 for help is normal, especially in the first months. It is better to di
 
 Ideally the SOC has its own **crisis communication** procedures. Without them, the room suggests how to handle these cases:
 
-| Situation | What to do |
-| --- | --- |
-| An urgent, critical alert needs escalating, but L2 hasn't responded for 30 minutes | Know where the emergency contacts are. Call L2, then L3, then your manager. |
-| A Slack or Teams account may be compromised and the login has to be checked with the user | Don't contact the user through the breached chat. Use another channel, such as a phone call. |
-| A flood of alerts arrives in a short time, some of them critical | Prioritise them according to the workflow, and tell the L2 on shift what is happening. |
-| Days later you realise you misclassified an alert and likely missed something malicious | Tell your L2 immediately and explain your concerns. Attackers can stay quiet for weeks before they act. |
-| Triage can't be finished because SIEM logs aren't parsed or aren't searchable | Don't skip the alert. Investigate what you can and report the problem to the L2 on shift or a SOC engineer. |
+```scenarios
+An urgent, critical alert needs escalating, but L2 hasn't responded for 30 minutes | Know where the emergency contacts are. Call L2, then L3, then your manager.
+A Slack or Teams account may be compromised and the login has to be checked with the user | Don't contact the user through the breached chat. Use another channel, such as a phone call.
+A flood of alerts arrives in a short time, some of them critical | Prioritise them according to the workflow, and tell the L2 on shift what is happening.
+Days later you realise you misclassified an alert and likely missed something malicious | Tell your L2 immediately and explain your concerns. Attackers can stay quiet for weeks before they act.
+Triage can't be finished because SIEM logs aren't parsed or aren't searchable | Don't skip the alert. Investigate what you can and report the problem to the L2 on shift or a SOC engineer.
+```
 
 # What I'm still working on
 

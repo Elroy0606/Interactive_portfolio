@@ -77,7 +77,7 @@ export default function SectorCard({ sector, index, onConnect, onDenied, onHover
 
         <div className="relative mt-4 flex flex-wrap gap-1.5">
           {sector.tags.map((tag) => (
-            <span key={tag} className="border border-white/10 px-1.5 py-0.5 font-ui text-[10px] tracking-widest text-white/45">
+            <span key={tag} className="chip-static">
               {tag}
             </span>
           ))}
@@ -88,7 +88,7 @@ export default function SectorCard({ sector, index, onConnect, onDenied, onHover
             <span className="text-warn/80">ACCESS_RESTRICTED // COMING_SOON</span>
           ) : (
             <span className="accent-text flex items-center gap-1 transition-[gap] group-hover:gap-2">
-              {sector.cta ?? 'INITIATE_CONNECTION'} <ChevronRight size={14} aria-hidden />
+              {sector.cta ?? 'INITIATE_CONNECTION'} <ChevronRight size={14} aria-hidden className="cta-arrow" />
             </span>
           )}
         </div>

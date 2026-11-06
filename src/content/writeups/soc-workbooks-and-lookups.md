@@ -20,25 +20,29 @@ I worked through the questions using the lab's identity and asset inventories:
 | What is the server? | A **file server in the UK datacenter** that stores the company's financial records. |
 | Who received the file? | The company's **US Financial Adviser**, so a US financial report going to them fits their job. |
 
-**My verdict: legitimate activity.** Both people hold finance roles, and sharing this file is within those roles.
+```verdict
+Legitimate activity | Both people hold finance roles, and sharing this file is within those roles.
+```
 
 # Lookup 2: network diagrams
 
 In bigger companies you also need to read an alert from the network's point of view. The second scenario was a chain of firewall alerts:
 
-| Time | Event |
-| --- | --- |
-| 08:00 | An external IP repeatedly connects to the corporate firewall on port TCP/10443 |
-| 08:23 | Firewall logs show that external IP being translated to an internal address |
-| 08:25 | The internal address scans one internal network range and finds no open ports |
-| 08:32 | It moves on to scan a second range, and the activity is still going |
+```timeline
+08:00 | An external IP repeatedly connects to the corporate firewall on port TCP/10443 | warn
+08:23 | Firewall logs show that external IP being translated to an internal address | warn
+08:25 | The internal address scans one internal network range and finds no open ports | danger
+08:32 | It moves on to scan a second range, and the activity is still going | danger live
+```
 
 The IPs alone don't tell you much. A **network diagram**, a map of the company's locations, subnets and how they connect, answers the questions: what runs on port 10443, which subnet the internal address belongs to, and what those scanned ranges are. With the diagram, the attack path becomes clear:
 
-1. The attacker **brute-forced the company VPN**, which was the service listening on port 10443.
-2. After logging in, they were assigned an address from the **VPN subnet**.
-3. They tried to scan the **database subnet**, but the firewall rules likely blocked them.
-4. Getting nowhere, they moved on to the **office subnet** to look for their next target.
+```netpath
+Internet | The attacker brute-forced the company VPN, which was the service listening on port 10443. | attacker
+VPN subnet | After logging in, they were assigned an address from the VPN subnet. | breach
+Database subnet | They tried to scan the database subnet, but the firewall rules likely blocked them. | blocked
+Office subnet | Getting nowhere, they moved on to the office subnet to look for their next target. | target
+```
 
 Diagrams in real companies can be far more complex, but the job they do for an analyst is the same: they give meaning to suspicious network activity.
 
@@ -54,9 +58,11 @@ What I took from seeing one: a workbook is also how a team helps new analysts ea
 
 The final task had three scenarios: **email analysis**, **PowerShell analysis** and **network analysis**. All three followed the same basic workflow:
 
-1. **Take ownership** of the alert.
-2. **Investigate** it, using the lookups above.
-3. **Decide**: if it's serious or you're not sure, **escalate to L2**; otherwise, **close it as a false positive**.
+```workflow
+Take ownership | Assign the alert to yourself.
+Investigate | Work it, using the lookups above.
+? Is it serious, or are you not sure? | YES: Escalate to L2 | NO: Close it as a false positive
+```
 
 It took me a few tries to get this right. The lesson was the order: assign the alert to yourself first, then work it, then hand it on or close it.
 

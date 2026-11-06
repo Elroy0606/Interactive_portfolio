@@ -34,7 +34,7 @@ export default function ContainerCard({ container, registerNode, hot, onHover, o
       onBlur={() => onHover(null)}
       aria-label={`Open data panel for ${container.name}, status ${container.status}`}
       style={{ '--accent': container.accent, '--led': container.accent }}
-      className={`hover-glow accent-border relative w-full border bg-panel/90 p-4 text-left backdrop-blur-sm lg:max-w-[320px] lg:self-center ${
+      className={`group press hover-glow accent-border relative w-full border bg-panel/90 p-4 text-left backdrop-blur-sm lg:max-w-[320px] lg:self-center ${
         container.side === 'left' ? 'lg:justify-self-end' : 'lg:justify-self-start'
       } ${POSITION[container.id]}`}
     >
@@ -61,7 +61,7 @@ export default function ContainerCard({ container, registerNode, hot, onHover, o
       <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/10 pt-2 font-ui text-[10px] tracking-widest">
         <span className={`border px-1.5 py-0.5 ${STATUS_TONE[container.tone]}`}>{container.status}</span>
         <span className="accent-text flex shrink-0 items-center">
-          INSPECT <ChevronRight size={12} aria-hidden />
+          INSPECT <ChevronRight size={12} aria-hidden className="cta-arrow" />
         </span>
       </div>
     </button>

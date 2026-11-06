@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Download, ExternalLink, Hourglass, Link2 } from 'lucide-react';
 import SectorHeader from '../ui/SectorHeader';
@@ -6,6 +6,8 @@ import CornerBrackets from '../ui/CornerBrackets';
 import ReadingSurface from '../ui/ReadingSurface';
 import useReadingMode from '../../hooks/useReadingMode';
 import { FormatBadge, WriteupDate } from './WriteupCard';
+import { JumpMenu, SectionRail, splitSections, useActiveSection } from './SectionRail';
+import { getCategory } from '../../data/writeups';
 import { sfx } from '../../lib/sound';
 import { useMotion } from '../../theme/motion';
 
@@ -18,6 +20,8 @@ const Loading = () => (
 );
 
 // Markdown report: the text is fetched when the page opens, then rendered.
+// Each top-level `#` heading starts a numbered section panel; on xl a sticky
+// rail lists the sections (a collapsible JUMP_TO menu on smaller screens).
 function Article({ writeup }) {
   const [text, setText] = useState(null);
   const [failed, setFailed] = useState(false);
@@ -33,8 +37,13 @@ function Article({ writeup }) {
     };
   }, [writeup]);
 
-  return (
-    <ReadingSurface className="max-w-3xl">
+  const { intro, sections } = useMemo(() => splitSections(text ?? ''), [text]);
+  const [ready, setReady] = useState(false); // sections are in the DOM (Markdown is lazy)
+  const active = useActiveSection(ready ? sections : []);
+  const hasRail = text !== null && sections.length > 1;
+
+  const page = (
+    <ReadingSurface className="w-full max-w-[52rem]">
       {failed ? (
         <p role="alert" className="font-mono text-xs text-danger">
           &gt; ERROR: the report could not be loaded. Reload the page to try again.
@@ -43,7 +52,22 @@ function Article({ writeup }) {
         <Loading />
       ) : (
         <Suspense fallback={<Loading />}>
-          <Markdown>{text}</Markdown>
+          <Mounted onMount={() => setReady(true)} />
+          {intro && <Markdown>{intro}</Markdown>}
+          {sections.map((s, i) => (
+            <section
+              key={s.id}
+              id={s.id}
+              tabIndex={-1}
+              aria-label={s.title}
+              className="relative mt-6 scroll-mt-20 border border-white/10 bg-black/10 p-4 focus:outline-none sm:p-6"
+            >
+              <Markdown>{s.body}</Markdown>
+              <span aria-hidden className="absolute right-3 top-2 font-ui text-[10px] track-20 text-white/35">
+                SECTION {String(i + 1).padStart(2, '0')} / {String(sections.length).padStart(2, '0')}
+              </span>
+            </section>
+          ))}
         </Suspense>
       )}
       {text !== null && (
@@ -53,6 +77,23 @@ function Article({ writeup }) {
       )}
     </ReadingSurface>
   );
+
+  if (!hasRail) return page;
+  return (
+    <>
+      <JumpMenu sections={sections} active={active} />
+      <div className="mx-auto max-w-[52rem] xl:grid xl:max-w-[70rem] xl:grid-cols-[15rem_minmax(0,52rem)] xl:items-start xl:gap-8">
+        <SectionRail sections={sections} active={active} />
+        {page}
+      </div>
+    </>
+  );
+}
+
+// Renders nothing; tells the article once the lazy Markdown chunk has mounted.
+function Mounted({ onMount }) {
+  useEffect(() => onMount(), [onMount]);
+  return null;
 }
 
 // PDF report: embedded viewer plus download / new-tab links (phones often
@@ -110,6 +151,7 @@ function ComingSoon({ writeup }) {
 export default function WriteupDetail({ writeup, onBack, onOpenRelated }) {
   const backRef = useRef(null);
   const { page } = useMotion();
+  const category = getCategory(writeup.category);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -119,6 +161,7 @@ export default function WriteupDetail({ writeup, onBack, onOpenRelated }) {
   return (
     <motion.section
       aria-label={writeup.title}
+      style={category ? { '--accent': category.accent } : undefined}
       {...page}
     >
       <SectorHeader
@@ -129,14 +172,28 @@ export default function WriteupDetail({ writeup, onBack, onOpenRelated }) {
         title={writeup.title}
       >
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {category && (
+            <span
+              className="flex items-center gap-1.5 border px-2 py-0.5 font-ui text-[10px] tracking-widest"
+              style={{ color: category.accent, borderColor: `color-mix(in srgb, ${category.accent} 45%, transparent)` }}
+            >
+              <category.icon size={10} aria-hidden /> {category.code}
+              {writeup.part && ` · PART ${String(writeup.part).padStart(2, '0')}`}
+            </span>
+          )}
           <FormatBadge writeup={writeup} />
           <WriteupDate date={writeup.date} />
         </div>
         {writeup.summary && <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">{writeup.summary}</p>}
+        {category?.notice && (
+          <p className="mt-3 inline-flex border border-warn/40 bg-warn/5 px-2 py-1 font-ui text-[10px] tracking-widest text-warn">
+            {category.notice}
+          </p>
+        )}
         {writeup.tags.length > 0 && (
           <ul aria-label="Tags" className="mt-3 flex flex-wrap gap-1.5">
             {writeup.tags.map((tag) => (
-              <li key={tag} className="border border-white/10 px-1.5 py-0.5 font-ui text-[10px] tracking-widest text-white/55">
+              <li key={tag} className="chip-static">
                 {tag.toUpperCase()}
               </li>
             ))}

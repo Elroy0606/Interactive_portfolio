@@ -42,12 +42,12 @@ export default function DevDistrict() {
         chips={
           <>
             <Tip label="PROJECTS LISTED" side="bottom">
-              <span className="accent-border accent-text accent-bg-soft flex items-center gap-2 border px-2.5 py-1.5">
+              <span className="chip-stat accent-border accent-text accent-bg-soft flex items-center gap-2 border px-2.5 py-1.5">
                 <AppWindow size={13} aria-hidden /> PROJECTS: {PROJECTS.length}
               </span>
             </Tip>
             <Tip label="ONLINE RIGHT NOW" side="bottom">
-              <span className="flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
+              <span className="chip-stat flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
                 <Radio size={13} aria-hidden /> LIVE: {LIVE}
               </span>
             </Tip>

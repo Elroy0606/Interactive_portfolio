@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { writeupImage } from '../../data/writeups';
+import { BLOCKS, parseBlock } from './blocks';
 
 // Themed Markdown renderer for write-ups (WriteupDetail) and vulnerability
 // reports (ReportViewer). Loaded lazily, so the parser is only downloaded when
@@ -11,6 +12,19 @@ import { writeupImage } from '../../data/writeups';
 // - Headings are shifted down one level: the page title is the only <h1>.
 // - Images are looked up by `resolveImage(name)` (default: src/content/writeups/);
 //   a name it does not know is not rendered.
+// - A fenced code block whose language is a visual block (```flow, ```alert ...,
+//   see blocks/README.md) is drawn as that diagram instead of as code.
+
+// <pre><code class="language-flow">...</code></pre> -> the Flow block, if it has rows.
+const textOf = (n) => (n.type === 'text' ? n.value : (n.children ?? []).map(textOf).join(''));
+function visualBlock(node) {
+  const code = node?.children?.find((c) => c.tagName === 'code');
+  const lang = [].concat(code?.properties?.className ?? []).find((c) => String(c).startsWith('language-'))?.slice(9);
+  const Block = lang && BLOCKS[lang.toLowerCase()];
+  if (!Block) return null;
+  const parsed = parseBlock(textOf(code));
+  return parsed.rows.length ? <Block {...parsed} /> : null;
+}
 
 const text = 'text-[15px] leading-relaxed text-white/85';
 
@@ -43,13 +57,17 @@ const components = {
     );
   },
   code: ({ node, ...p }) => <code className="bg-white/10 px-1 py-0.5 font-mono text-[0.88em] text-matrix" {...p} />,
-  pre: ({ node, ...p }) => (
+  pre: ({ node, ...p }) => {
+    const block = visualBlock(node);
+    if (block) return block;
+    return (
     <pre
       className="my-4 overflow-x-auto border border-white/10 bg-black/50 p-3 font-mono text-[12.5px] leading-relaxed text-white/85 [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-inherit"
       tabIndex={0}
       {...p}
     />
-  ),
+    );
+  },
   table: ({ node, ...p }) => (
     <div className="my-4 overflow-x-auto" tabIndex={0}>
       <table className="w-full border-collapse border border-white/10 text-left text-[13.5px]" {...p} />

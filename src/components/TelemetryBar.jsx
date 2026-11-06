@@ -5,6 +5,7 @@ import Tip from './ui/Tip';
 import ThemeToggle from './ThemeToggle';
 import { THEME } from '../theme/theme';
 import { sfx } from '../lib/sound';
+import { getWriteup } from '../data/writeups';
 
 const PATHS = {
   hub: '~/mainframe',
@@ -23,7 +24,10 @@ function currentPath(state) {
     if (state.activeReportId) p += `/${state.activeReportId}`;
     return p;
   }
-  if (state.view === 'writeups' && state.activeWriteupId) return `${PATHS.writeups}/${state.activeWriteupId}`;
+  if (state.view === 'writeups' && state.activeWriteupId) {
+    const cat = getWriteup(state.activeWriteupId)?.category;
+    return `${PATHS.writeups}/${cat ? `${cat.replace(/-/g, '_')}/` : ''}${state.activeWriteupId}`;
+  }
   return PATHS[state.view];
 }
 
@@ -100,7 +104,7 @@ export default function TelemetryBar() {
                   // Toggling ON: cue plays once the context exists (next tick).
                   if (!state.soundOn) setTimeout(sfx.confirm, 30);
                 }}
-                className="flex items-center gap-1.5 text-white/50 transition-colors hover:text-cyber"
+                className="press flex items-center gap-1.5 text-white/50 transition-colors hover:text-cyber"
               >
                 {state.soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
                 <span className="hidden sm:inline">SFX</span>

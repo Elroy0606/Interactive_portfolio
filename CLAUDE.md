@@ -26,10 +26,22 @@ Ids and labels (`src/theme/theme.js`): `cyberpunk` = **Night** (default), `dim` 
   - Identity colours `id-cyan id-amber id-green id-magenta id-blue id-violet id-red`: the `accent` of a sector / node / container / folder in `src/data` (stored as `'var(--color-id-…)'`). Distinct hues in Cyberpunk, the same hues softened in Dim, all equal to the accent in Professional.
   - Effects: `--glow-*` (+ per-element `--glow-accent`; `transparent` = glow off), `--text-glow`, `--shadow-board/card/card-hover`, `--track` (multiplier for `track-NN` letter-spacing utilities), `--fx` (running/paused for decorative CSS animations), `--dur-hover/dim`, textures (`--page-grid --blueprint-* --hatch --holo --texture-lines`), `--btn-*`, `--toggle-*`, `--radius`.
   - Colours passed from JS are CSS values (often `var(--color-…)`): apply them with `style`, mix alpha with `color-mix(in srgb, X N%, transparent)`, never by appending hex digits.
-- **Motion tokens: `src/theme/motion.js`** (`useMotion()`): `viewProps` (hub <-> sector switch), `itemProps(i)` / `fadeProps` (content entrance), `subView`, `page`, `board`, `zoom` / `dossier` (camera phase ms), `zoomScale`, `pan`, `tilt`, `morph`, `typing`. With `prefers-reduced-motion` the view and item transitions are 0.
+- **Motion tokens: `src/theme/motion.js`** (`useMotion()`): `viewProps` (hub <-> sector switch), `itemProps(i)` / `fadeProps` (content entrance), `subView`, `page`, `reveal` / `revealProps(i)` (write-up diagram parts rising in on scroll), `board`, `zoom` / `dossier` (camera phase ms), `zoomScale`, `pan`, `tilt`, `morph`, `typing`. With `prefers-reduced-motion` the view and item transitions are 0.
 - **Dim** (`[data-theme="dim"]`): slate surfaces, pastel accents, no glow, `--fx: paused`, same mono typeface and corner ticks as Cyberpunk. It uses the Professional motion tokens (`TOKENS[THEME.DIM]` in `motion.js`), has no boot log, no ambient background, no scanlines and no sound. The "rules a token cannot express" block at the end of `index.css` applies to both Dim and Professional through `:is([data-theme="professional"], [data-theme="dim"])`, including the AA contrast floor (each theme has its own `--color-muted`).
 - **Professional-only behaviour** (small conditionals, not forked components): `AmbientBackground` and `Scanlines` are not mounted; typing shows text at once (`useTerminal`); the boot log is skipped; sound is off and the SFX toggle hidden; rack / folder tilt and the report morph are off. A short block at the end of `index.css` holds the rules a token cannot express (hide cursor / glitch layers / corner ticks, card shadows, and the **AA contrast floor** that maps dim `text-white/≤60` to `--color-muted` and tinted status text to its full colour).
 - **Change a token**: edit the value in the theme's block, e.g. the Professional accent is `--color-cyber` in `[data-theme="professional"]`; the Cyberpunk accent is `--color-cyber` in `@theme static` (and `--color-id-*` for per-sector colours).
+
+## Affordances (what is clickable)
+Rule a visitor learns: **solid accent border + icon = clickable; dashed or borderless = information.** Classes in `index.css` (all token-driven, calm in Dim / Day, no movement with reduced motion):
+- Every `button`, `[role=button|tab]`, `summary`, `a[href]` gets `cursor: pointer` in `@layer base` (Tailwind v4 defaults buttons to the arrow). The focus ring is `2px` in the element's own `--accent`.
+- `.lift`: whole-card click targets (sector cards via Framer, write-up cards, learning-path stops) rise by the `--lift` token on hover / focus and press on click. **Not** on lab nodes, containers or AD lab nodes: they are trace endpoints and would leave their lines; those use `.press`.
+- `.press`: small controls (tabs, tiles, toggles, accordion buttons) shrink slightly on `:active`; `btn-cyber` and the theme toggle press too. Both use the `translate` / `scale` properties, not `transform`, so they combine with Framer Motion.
+- `.cta-arrow` on the ChevronRight / ArrowRight in a card's CTA row: nudges forward while the card (`.group`) is hovered.
+- `.link-ui`: text-only links (accent, underline that firms up on hover).
+- `.chip-static`: tags (borderless, faint fill, muted ink in Dim / Day). `.chip-stat`: header stat readouts (dashed border).
+- `.hint`: micro-label with `MousePointerClick` explaining an interactive component (`FILTER BY TOPIC`, `CLICK A ROOM TO OPEN IT`, AD lab `HOVER A NODE TO PREVIEW IT · CLICK TO PIN IT`). Visual blocks pass `hint` to `Frame` (top-right).
+- Icon vocabulary: `ChevronRight` open / go deeper · `ArrowUpRight` / `ExternalLink` leaves the site · `Plus` / `Minus` expands in place · `ArrowLeft` back · `ArrowDown` jumps down the page.
+- A new interactive element uses these classes; a container whose children are the only click targets (ProjectCard, Highlights card) gets no hover glow or lift, so it does not look clickable.
 
 ## Reading mode (reports)
 - Reports are read on `ui/ReadingSurface` (class `.reading-surface`: opaque `--color-paper`, own stacking context, board shadow). Used by the write-up article (`WriteupDetail`) and the vulnerability report reader (`ReportViewer`).
@@ -66,7 +78,7 @@ src/
     dns.js                  sample allowed/blocked domains + looping FLOW_SAMPLES for the Pi-hole visuals
     dossiers.js             Sector 03: ARCHIVE, SEVERITY colours, DOSSIERS (folders of real reports), file lookup, reportImage
     projects.js             Sector 04: PROJECTS (one object per website / app) + STATUS colours
-    writeups.js             Sector 02: WRITEUPS (one object per report), file lookup, getWriteupFor
+    writeups.js             Sector 02: CATEGORIES + WRITEUPS (one object per report), CATEGORY_TABS, file lookup, getWriteupFor
     helper.js               helper bot tips (HELPER_STEPS) + how to add one
     highlights.js           home page HIGHLIGHTS: collects entries flagged `featured` in services / projects / writeups (holds no content)
   content/
@@ -94,7 +106,8 @@ src/
     pihole/   PiholeSubView  FlowNode  FilterVisual  WebUiPanel
     vulns/    VulnsWorld  DossierGrid  DossierFolder  DossierArchive  ReportIcon  ReportViewer
     dev/      DevDistrict  ProjectCard
-    writeups/ WriteupsWorld  WriteupCard  WriteupDetail  Markdown
+    writeups/ WriteupsWorld  CategoryTabs  LearningPath  WriteupCard  WriteupDetail  SectionRail  Markdown
+              blocks/  visual blocks for Markdown reports (Flow, Cards, Alert, Severity, FiveWs, Timeline, NetPath, Workflow, Scenarios, Verdict, ProcTree) + parse.js + README.md
     (ui/ also has SectorHeader and CardStage, shared by Sectors 02 and 04)
 ```
 
@@ -213,10 +226,13 @@ A glowing finger-pointer that teaches the two drill-downs.
 - **Honesty rule**: only real projects, with the tools actually used. These are personal projects; never describe them as professional or client work.
 
 ## Sector 02: reports and write-ups (`components/writeups/`)
+- **Categories**: `CATEGORIES` in `data/writeups.js` (id, code, label, icon, identity-token accent, blurb, optional `path` = learning-path label, optional `notice` badge). Every entry has `category` and an optional `part` (learning-path order). `CATEGORY_TABS` keeps only categories that hold a report, so **add a category only when its first report is ready** (current: `soc-studies` = SOC_STUDIES, `home-lab` = HOME_LAB_BUILDS). The index is `CategoryTabs` (WAI-ARIA tabs, arrow keys) → panel (category intro, `LearningPath` when the category has a `path` and 2+ parts, then `CardStage` of `WriteupCard`s, ordered by `part`, then newest). The open tab is local state in `WriteupsWorld` and follows the open report, so closing a report lands on its category. The detail page takes the category accent and shows its code / part / notice; the breadcrumb is `~/sector02/write_ups/<category>/<id>`.
+- **Sectioned articles**: `SectionRail.jsx` splits a Markdown report on top-level `#` headings (outside code fences); each becomes a numbered section panel, listed in a sticky rail on `xl` (active section via IntersectionObserver) and a collapsible `JUMP_TO` menu below `xl`.
+- **Visual blocks** (`components/writeups/blocks/`, reference in its `README.md`): a fenced code block named `flow`, `cards`/`tools`, `alert`, `severity`, `fivews`, `timeline`, `netpath`, `workflow`, `scenarios`, `verdict` or `proctree` is drawn as a diagram by `Markdown.jsx` (also in Sector 03 reports). Plain-text line format (`key: value` settings, then rows split by ` | `), so the `.md` stays readable and no raw HTML is rendered. Parts rise in with `useMotion().revealProps` (once, on scroll); `.flow-link` packets run in Night only (hidden in Dim / Day and with reduced motion). Severity colours come from `SEVERITY` in `data/dossiers.js`. **Content rule**: blocks only restyle what is in the owner's notes; never add steps, tools or process trees that are not there (`proctree` is unused until a note has one).
 - **No upload form.** Publishing = drop a file in `src/content/writeups/`, add one entry to **`data/writeups.js`**, redeploy (how-to at the top of that file and in the folder's README).
 - `.md` files are loaded lazily (`?raw`) and rendered by `Markdown.jsx` (`react-markdown` + `remark-gfm`, lazy chunk; raw HTML is not rendered; headings shift down one level because the page title is the only `h1`; images only from the same folder or a sub-folder of it, one per report). `.pdf` files get an `<iframe>` viewer plus `DOWNLOAD_PDF` / `OPEN_IN_NEW_TAB`.
 - An entry is `published` only when its file exists **and** `privacyChecked: true`; otherwise the card and the detail page show `COMING_SOON` (dev shows a note if the file is there but unchecked). Everything in the folder is bundled regardless of the flag, so only clean files go in.
-- Entry fields: `id, title, date (YYYY-MM-DD | null), summary, tags, file, privacyChecked, related {kind: 'lab' | 'project', id, label}`. Sorted newest first, undated last. No tag filter (the site has no filter pattern).
+- Entry fields: `id, title, date (YYYY-MM-DD | null), summary, tags, file, privacyChecked, category, part?, related {kind: 'lab' | 'project', id, label}`. Sorted newest first, undated last. No tag filter (the site has no filter pattern).
 - Navigation: index (`WriteupCard`s) → detail (`WriteupDetail`) via `activeWriteupId`; Esc pops detail → index → hub.
 - **Cross-links**: `related` links a report to its project and back (`getWriteupFor(kind, id)`). `WRITEUP_OPEN{id}` opens a report from any sector (used by the chip in `AdLabSubView` and by `ProjectCard`); `JUMP_TO_LAB{id}` lands directly inside a lab node (`zoom: 'inside'`, no stored pose, so the exit is a plain fade-in of the blueprint); `JUMP_TO_PROJECTS` opens Sector 04. These go straight to the target view.
 - **Privacy rule (both sectors)**: no addresses, subnets, hardware identifiers, email, phone number, or names of companies or people, in files, alt text, data or comments. The original AD lab report PDF must never be added to the repo; only a checked, web-safe version with metadata stripped.

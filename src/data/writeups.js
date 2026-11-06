@@ -1,4 +1,25 @@
+import { Server, ShieldAlert } from 'lucide-react';
+
 // Sector 02: REPORTS AND WRITE-UPS (components/writeups/)
+//
+// The index is grouped by CATEGORIES (one tab each). A category only shows a
+// tab once at least one report points to it, so add a category when its first
+// report is ready, not before.
+//
+// HOW TO ADD A CATEGORY
+// ---------------------
+// Add one object to CATEGORIES (the order here is the tab order):
+//   {
+//     id: 'network-security',      // what reports put in `category`
+//     code: 'NETWORK_SECURITY',    // tab and panel label
+//     label: 'Network Security',   // plain name (screen readers, breadcrumbs)
+//     icon: Network,               // a lucide-react icon
+//     accent: 'var(--color-id-blue)',  // an identity token (src/index.css)
+//     blurb: 'One sentence on what this group holds.',
+//     path: 'TRYHACKME // SOME PATH',  // optional. Reports with `part` are then
+//                                  //   drawn as a numbered learning path.
+//     notice: 'Training notes, not on-the-job experience.',  // optional badge text
+//   },
 //
 // HOW TO ADD A REPORT
 // -------------------
@@ -26,6 +47,9 @@
 //     privacyChecked: true,        // Set to true only after step 1. While it is
 //                                  //   false the report stays on COMING_SOON
 //                                  //   even if the file exists.
+//     category: 'soc-studies',     // required. id of a CATEGORIES entry.
+//     part: 1,                     // optional. Position in the category's
+//                                  //   learning path (lowest first).
 //     related: {                   // optional. Links the report to a project,
 //                                  //   and the project back to the report.
 //       kind: 'lab',               // 'lab' = a home lab node, 'project' = a Sector 04 project
@@ -42,10 +66,38 @@
 //     highlightTags: ['A', 'B'],   // optional, two or three. Default: first three of `tags`
 // Remove `featured` to take it off the home page again.
 //
+// VISUAL BLOCKS (Markdown reports)
+// --------------------------------
+// A fenced code block named after a block is drawn as a diagram instead of
+// code, e.g. ```flow ... ```. The blocks and their line format are listed in
+// components/writeups/blocks/README.md. Each top-level `#` heading starts a
+// numbered section with its own entry in the section rail.
+//
 // Markdown notes: the page already shows the title, so start the file with
 // text or a `#` section heading (not the title again). Images: save them in the
 // same folder and write ![what it shows](file-name.png), or in a sub-folder per
 // report and write ![what it shows](my-report/file-name.png). Raw HTML is ignored.
+
+export const CATEGORIES = [
+  {
+    id: 'soc-studies',
+    code: 'SOC_STUDIES',
+    label: 'SOC Studies',
+    icon: ShieldAlert,
+    accent: 'var(--color-id-cyan)',
+    blurb: 'My notes from the TryHackMe SOC Level 1 path, in the order I took the rooms.',
+    path: 'TRYHACKME // SOC LEVEL 1 PATH',
+    notice: 'TRAINING_NOTES // NOT ON-THE-JOB EXPERIENCE',
+  },
+  {
+    id: 'home-lab',
+    code: 'HOME_LAB_BUILDS',
+    label: 'Home Lab Builds',
+    icon: Server,
+    accent: 'var(--color-id-violet)',
+    blurb: 'Reports on how I built, tested and documented projects in my home lab.',
+  },
+];
 
 const DIR = '../content/writeups/';
 const articles = import.meta.glob(['../content/writeups/*.md', '!../content/writeups/README.md'], {
@@ -69,6 +121,7 @@ const list = [
     tags: ['Active Directory', 'Windows Server 2025', 'Group Policy', 'Sophos Firewall', 'Remote Desktop Services', 'Veeam', 'Proxmox VE', 'PowerShell'],
     file: 'windows-ad-lab.md', // images are in src/content/writeups/windows-ad-lab/
     privacyChecked: true,
+    category: 'home-lab',
     related: { kind: 'lab', id: 'adlab', label: 'Windows Server and Active Directory Lab' },
   },
   {
@@ -80,6 +133,8 @@ const list = [
     tags: ['TryHackMe', 'SOC Level 1', 'Alert Triage', 'SIEM', 'True / False Positives'],
     file: 'soc-l1-alert-triage.md',
     privacyChecked: true,
+    category: 'soc-studies',
+    part: 1,
   },
   {
     id: 'soc-l1-alert-reporting',
@@ -90,6 +145,8 @@ const list = [
     tags: ['TryHackMe', 'SOC Level 1', 'Alert Reporting', 'Escalation', 'Five Ws'],
     file: 'soc-l1-alert-reporting.md',
     privacyChecked: true,
+    category: 'soc-studies',
+    part: 2,
   },
   {
     id: 'soc-workbooks-and-lookups',
@@ -100,6 +157,8 @@ const list = [
     tags: ['TryHackMe', 'SOC Level 1', 'Workbooks', 'Asset Inventory', 'Network Diagrams'],
     file: 'soc-workbooks-and-lookups.md',
     privacyChecked: true,
+    category: 'soc-studies',
+    part: 3,
   },
 ];
 
@@ -122,6 +181,21 @@ function resolve(w) {
 
 // Newest first; undated entries (not published yet) go last.
 export const WRITEUPS = list.map(resolve).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+
+// Categories that hold at least one report, in CATEGORIES order (the tabs).
+export const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
+export const CATEGORY_TABS = CATEGORIES.map((c) => ({
+  ...c,
+  // Learning-path order (part) first, then newest first.
+  writeups: WRITEUPS.filter((w) => w.category === c.id).sort(
+    (a, b) => (a.part ?? Infinity) - (b.part ?? Infinity) || (b.date ?? '').localeCompare(a.date ?? ''),
+  ),
+})).filter((c) => c.writeups.length > 0);
+if (import.meta.env.DEV) {
+  for (const w of WRITEUPS) {
+    if (!getCategory(w.category)) console.warn(`[writeups] "${w.id}" has no valid category, so it is not listed.`);
+  }
+}
 
 export const getWriteup = (id) => WRITEUPS.find((w) => w.id === id);
 // The report written about a project, if there is one (used for the link back).

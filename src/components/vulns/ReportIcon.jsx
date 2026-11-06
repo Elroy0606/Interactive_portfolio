@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SEVERITY } from '../../data/dossiers';
 import { sfx } from '../../lib/sound';
@@ -56,6 +57,9 @@ export default function ReportIcon({ report, index, accent, onOpen }) {
       <div className="mt-2.5">
         <div className="text-[13px] font-medium leading-snug text-white/85 transition-colors group-hover/doc:text-white">{report.title}</div>
         <div className="mt-1 font-ui text-[10px] tracking-widest text-white/35">{report.file}</div>
+        <div aria-hidden className="accent-text mt-1.5 flex items-center gap-0.5 font-ui text-[10px] font-bold tracking-widest">
+          OPEN_REPORT <ChevronRight size={12} className="transition-[translate] duration-200 group-hover/doc:translate-x-[3px]" />
+        </div>
       </div>
     </motion.button>
   );

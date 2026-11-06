@@ -109,7 +109,7 @@ function HighlightCard({ item, index, single }) {
           {item.tags.length > 0 && (
             <ul aria-label="Key skills" className="mt-4 flex flex-wrap gap-2">
               {item.tags.map((tag) => (
-                <li key={tag} className="accent-border accent-text accent-bg-soft border px-2 py-0.5 font-ui text-[11px] font-medium tracking-wider">
+                <li key={tag} className="accent-text accent-bg-soft px-2 py-0.5 font-ui text-[11px] font-medium tracking-wider">
                   {tag}
                 </li>
               ))}
@@ -118,13 +118,13 @@ function HighlightCard({ item, index, single }) {
 
           <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
             <button type="button" className="btn-cyber" onClick={() => go(item.open)}>
-              {item.openLabel} <ArrowRight size={14} aria-hidden />
+              {item.openLabel} <ArrowRight size={14} aria-hidden className="cta-arrow" />
               <span className="sr-only">: {item.title}</span>
             </button>
             {item.report && (
               <button
                 type="button"
-                className="flex items-center gap-1.5 font-ui text-xs tracking-widest text-white/70 underline decoration-white/30 underline-offset-4 transition-colors hover:text-cyber"
+                className="link-ui flex items-center gap-1.5 font-ui text-xs tracking-widest"
                 onClick={() => go({ type: 'WRITEUP_OPEN', id: item.report.id })}
               >
                 <FileText size={13} aria-hidden /> {item.report.published ? 'READ_REPORT' : 'REPORT: COMING_SOON'}

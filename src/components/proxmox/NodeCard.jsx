@@ -35,7 +35,7 @@ export default function NodeCard({ service, registerNode, hot, dim = false, onHo
         service.drillable ? `Enter ${service.name} internal view` : `Open data panel for ${service.name}`
       }
       style={{ '--accent': service.accent, '--led': service.accent }}
-      className={`hover-glow zoomable ${dim ? 'is-dim' : ''} accent-border relative w-full border bg-panel/90 p-4 text-left backdrop-blur-sm lg:max-w-[300px] lg:self-center ${
+      className={`group press hover-glow zoomable ${dim ? 'is-dim' : ''} accent-border relative w-full border bg-panel/90 p-4 text-left backdrop-blur-sm lg:max-w-[300px] lg:self-center ${
         service.side === 'left' ? 'lg:justify-self-end' : 'lg:justify-self-start'
       } ${POSITION[service.id]}`}
     >
@@ -56,7 +56,7 @@ export default function NodeCard({ service, registerNode, hot, dim = false, onHo
           <span className="led" aria-hidden /> {service.state ?? 'ONLINE'} · {service.slot}
         </span>
         <span className="accent-text flex items-center">
-          {service.drillable ? 'ENTER' : 'INSPECT'} <ChevronRight size={12} aria-hidden />
+          {service.drillable ? 'ENTER' : 'INSPECT'} <ChevronRight size={12} aria-hidden className="cta-arrow" />
         </span>
       </div>
     </button>

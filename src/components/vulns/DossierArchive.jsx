@@ -47,12 +47,12 @@ export default function DossierArchive({ dossier, onClose, onOpenReport }) {
 
         <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
           <Tip label="REPORTS IN THIS DOSSIER" side="bottom">
-            <span className="accent-border accent-text accent-bg-soft flex items-center gap-2 border px-2.5 py-1.5">
+            <span className="chip-stat accent-border accent-text accent-bg-soft flex items-center gap-2 border px-2.5 py-1.5">
               <FileText size={13} aria-hidden /> FILES: {dossier.reports.length}
             </span>
           </Tip>
           <Tip label="ACCESS LEVEL REQUIRED" side="bottom">
-            <span className="flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
+            <span className="chip-stat flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
               <ShieldCheck size={13} aria-hidden /> CLEARANCE {dossier.clearance}
             </span>
           </Tip>

@@ -9,7 +9,8 @@ Report files for Sector 02. This is the "upload" folder: there is no upload form
    - `.md` is rendered as a styled article.
    - `.pdf` is shown in an embedded viewer with a download button.
    - Images used by a Markdown report go in this folder too: `![what it shows](file-name.png)`, or in a sub-folder named after the report: `![what it shows](my-report/file-name.png)`.
-3. **Add one entry** to `src/data/writeups.js` (every field is explained at the top of that file) and set `privacyChecked: true`.
+3. **Add one entry** to `src/data/writeups.js` (every field is explained at the top of that file), give it a `category` (and a `part` if it belongs to a learning path), and set `privacyChecked: true`.
+   Optional: turn tables and step lists into visual blocks (```` ```flow ````, ```` ```alert ```` ...). The formats are in `src/components/writeups/blocks/README.md`.
 4. Redeploy.
 
 Everything in this folder is deployed with the site, even while `privacyChecked` is false. Only put a file here once it is clean.

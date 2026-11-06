@@ -6,23 +6,26 @@ This is training, not on-the-job SOC experience. I'm publishing it to show what 
 
 An alert starts as an ordinary event, such as a user login, a process launch or a file download. The pipeline looks like this:
 
-1. **Event:** something happens on a system.
-2. **Log:** the system that saw it (the operating system, a firewall, a cloud provider) records it.
-3. **Collection:** the logs are shipped to a security solution such as a SIEM or EDR.
-4. **Detection:** a rule matches a specific event or sequence of events and the solution raises an **alert**.
+```flow
+Event | Something happens on a system.
+Log | The system that saw it (the operating system, a firewall, a cloud provider) records it.
+Collection | The logs are shipped to a security solution such as a SIEM or EDR.
+Detection | A rule matches a specific event or sequence of events and the solution raises an alert.
+```
 
 A SOC can receive millions of log lines a day from thousands of systems, and almost all of them are expected activity. Alerts exist so analysts don't have to read raw logs. They highlight only the suspicious or unusual events, so a team triages dozens of alerts a day instead of millions of lines.
 
 # Where alerts are managed
 
-| Solution | What it does | Notes from the room |
-| --- | --- | --- |
-| **SIEM** (Security Information and Event Management) | Collects and analyses logs from devices, firewalls and servers across the network | Strong alert management; the right choice for most SOC teams |
-| **EDR** (Endpoint Detection and Response) | Runs on workstations, servers and laptops, watches endpoint activity and can isolate a compromised host | Has its own alert dashboard, but teams usually prefer to work alerts in a SIEM or SOAR |
-| **NDR** (Network Detection and Response) | Analyses network traffic for suspicious patterns, lateral movement and data exfiltration | Same as EDR |
-| **SOAR** (Security Orchestration, Automation and Response) | Connects security tools and runs automated playbooks for repetitive triage steps | Larger teams use it to pull alerts from many tools into one place |
-| **XDR** (Extended Detection and Response) | Correlates endpoint, network, cloud and email data in one platform | Cross-domain visibility |
-| **ITSM** (IT Service Management) | Ticketing for logging, assigning and tracking incidents to resolution | Some teams run alerts through a dedicated ticketing setup |
+```tools
+kind: TOOLS
+SIEM | Security Information and Event Management | Collects and analyses logs from devices, firewalls and servers across the network | Strong alert management; the right choice for most SOC teams
+EDR | Endpoint Detection and Response | Runs on workstations, servers and laptops, watches endpoint activity and can isolate a compromised host | Has its own alert dashboard, but teams usually prefer to work alerts in a SIEM or SOAR
+NDR | Network Detection and Response | Analyses network traffic for suspicious patterns, lateral movement and data exfiltration | Same as EDR: it has its own alert dashboard, but teams usually prefer to work alerts in a SIEM or SOAR
+SOAR | Security Orchestration, Automation and Response | Connects security tools and runs automated playbooks for repetitive triage steps | Larger teams use it to pull alerts from many tools into one place
+XDR | Extended Detection and Response | Correlates endpoint, network, cloud and email data in one platform | Cross-domain visibility
+ITSM | IT Service Management | Ticketing for logging, assigning and tracking incidents to resolution | Some teams run alerts through a dedicated ticketing setup
+```
 
 # What alert triage is
 
@@ -39,16 +42,17 @@ Why it matters to the SOC:
 
 Every SIEM lays alerts out differently, but the same core fields show up everywhere.
 
-| # | Property | What it tells you | Examples |
-| --- | --- | --- | --- |
-| 1 | **Alert time** | When the alert was created. Usually a few minutes after the event itself | Event at 15:32, alert at 15:35 |
-| 2 | **Alert name** | A summary of what happened, taken from the detection rule's name | Unusual Login Location, Windows RDP Bruteforce, Potential Data Exfiltration |
-| 3 | **Severity** | How urgent it is. Set by detection engineers, can be changed by the analyst | Low, Medium, High, Critical |
-| 4 | **Status** | Whether someone is working on it or triage is done | New, In Progress, Closed (plus custom statuses) |
-| 5 | **Verdict** | Also called classification: real threat or noise | True Positive, False Positive (plus custom verdicts) |
-| 6 | **Assignee** | The analyst who owns the alert and is responsible for it | Sometimes called the alert owner |
-| 7 | **Description** | What the rule detects, why it can mean an attack, and sometimes how to triage it | Usually three short sections |
-| 8 | **Fields** | The values the alert fired on, plus analyst comments | Affected hostname, command line, and more depending on the alert |
+```alert
+title: Anatomy of an alert
+Alert time | Event at 15:32, alert at 15:35 | When the alert was created. Usually a few minutes after the event itself.
+Alert name | Unusual Login Location, Windows RDP Bruteforce, Potential Data Exfiltration | A summary of what happened, taken from the detection rule's name.
+Severity | Low, Medium, High, Critical | How urgent it is. Set by detection engineers, can be changed by the analyst.
+Status | New, In Progress, Closed (plus custom statuses) | Whether someone is working on it or triage is done.
+Verdict | True Positive, False Positive (plus custom verdicts) | Also called classification: real threat or noise.
+Assignee | Sometimes called the alert owner | The analyst who owns the alert and is responsible for it.
+Description | Usually three short sections | What the rule detects, why it can mean an attack, and sometimes how to triage it.
+Fields | Affected hostname, command line, and more depending on the alert | The values the alert fired on, plus analyst comments.
+```
 
 The detail I'll remember: **alert time is not event time.** When building a timeline, use the event time.
 
@@ -56,9 +60,20 @@ The detail I'll remember: **alert time is not event time.** When building a time
 
 Each SOC sets its own prioritisation rules and usually builds them into the SIEM's sorting. The simplest and most common approach has three steps:
 
-1. **Filter.** Only take alerts that are new and unassigned. Don't pick up something a teammate has already reviewed or is working on.
-2. **Sort by severity.** Critical first, then High, Medium and Low. Detection engineers tune critical rules to be the most likely to be real and the most damaging.
-3. **Sort by time.** Oldest first. If two alerts are both real breaches, the attacker in the older one has had more time and may already be taking data, while the newer one is probably still exploring.
+```flow
+Filter | Only take alerts that are new and unassigned. Don't pick up something a teammate has already reviewed or is working on.
+Sort by severity | Critical first, then High, Medium and Low. Detection engineers tune critical rules to be the most likely to be real and the most damaging.
+Sort by time | Oldest first. If two alerts are both real breaches, the attacker in the older one has had more time and may already be taking data, while the newer one is probably still exploring.
+```
+
+```severity
+title: Severity order
+caption: Inside each level, the oldest alert comes first.
+Critical
+High
+Medium
+Low
+```
 
 # Practice: working the queue
 
@@ -68,12 +83,14 @@ The Low alert was the one I spent the most time on. The rule fires on **any down
 
 What the alert showed:
 
-| Field | Value |
-| --- | --- |
-| Accessed URL | `https://github.com/facebook/react` |
-| Source user | A developer account |
-| Source host | An IT team laptop |
-| Source network | The developers' VPN segment |
+```alert
+title: Download from GitHub
+severity: Low
+Accessed URL | https://github.com/facebook/react
+Source user | A developer account
+Source host | An IT team laptop
+Source network | The developers' VPN segment
+```
 
 My reasoning:
 
@@ -81,7 +98,9 @@ My reasoning:
 - The user and the network both belong to the development team, for whom downloading React is normal work.
 - Nothing in the alert pointed to a malicious file.
 
-**Verdict: false positive.** I closed it.
+```verdict
+False positive | I closed it.
+```
 
 # What I'm still working on
 

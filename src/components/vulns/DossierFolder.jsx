@@ -138,7 +138,7 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
                 {String(count).padStart(2, '0')} FILES
               </span>
               <span className="accent-text flex items-center transition-[gap] group-hover/folder:gap-1">
-                OPEN <ChevronRight size={13} aria-hidden />
+                OPEN <ChevronRight size={13} aria-hidden className="cta-arrow" />
               </span>
             </div>
 

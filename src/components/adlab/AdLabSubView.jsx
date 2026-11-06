@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, FileText, ListChecks, Server } from 'lucide-react';
+import { ArrowDown, ArrowLeft, FileText, ListChecks, MousePointerClick, Server } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { getService } from '../../data/services';
 import { getWriteupFor } from '../../data/writeups';
@@ -96,11 +96,16 @@ function LabNode({ node, registerNode, hot, pinned, onHover, onPin, className = 
       onFocus={() => onHover(node.id)}
       onBlur={() => onHover(null)}
       style={{ '--accent': node.accent, '--led': node.accent }}
-      className={cn('hover-glow accent-border relative w-full border bg-panel/90 p-3 text-left backdrop-blur-sm', className)}
+      className={cn('press hover-glow accent-border relative w-full border bg-panel/90 p-3 text-left backdrop-blur-sm', className)}
     >
       <span className="accent-text">
         <CornerBrackets className="h-2.5 w-2.5" />
       </span>
+      {pinned && (
+        <span aria-hidden className="accent-text accent-bg-soft absolute right-2 top-1.5 px-1 font-ui text-[9px] font-bold tracking-widest">
+          PINNED
+        </span>
+      )}
       <div className="flex items-start gap-2.5">
         <div className="accent-text accent-bg-soft accent-border flex h-9 w-9 shrink-0 items-center justify-center border">
           <Icon size={18} strokeWidth={1.5} aria-hidden />
@@ -312,12 +317,12 @@ export default function AdLabSubView() {
 
         <div className="flex flex-wrap gap-2 font-ui text-[11px] tracking-widest">
           <Tip label="USED IN PLACE OF HYPER-V" side="bottom">
-            <span className="flex items-center gap-2 border border-cyber/30 bg-cyber/5 px-2.5 py-1.5 text-cyber">
+            <span className="chip-stat flex items-center gap-2 border border-cyber/30 bg-cyber/5 px-2.5 py-1.5 text-cyber">
               <Server size={13} aria-hidden /> HYPERVISOR: PROXMOX VE
             </span>
           </Tip>
           <Tip label="LAB SHEET PROGRESS" side="bottom">
-            <span className="flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
+            <span className="chip-stat flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
               <ListChecks size={13} aria-hidden /> HANDS-ON: {TASKS.handsOn}/{TASKS.total} TASKS
             </span>
           </Tip>
@@ -385,14 +390,17 @@ export default function AdLabSubView() {
             key={id}
             type="button"
             onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="border border-white/15 px-2.5 py-1.5 text-white/55 transition-colors hover:border-cyber/50 hover:text-cyber"
+            className="press flex items-center gap-1 border border-white/15 px-2.5 py-1.5 text-white/55 hover:border-cyber/50 hover:text-cyber"
           >
-            {label}
+            {label} <ArrowDown size={11} aria-hidden />
           </button>
         ))}
       </nav>
 
       {/* ---- interactive network diagram ---- */}
+      <p className="hint mb-2" style={{ '--accent': 'var(--color-cyber)' }}>
+        <MousePointerClick size={12} aria-hidden /> HOVER A NODE TO PREVIEW IT · CLICK TO PIN IT
+      </p>
       <div id="adlab-map" className="grid scroll-mt-20 gap-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)]">
         <div className="min-w-0">
           <div className="relative overflow-hidden border border-cyber/25 shadow-[0_0_50px_color-mix(in_srgb,var(--glow-cyber)_7%,transparent)]">
@@ -599,7 +607,7 @@ export default function AdLabSubView() {
         <Section id="adlab-stack" title="TECH_STACK" accent={VIOLET}>
           <ul className="flex flex-wrap gap-2">
             {TAGS.map((tech) => (
-              <li key={tech} className="accent-border accent-text accent-bg-soft border px-2.5 py-1 font-ui text-xs font-medium tracking-wider">
+              <li key={tech} className="accent-text accent-bg-soft px-2.5 py-1 font-ui text-xs font-medium tracking-wider">
                 {tech}
               </li>
             ))}

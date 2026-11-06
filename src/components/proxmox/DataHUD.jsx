@@ -172,7 +172,7 @@ export default function DataHUD({ service, onClose, eyebrow }) {
             <Section title="TECH_STACK" className="mt-8">
               <ul className="flex flex-wrap gap-2">
                 {service.stack.map((tech) => (
-                  <li key={tech} className="accent-border accent-text accent-bg-soft border px-2.5 py-1 font-ui text-xs font-medium tracking-wider">
+                  <li key={tech} className="accent-text accent-bg-soft px-2.5 py-1 font-ui text-xs font-medium tracking-wider">
                     {tech}
                   </li>
                 ))}
