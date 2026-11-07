@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Folder, FileText } from 'lucide-react';
 import { useApp, ZOOM } from '../../state/AppContext';
 import { useMotion } from '../../theme/motion';
+import { backLabel } from '../../data/tracks';
 import { ARCHIVE, DOSSIERS, REPORT_COUNT, getDossier, getReport } from '../../data/dossiers';
 import GlitchText from '../ui/GlitchText';
 import Tip from '../ui/Tip';
@@ -51,7 +52,7 @@ export default function VulnsWorld() {
         sfx.close();
         dispatch({ type: 'DOSSIER_EXIT' });
       } else if (phase === ZOOM.NONE) {
-        dispatch({ type: 'RETURN_TO_HUB' });
+        dispatch({ type: 'LEAVE_SECTOR' });
       }
     };
     window.addEventListener('keydown', onKey);
@@ -89,10 +90,10 @@ export default function VulnsWorld() {
               className="btn-cyber mb-4"
               onClick={() => {
                 sfx.click();
-                dispatch({ type: 'RETURN_TO_HUB' });
+                dispatch({ type: 'LEAVE_SECTOR' });
               }}
             >
-              <ArrowLeft size={14} aria-hidden /> [RETURN_TO_SECTOR_HUB]
+              <ArrowLeft size={14} aria-hidden /> {backLabel(state.track)}
             </button>
             <p className="font-ui text-xs track-30 text-matrix">[SECTOR 03] // SEC_OPS_GRID // SECURE_ACCESS</p>
             <h1 className="mt-1 break-words font-ui text-xl font-bold leading-tight text-id-green text-glow sm:text-4xl">

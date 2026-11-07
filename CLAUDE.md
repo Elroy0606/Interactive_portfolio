@@ -1,10 +1,19 @@
 # CLAUDE.md — MAINFRAME_OS Cyberpunk Portfolio
 
-Interactive portfolio styled as a cyberpunk mainframe / hacker terminal. The visitor lands on a hub: hero, a **Highlights** section, then the "sectors"; clicking one opens it straight away (a short view transition, no loading sequence). The site has **three themes**, shown to visitors as **Night** (cyberpunk, the default), **Dim** and **Day** (professional), switched by a toggle in the top bar (see "Themes"). A **helper bot** (a squirrel) gives first-time visitors tips (see "Helper bot"). **Sector 01** (`INFRASTRUCTURE_LAB`, Proxmox home lab) and **Sector 03** (`SEC_OPS_GRID`, vulnerability reports) are playable, as are the two card-based sectors: **Sector 04** (`DEV_DISTRICT`, websites and apps) and **Sector 02** (`WRITE-UPS`, build reports).
+Interactive portfolio styled as a cyberpunk mainframe / hacker terminal. The visitor lands on a hub: hero, a choice between two **paths** (Theory / Practical, see "Tracks"), the **Highlights** section and the system log. A path opens a **track page** listing its "sectors"; clicking one opens it straight away (a short view transition, no loading sequence). The site has **three themes**, shown to visitors as **Night** (cyberpunk, the default), **Dim** and **Day** (professional), switched by a toggle in the top bar (see "Themes"). A **helper bot** (a squirrel) gives first-time visitors tips (see "Helper bot"). **Sector 01** (`INFRASTRUCTURE_LAB`, Proxmox home lab) and **Sector 03** (`SEC_OPS_GRID`, vulnerability reports) are playable, as are the two card-based sectors: **Sector 04** (`DEV_DISTRICT`, websites and apps) and **Sector 02** (`WRITE-UPS`, build reports).
 
 - **Sector 01**: a blueprint of the lab. **Every node click flies the camera to that node.** Docker (`CONTAINER_SUBSTRATE_MANIFEST::DOCKER_INFRA`), Pi-hole (`DNS_TRAFFIC_FLOW::AD_BLOCKING_PIPELINE`) and the Windows AD lab (`WINDOWS_SERVER::ACTIVE_DIRECTORY_LAB`) then swap to a full sub-view; HAOS, Kali and Ollama show a **centered information board**. A guide cursor onboards first-time visitors (Pi-hole, then Docker).
 - **Sector 03**: `DOSSIER_ARCHIVE::BUNGE_OPS`, a shelf of dossier folders → camera-zoom into one → miniature report icons → PDF-style reader.
 - In the Cyberpunk theme every screen sits on an **ambient background** (drifting hex particles, data streams, circuit lines, telemetry readouts) that fades out toward the middle so focus stays on the active module.
+
+## Tracks (Theory / Practical) (`data/tracks.js`, `components/TrackCard.jsx`, `components/TrackWorld.jsx`, `components/ui/TrackSwitch.jsx`)
+- Two paths: `theory` (Track A, `THEORY_KNOWLEDGE`, what I have studied: study notes) and `practical` (Track B, `PRACTICAL_EXPERIENCE`, what I have built and tested hands-on). Accents `--color-id-blue` / `--color-id-magenta`.
+- **Mapping is data**: a sector joins a track via `tracks: { <trackId>: {overrides} }` in `data/sectors.js` (overrides = label / blurb / tags / cta for that track's card; `{}` = as written). Sector 01, 03, 04 are `practical`; Sector 02 is in both (Theory = Study Notes, Practical = Build Reports). A write-up category joins a track via `track` in `data/writeups.js` (`soc-studies` → theory, `home-lab` → practical).
+- **Hub**: two `TrackCard`s (`ENTER_TRACK{track}`), then Highlights and the log. No sector cards on the hub any more.
+- **Track page** (`VIEWS.TRACK`): `SectorHeader` (return → hub, stat chips from `TRACK_STATS`), `TrackSwitch` (tabs; switching dispatches `ENTER_TRACK`), learning paths of the track's write-up categories that have a `path`, then the track's `SectorCard`s in a `CardStage` (two per row). Esc → hub.
+- **Sector 02** shows a `TrackSwitch` (`SET_TRACK`) above the category tabs; only the open track's categories are listed.
+- **Return**: sectors dispatch `LEAVE_SECTOR` (button and Esc) → the track page if `state.track` is set, else the hub; the label comes from `backLabel(state.track)` (`[RETURN_TO_THEORY_TRACK]`). `WRITEUP_OPEN` sets the track of the report's category; `JUMP_TO_LAB` / `JUMP_TO_PROJECTS` set `practical`; `RETURN_TO_HUB` clears it.
+- Breadcrumb: `~/mainframe/<track>` on the track page, `~/<track>/sector0N/...` inside a sector.
 
 ## Tech stack
 - **Vite 8 + React 19** (plain JS/JSX, no TypeScript, no router)
@@ -130,7 +139,8 @@ src/
 Single reducer in `AppContext.jsx` (`initialState()` is a function: it reads the applied theme and localStorage for the tour):
 ```
 { theme: 'cyberpunk'|'professional',
-  view: 'boot'|'hub'|'proxmox'|'dev'|'vulns'|'writeups',   // starts at 'hub' in professional (no boot log)
+  view: 'boot'|'hub'|'track'|'proxmox'|'dev'|'vulns'|'writeups',   // starts at 'hub' in professional (no boot log)
+  track: 'theory'|'practical'|null,   // path picked on the hub (data/tracks.js)
   // Sector 01
   zoom: 'none'|'entering'|'inside'|'exiting',   // ZOOM enum
   zoomTarget,                 // service id being zoomed into (any node)
@@ -146,14 +156,15 @@ Single reducer in `AppContext.jsx` (`initialState()` is a function: it reads the
   soundOn }
 ```
 (`activeServiceId`, `OPEN_SERVICE` and `CLOSE_SERVICE` were removed: every node click is now a zoom.)
-Actions: `BOOT_DONE`, `SET_THEME{theme}`, `ENTER_SECTOR{sectorId}` (routes via `SECTOR_VIEWS`: '01' → proxmox, '02' → writeups, '03' → vulns, '04' → dev), `RETURN_TO_HUB` (resets zoom and dossier state), `ZOOM_START{id}`, `ZOOM_ENTERED`, `ZOOM_EXIT`, `ZOOM_EXITED`, `OPEN_CONTAINER{id}`, `CLOSE_CONTAINER`, `DOSSIER_START{id}`, `DOSSIER_ENTERED`, `DOSSIER_EXIT`, `DOSSIER_EXITED`, `REPORT_OPEN{id}`, `REPORT_CLOSE`, `WRITEUP_OPEN{id}`, `WRITEUP_CLOSE`, `JUMP_TO_LAB{id}`, `JUMP_TO_PROJECTS`, `TOUR_NEXT`, `TOUR_OFF`, `TOUR_ON`, `TOGGLE_SOUND`. Transitions are guarded (`ENTER_SECTOR` only from hub, `ZOOM_START` only in proxmox with `zoom==='none'`, `DOSSIER_START` only in vulns with `dossier==='none'`, …) so double-fires are harmless.
-Flows: (boot →) hub → (click sector) → proxmox | dev | vulns | writeups → `RETURN_TO_HUB`. Lab: `none` →(click node)→ `entering` →(950ms)→ `inside` →(close / `[RETURN_TO_PROXMOX_LAB]` / Esc)→ `exiting` →(800ms)→ `none`.
+Actions: `BOOT_DONE`, `SET_THEME{theme}`, `ENTER_TRACK{track}` (hub / track page → track page), `SET_TRACK{track}` (no view change; Sector 02 switch), `ENTER_SECTOR{sectorId}` (from hub or track page; routes via `SECTOR_VIEWS`: '01' → proxmox, '02' → writeups, '03' → vulns, '04' → dev), `LEAVE_SECTOR` (→ track page or hub), `RETURN_TO_HUB` (resets zoom, dossier state and track), `ZOOM_START{id}`, `ZOOM_ENTERED`, `ZOOM_EXIT`, `ZOOM_EXITED`, `OPEN_CONTAINER{id}`, `CLOSE_CONTAINER`, `DOSSIER_START{id}`, `DOSSIER_ENTERED`, `DOSSIER_EXIT`, `DOSSIER_EXITED`, `REPORT_OPEN{id}`, `REPORT_CLOSE`, `WRITEUP_OPEN{id}`, `WRITEUP_CLOSE`, `JUMP_TO_LAB{id}`, `JUMP_TO_PROJECTS`, `TOUR_NEXT`, `TOUR_OFF`, `TOUR_ON`, `TOGGLE_SOUND`. Transitions are guarded (`ENTER_SECTOR` only from hub, `ZOOM_START` only in proxmox with `zoom==='none'`, `DOSSIER_START` only in vulns with `dossier==='none'`, …) so double-fires are harmless.
+Flows: (boot →) hub → (click path) → track → (click sector) → proxmox | dev | vulns | writeups → `LEAVE_SECTOR` → track → `RETURN_TO_HUB`. Lab: `none` →(click node)→ `entering` →(950ms)→ `inside` →(close / `[RETURN_TO_PROXMOX_LAB]` / Esc)→ `exiting` →(800ms)→ `none`.
 Local UI state stays local: hub log (`Hub.jsx`), hovered ids and camera `pose` (`ProxmoxWorld.jsx`, `DockerSubView.jsx`, `DossierGrid.jsx`), Pi-hole `showInfo`, the DNS simulation (restarts on each entry to the Pi-hole view).
 
 ## Component hierarchy
 ```
 Shell (App.jsx)         AmbientBackground* · TelemetryBar (ThemeToggle) · <View> · TourGuide (z-45) · Scanlines*   (* cyberpunk only)
-Hub                     header / Highlights (only if something is featured) / SectorCard x4 / SystemLog
+Hub                     header / TrackCard x2 / Highlights (only if something is featured) / SystemLog
+TrackWorld              SectorHeader / TrackSwitch / LearningPath panels / CardStage of SectorCards
 ProxmoxWorld            pose, phase timers, lab header (+ GUIDE toggle chip), info board
 ├─ Blueprint            (unless zoom==='inside' with a sub-view) camera layer + rack/nodes/traces
 │  ├─ TraceLayer · Rack (data-tour-avoid) · NodeCard xN (data-tour="<id>")
@@ -244,7 +255,7 @@ A glowing finger-pointer that teaches the two drill-downs.
 - Verifying UI when the Chrome extension is unavailable: headless Chrome via `puppeteer-core` (see the assistant memory note); set the viewport before `goto`, wait on button `aria-label`s, not fixed sleeps.
 
 ## Adding another sector
-Add it to `sectors.js` (`locked:false`, an identity-token `accent`, optional `cta`), add a `VIEWS.*` entry and world component, map it in `SECTOR_VIEWS` (`state/AppContext.jsx`) and `VIEW_COMPONENTS` (`App.jsx`), and add its breadcrumb in `TelemetryBar.jsx`. Spread `useMotion().viewProps` on its `motion.main` so it opens with the same short transition. The hub grid is `md:grid-cols-2 xl:grid-cols-4` (four sectors); a fifth needs a new layout. Card-based sectors can reuse `ui/SectorHeader` and `ui/CardStage`.
+Add it to `sectors.js` (`locked:false`, an identity-token `accent`, optional `cta`, and `tracks` to put it on a path), add a `VIEWS.*` entry and world component, map it in `SECTOR_VIEWS` (`state/AppContext.jsx`) and `VIEW_COMPONENTS` (`App.jsx`), and add its breadcrumb in `TelemetryBar.jsx`. Spread `useMotion().viewProps` on its `motion.main` so it opens with the same short transition. Its return button / Esc dispatch `LEAVE_SECTOR` with `backLabel(state.track)`. Track pages lay sectors out two per row in a wrapping `CardStage`, so a fifth sector needs no layout change. Card-based sectors can reuse `ui/SectorHeader` and `ui/CardStage`.
 
 ## Future expansion
 1. Sector 04: fill in the Tetris description, tags and screenshot; repo links per project.

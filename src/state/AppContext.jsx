@@ -1,10 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import { setSoundEnabled } from '../lib/sound';
 import { THEME, applyTheme, readTheme } from '../theme/theme';
+import { TRACK, getTrack, soleTrackOf, trackOfWriteup } from '../data/tracks';
 
 export const VIEWS = {
   BOOT: 'boot',
   HUB: 'hub',
+  TRACK: 'track', // the Theory / Practical path page (state.track says which)
   PROXMOX: 'proxmox', // Sector 01
   DEV: 'dev', // Sector 04
   VULNS: 'vulns', // Sector 03
@@ -58,6 +60,10 @@ const initialState = () => {
   return {
     theme,
     view: firstView(theme),
+    // Path picked on the home page: 'theory' | 'practical' | null (hub).
+    // A sector opened from a track returns to that track; Sector 02 lists only
+    // the write-up categories of this track.
+    track: null,
     // Sector 01. Every node click starts a camera zoom; nodes with a sub-view
     // (see SUB_VIEWS in ProxmoxWorld) swap to it, the others show a centered info board.
     zoom: ZOOM.NONE,
@@ -86,8 +92,20 @@ function reducer(state, action) {
   switch (action.type) {
     case 'BOOT_DONE':
       return state.view === VIEWS.BOOT ? { ...state, view: VIEWS.HUB } : state;
-    case 'ENTER_SECTOR': // hub card click: the sector opens straight away
-      return state.view === VIEWS.HUB ? { ...state, view: SECTOR_VIEWS[action.sectorId] ?? VIEWS.HUB } : state;
+    case 'ENTER_TRACK': // hub path card, or the path switch on a track page
+      if (!getTrack(action.track) || (state.view !== VIEWS.HUB && state.view !== VIEWS.TRACK)) return state;
+      return { ...state, view: VIEWS.TRACK, track: action.track };
+    case 'SET_TRACK': // path switch inside a sector (Sector 02): no view change
+      return getTrack(action.track) && state.view !== VIEWS.BOOT ? { ...state, track: action.track } : state;
+    case 'ENTER_SECTOR': // sector card click on a track page: the sector opens straight away
+      if (state.view !== VIEWS.HUB && state.view !== VIEWS.TRACK) return state;
+      return {
+        ...state,
+        view: SECTOR_VIEWS[action.sectorId] ?? state.view,
+        track: state.track ?? soleTrackOf(action.sectorId),
+      };
+    case 'LEAVE_SECTOR': // a sector's return button / Esc: back to its track, or the hub
+      return { ...state, view: state.track ? VIEWS.TRACK : VIEWS.HUB, ...RESET_SECTORS };
     case 'SET_THEME':
       if (action.theme === state.theme) return state;
       return {
@@ -97,7 +115,7 @@ function reducer(state, action) {
         view: state.view === VIEWS.BOOT ? firstView(action.theme) : state.view,
       };
     case 'RETURN_TO_HUB':
-      return { ...state, view: VIEWS.HUB, ...RESET_SECTORS };
+      return { ...state, view: VIEWS.HUB, track: null, ...RESET_SECTORS };
 
     // ---- Sector 01: lab ----
     case 'ZOOM_START':
@@ -141,15 +159,23 @@ function reducer(state, action) {
 
     // ---- Sector 02: write-ups (+ cross-links between a project and its write-up) ----
     case 'WRITEUP_OPEN': // from the index, a related project in another sector, or a hub highlight
-      return canJump(state) ? { ...state, ...RESET_SECTORS, view: VIEWS.WRITEUPS, activeWriteupId: action.id } : state;
+      return canJump(state)
+        ? {
+            ...state,
+            ...RESET_SECTORS,
+            view: VIEWS.WRITEUPS,
+            activeWriteupId: action.id,
+            track: trackOfWriteup(action.id) ?? state.track, // the report's own path
+          }
+        : state;
     case 'WRITEUP_CLOSE':
       return { ...state, activeWriteupId: null };
     case 'JUMP_TO_LAB': // straight into a lab node's inner view (no camera zoom: the stage was never shown)
       return canJump(state)
-        ? { ...state, ...RESET_SECTORS, view: VIEWS.PROXMOX, zoom: ZOOM.INSIDE, zoomTarget: action.id }
+        ? { ...state, ...RESET_SECTORS, view: VIEWS.PROXMOX, track: TRACK.PRACTICAL, zoom: ZOOM.INSIDE, zoomTarget: action.id }
         : state;
     case 'JUMP_TO_PROJECTS':
-      return canJump(state) ? { ...state, ...RESET_SECTORS, view: VIEWS.DEV } : state;
+      return canJump(state) ? { ...state, ...RESET_SECTORS, view: VIEWS.DEV, track: TRACK.PRACTICAL } : state;
 
     // ---- Onboarding tour ----
     case 'TOUR_NEXT': // timer ran out on the current step

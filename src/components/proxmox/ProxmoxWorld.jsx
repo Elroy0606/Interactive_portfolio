@@ -4,6 +4,7 @@ import { ArrowLeft, Boxes, HardDrive, MousePointerClick } from 'lucide-react';
 import { useApp, ZOOM } from '../../state/AppContext';
 import { useMotion } from '../../theme/motion';
 import { HOST, SERVICES, getService } from '../../data/services';
+import { backLabel } from '../../data/tracks';
 import GlitchText from '../ui/GlitchText';
 import Tip from '../ui/Tip';
 import Blueprint from './Blueprint';
@@ -82,10 +83,10 @@ export default function ProxmoxWorld() {
               className="btn-cyber mb-4"
               onClick={() => {
                 sfx.click();
-                dispatch({ type: 'RETURN_TO_HUB' });
+                dispatch({ type: 'LEAVE_SECTOR' });
               }}
             >
-              <ArrowLeft size={14} aria-hidden /> RETURN TO HOME
+              <ArrowLeft size={14} aria-hidden /> {backLabel(state.track)}
             </button>
             <p className="font-ui text-xs track-30 text-matrix">[SECTOR 01] // ACCESS_GRANTED</p>
             <h1 className="mt-1 font-ui text-3xl font-bold leading-tight text-cyber text-glow sm:text-4xl">

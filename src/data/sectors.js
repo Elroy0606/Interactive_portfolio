@@ -8,6 +8,11 @@ import { Server, Code2, ShieldAlert, NotebookPen } from 'lucide-react';
 // `accent` is an identity colour token (src/index.css): each sector has its own
 // colour in the cyberpunk theme, and they all resolve to the one accent in the
 // professional theme.
+//
+// `tracks` puts the sector on the Theory and/or Practical path (data/tracks.js).
+// Each key is a track id; its value overrides card fields (label, blurb, tags,
+// cta) on that track's page, `{}` = the card as written here. The home page
+// shows the two tracks, not the sectors.
 export const SECTORS = [
   {
     id: '01',
@@ -20,6 +25,7 @@ export const SECTORS = [
     icon: Server,
     accent: 'var(--color-id-cyan)',
     tags: ['PROXMOX', 'DOCKER', 'HAOS', 'KALI', 'OLLAMA'],
+    tracks: { practical: {} },
   },
   {
     id: '02',
@@ -32,6 +38,19 @@ export const SECTORS = [
     accent: 'var(--color-id-violet)',
     cta: 'OPEN_ARCHIVE',
     tags: ['HOME LAB', 'ARTICLES', 'PDF'],
+    tracks: {
+      theory: {
+        label: 'Study Notes',
+        blurb: 'My notes from security courses and training platforms, such as the TryHackMe SOC Level 1 path. Open one to read it on the site.',
+        tags: ['TRYHACKME', 'SOC LEVEL 1', 'STUDY NOTES'],
+        cta: 'OPEN_NOTES',
+      },
+      practical: {
+        label: 'Build Reports',
+        blurb: 'Reports that explain how I built and tested my labs and projects. Open one to read it on the site.',
+        tags: ['HOME LAB', 'BUILD REPORTS', 'ARTICLES'],
+      },
+    },
   },
   {
     id: '03',
@@ -45,6 +64,7 @@ export const SECTORS = [
     accent: 'var(--color-id-green)',
     cta: 'SECURE_ACCESS',
     tags: ['PENTEST REPORTS', 'PRACTICE LABS', 'SQL INJECTION'],
+    tracks: { practical: {} },
   },
   {
     id: '04',
@@ -56,5 +76,6 @@ export const SECTORS = [
     icon: Code2,
     accent: 'var(--color-id-amber)',
     tags: ['WEBSITES', 'APPS', 'LIVE DEMOS'],
+    tracks: { practical: {} },
   },
 ];

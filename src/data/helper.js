@@ -17,7 +17,7 @@
 //   {
 //     id: 'sound-toggle',          // required. Unique. This is what is remembered as "seen".
 //     view: 'hub',                 // trigger: the page the visitor is on. One of
-//                                  //   'hub' | 'proxmox' | 'dev' | 'vulns' | 'writeups',
+//                                  //   'hub' | 'track' | 'proxmox' | 'dev' | 'vulns' | 'writeups',
 //                                  //   or a list: ['hub', 'dev']. Leave out for "any page".
 //     when: (state) => state.theme === 'cyberpunk',
 //                                  // optional extra trigger. Receives the app state

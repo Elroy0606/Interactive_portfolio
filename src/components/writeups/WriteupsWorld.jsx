@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FileCheck2, Library } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
-import { CATEGORY_TABS, WRITEUPS, getWriteup } from '../../data/writeups';
+import { CATEGORY_TABS, getWriteup } from '../../data/writeups';
+import { TRACKS, backLabel, getTrack, trackOfWriteup, writeupsFor } from '../../data/tracks';
+import TrackSwitch, { trackTabId } from '../ui/TrackSwitch';
 import SectorHeader from '../ui/SectorHeader';
 import CardStage from '../ui/CardStage';
 import Tip from '../ui/Tip';
@@ -14,10 +16,19 @@ import { sfx } from '../../lib/sound';
 import { useMotion } from '../../theme/motion';
 
 const ACCENT = 'var(--color-id-violet)';
-const PUBLISHED = WRITEUPS.filter((w) => w.published).length;
+const TRACK_PANEL_ID = 'wu-track-panel';
+// Per track: { all: n, published: n } (counts for the path switch and the header chips).
+const COUNTS = Object.fromEntries(
+  TRACKS.map((t) => {
+    const list = writeupsFor(t.id);
+    return [t.id, { all: list.length, published: list.filter((w) => w.published).length }];
+  }),
+);
 
-// Sector 02 (WRITE-UPS): reports and study notes, grouped by category.
-//   index (category tabs -> intro, learning path, cards)  --click card-->  detail page (article / PDF / coming soon)
+// Sector 02 (WRITE-UPS): reports and study notes, split by path first, then by category.
+//   index (path switch -> category tabs -> intro, learning path, cards)  --click card-->  detail page (article / PDF / coming soon)
+// The path is `state.track` (data/tracks.js): Theory = study notes, Practical =
+// build reports. Each category belongs to one track (`track` in data/writeups.js).
 // The open tab is local state; it follows the report that was open, so closing
 // a report (even one opened from another sector) lands on its own category.
 // `activeWriteupId` lives in the app reducer so other sectors can link straight
@@ -26,13 +37,18 @@ export default function WriteupsWorld() {
   const { state, dispatch } = useApp();
   const active = getWriteup(state.activeWriteupId);
   const { viewProps, fadeProps } = useMotion();
-  const [catId, setCatId] = useState(() => active?.category ?? CATEGORY_TABS[0]?.id);
+  const track = getTrack(state.track) ?? getTrack(trackOfWriteup(state.activeWriteupId)) ?? TRACKS[0];
+  const tabs = CATEGORY_TABS.filter((c) => c.track === track.id);
+  const [catId, setCatId] = useState(() => active?.category ?? tabs[0]?.id);
   useEffect(() => {
     if (active?.category) setCatId(active.category);
   }, [active]);
-  const cat = CATEGORY_TABS.find((c) => c.id === catId) ?? CATEGORY_TABS[0];
+  // Switching path keeps the remembered tab only if it is on the new path.
+  const cat = tabs.find((c) => c.id === catId) ?? tabs[0];
+  const counts = COUNTS[track.id];
 
-  const toHub = useCallback(() => dispatch({ type: 'RETURN_TO_HUB' }), [dispatch]);
+  const toHub = useCallback(() => dispatch({ type: 'LEAVE_SECTOR' }), [dispatch]);
+  const setTrack = useCallback((id) => dispatch({ type: 'SET_TRACK', track: id }), [dispatch]);
   const open = useCallback((id) => dispatch({ type: 'WRITEUP_OPEN', id }), [dispatch]);
   const close = useCallback(() => dispatch({ type: 'WRITEUP_CLOSE' }), [dispatch]);
   const openRelated = useCallback(
@@ -74,33 +90,48 @@ export default function WriteupsWorld() {
             transition={{ duration: 0.25 }}
           >
             <SectorHeader
-              backLabel="[RETURN_TO_SECTOR_HUB]"
+              backLabel={backLabel(state.track)}
               onBack={toHub}
-              eyebrow="[SECTOR 02] // KNOWLEDGE_BASE // ACCESS_GRANTED"
+              eyebrow={`[SECTOR 02] // KNOWLEDGE_BASE // ${track.label.toUpperCase()}`}
               title="REPORTS_AND_WRITE-UPS"
               chips={
                 <>
                   <Tip label="REPORTS LISTED" side="bottom">
                     <span className="chip-stat accent-border accent-text accent-bg-soft flex items-center gap-2 border px-2.5 py-1.5">
-                      <Library size={13} aria-hidden /> REPORTS: {WRITEUPS.length}
+                      <Library size={13} aria-hidden /> REPORTS: {counts.all}
                     </span>
                   </Tip>
                   <Tip label="READY TO READ" side="bottom">
                     <span className="chip-stat flex items-center gap-2 border border-matrix/30 bg-matrix/5 px-2.5 py-1.5 text-matrix">
-                      <FileCheck2 size={13} aria-hidden /> PUBLISHED: {PUBLISHED}
+                      <FileCheck2 size={13} aria-hidden /> PUBLISHED: {counts.published}
                     </span>
                   </Tip>
                 </>
               }
             >
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/55">
-                Reports on my home lab builds and my study notes, grouped by topic. These are personal projects and training, not client work.
+                My study notes (Theory) and reports on what I built (Practical), grouped by topic. These are personal projects and training, not client work.
               </p>
             </SectorHeader>
 
+            <TrackSwitch
+              scope="wu"
+              active={track.id}
+              onChange={setTrack}
+              controls={TRACK_PANEL_ID}
+              counts={Object.fromEntries(TRACKS.map((t) => [t.id, COUNTS[t.id].all]))}
+              hint="THEORY OR PRACTICAL"
+            />
+
+            <div id={TRACK_PANEL_ID} role="tabpanel" aria-labelledby={trackTabId('wu', track.id)}>
+            {!cat && (
+              <p className="border border-dashed border-white/20 p-6 text-center font-ui text-xs tracking-widest text-white/50">
+                NO {track.label.toUpperCase()} REPORTS YET // COMING_SOON
+              </p>
+            )}
             {cat && (
               <>
-                <CategoryTabs tabs={CATEGORY_TABS} active={cat.id} onChange={setCatId} />
+                <CategoryTabs tabs={tabs} active={cat.id} onChange={setCatId} />
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={cat.id}
@@ -134,9 +165,10 @@ export default function WriteupsWorld() {
                 </AnimatePresence>
               </>
             )}
+            </div>
 
             <p className="mt-4 text-center font-ui text-[11px] track-20 text-white/30">
-              [ PICK A TOPIC · CLICK A REPORT TO OPEN IT · ESC TO RETURN ]
+              [ PICK A PATH AND A TOPIC · CLICK A REPORT TO OPEN IT · ESC TO RETURN ]
             </p>
           </motion.section>
         )}

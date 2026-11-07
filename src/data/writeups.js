@@ -19,6 +19,10 @@ import { Server, ShieldAlert } from 'lucide-react';
 //     path: 'TRYHACKME // SOME PATH',  // optional. Reports with `part` are then
 //                                  //   drawn as a numbered learning path.
 //     notice: 'Training notes, not on-the-job experience.',  // optional badge text
+//     track: 'theory',             // required. 'theory' (study notes, concepts) or
+//                                  //   'practical' (hands-on builds and testing).
+//                                  //   Sector 02 lists a category under this track
+//                                  //   only (data/tracks.js).
 //   },
 //
 // HOW TO ADD A REPORT
@@ -88,6 +92,7 @@ export const CATEGORIES = [
     blurb: 'My notes from the TryHackMe SOC Level 1 path, in the order I took the rooms.',
     path: 'TRYHACKME // SOC LEVEL 1 PATH',
     notice: 'TRAINING_NOTES // NOT ON-THE-JOB EXPERIENCE',
+    track: 'theory',
   },
   {
     id: 'home-lab',
@@ -96,6 +101,7 @@ export const CATEGORIES = [
     icon: Server,
     accent: 'var(--color-id-violet)',
     blurb: 'Reports on how I built, tested and documented projects in my home lab.',
+    track: 'practical',
   },
 ];
 

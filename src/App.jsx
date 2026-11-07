@@ -4,6 +4,7 @@ import Scanlines from './components/Scanlines';
 import TelemetryBar from './components/TelemetryBar';
 import BootSequence from './components/BootSequence';
 import Hub from './components/Hub';
+import TrackWorld from './components/TrackWorld';
 import ProxmoxWorld from './components/proxmox/ProxmoxWorld';
 import DevDistrict from './components/dev/DevDistrict';
 import VulnsWorld from './components/vulns/VulnsWorld';
@@ -18,6 +19,7 @@ import { THEME } from './theme/theme';
 const VIEW_COMPONENTS = {
   [VIEWS.BOOT]: BootSequence,
   [VIEWS.HUB]: Hub,
+  [VIEWS.TRACK]: TrackWorld,
   [VIEWS.PROXMOX]: ProxmoxWorld,
   [VIEWS.DEV]: DevDistrict,
   [VIEWS.VULNS]: VulnsWorld,

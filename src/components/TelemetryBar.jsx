@@ -15,8 +15,15 @@ const PATHS = {
   writeups: '~/sector02/write_ups',
 };
 
-// Breadcrumb for the current view, including drill-downs.
+// Breadcrumb for the current view, including drill-downs. A sector opened
+// from a path is shown under it: ~/practical/sector01/infrastructure_lab/...
 function currentPath(state) {
+  if (state.view === 'hub' || state.view === 'track') return state.track ? `${PATHS.hub}/${state.track}` : PATHS.hub;
+  const p = sectorPath(state);
+  return state.track && p ? p.replace(/^~\//, `~/${state.track}/`) : p;
+}
+
+function sectorPath(state) {
   if (state.view === 'proxmox' && state.zoom !== 'none') return `${PATHS.proxmox}/${state.zoomTarget}`;
   if (state.view === 'vulns') {
     let p = PATHS.vulns;

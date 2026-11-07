@@ -4,6 +4,7 @@ import { AppWindow, Radio } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { PROJECTS } from '../../data/projects';
 import { getWriteupFor } from '../../data/writeups';
+import { backLabel } from '../../data/tracks';
 import SectorHeader from '../ui/SectorHeader';
 import CardStage from '../ui/CardStage';
 import Tip from '../ui/Tip';
@@ -16,9 +17,9 @@ const LIVE = PROJECTS.filter((p) => p.status === 'Live').length;
 // Sector 04 (DEV_DISTRICT): the websites and apps I have made, one card each.
 // Everything shown comes from data/projects.js.
 export default function DevDistrict() {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const { viewProps } = useMotion();
-  const toHub = useCallback(() => dispatch({ type: 'RETURN_TO_HUB' }), [dispatch]);
+  const toHub = useCallback(() => dispatch({ type: 'LEAVE_SECTOR' }), [dispatch]);
   const openWriteup = useCallback((id) => dispatch({ type: 'WRITEUP_OPEN', id }), [dispatch]);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function DevDistrict() {
       {...viewProps}
     >
       <SectorHeader
-        backLabel="[RETURN_TO_SECTOR_HUB]"
+        backLabel={backLabel(state.track)}
         onBack={toHub}
         eyebrow="[SECTOR 04] // DEV_DISTRICT // ACCESS_GRANTED"
         title="WEBSITES_AND_APPS"
