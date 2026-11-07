@@ -166,6 +166,18 @@ const list = [
     category: 'soc-studies',
     part: 3,
   },
+  {
+    id: 'soc-metrics-and-objectives',
+    title: 'SOC Metrics and Objectives: TryHackMe Notes',
+    date: '2026-11-07',
+    summary:
+      'My notes from the TryHackMe SOC Metrics and Objectives room: the core metrics a SOC is measured by, the MTTD, MTTA and MTTR targets in an SLA, and what an L1 analyst can do to improve them.',
+    tags: ['TryHackMe', 'SOC Level 1', 'SOC Metrics', 'SLA', 'MTTD / MTTA / MTTR'],
+    file: 'soc-metrics-and-objectives.md',
+    privacyChecked: true,
+    category: 'soc-studies',
+    part: 4,
+  },
 ];
 
 function resolve(w) {

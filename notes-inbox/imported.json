@@ -8,5 +8,10 @@
     "sha256": "038bf35fe64458f74a907916070236ae473685f3516aa012249db3b55c413216",
     "writeupId": "soc-workbooks-and-lookups",
     "importedAt": "2026-11-06"
+  },
+  "SOC Metrics and Objectives.docx": {
+    "sha256": "70054bdec3a31abd5d726e9b84f20f6718f6a9ec8040a6d78100d201cb50445c",
+    "writeupId": "soc-metrics-and-objectives",
+    "importedAt": "2026-11-07"
   }
 }
