@@ -13,5 +13,10 @@
     "sha256": "70054bdec3a31abd5d726e9b84f20f6718f6a9ec8040a6d78100d201cb50445c",
     "writeupId": "soc-metrics-and-objectives",
     "importedAt": "2026-11-07"
+  },
+  "Intro to EDR.docx": {
+    "sha256": "71eea79b2a9252f88cf0b71bb8a1d0a180e195ae7c139857e455c3f940eb557c",
+    "writeupId": "intro-to-edr",
+    "importedAt": "2026-11-09"
   }
 }

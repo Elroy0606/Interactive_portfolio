@@ -178,6 +178,18 @@ const list = [
     category: 'soc-studies',
     part: 4,
   },
+  {
+    id: 'intro-to-edr',
+    title: 'Intro to EDR: TryHackMe Notes',
+    date: '2026-11-08',
+    summary:
+      'My notes from the TryHackMe Intro to EDR room: the three pillars of EDR, why antivirus alone misses advanced attacks, the telemetry agents collect, and the detection techniques and response actions an analyst can use.',
+    tags: ['TryHackMe', 'SOC Level 1', 'EDR', 'Endpoint Telemetry', 'MITRE ATT&CK'],
+    file: 'intro-to-edr.md',
+    privacyChecked: true,
+    category: 'soc-studies',
+    part: 5,
+  },
 ];
 
 function resolve(w) {

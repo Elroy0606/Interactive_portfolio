@@ -4,6 +4,7 @@ import { ArrowLeft, Download, ExternalLink, Hourglass, Link2 } from 'lucide-reac
 import SectorHeader from '../ui/SectorHeader';
 import CornerBrackets from '../ui/CornerBrackets';
 import ReadingSurface from '../ui/ReadingSurface';
+import LoadBoundary from '../ui/LoadBoundary';
 import useReadingMode from '../../hooks/useReadingMode';
 import { FormatBadge, WriteupDate } from './WriteupCard';
 import { JumpMenu, SectionRail, splitSections, useActiveSection } from './SectionRail';
@@ -51,24 +52,26 @@ function Article({ writeup }) {
       ) : text === null ? (
         <Loading />
       ) : (
-        <Suspense fallback={<Loading />}>
-          <Mounted onMount={() => setReady(true)} />
-          {intro && <Markdown>{intro}</Markdown>}
-          {sections.map((s, i) => (
-            <section
-              key={s.id}
-              id={s.id}
-              tabIndex={-1}
-              aria-label={s.title}
-              className="relative mt-6 scroll-mt-20 border border-white/10 bg-black/10 p-4 focus:outline-none sm:p-6"
-            >
-              <Markdown>{s.body}</Markdown>
-              <span aria-hidden className="absolute right-3 top-2 font-ui text-[10px] track-20 text-white/35">
-                SECTION {String(i + 1).padStart(2, '0')} / {String(sections.length).padStart(2, '0')}
-              </span>
-            </section>
-          ))}
-        </Suspense>
+        <LoadBoundary>
+          <Suspense fallback={<Loading />}>
+            <Mounted onMount={() => setReady(true)} />
+            {intro && <Markdown>{intro}</Markdown>}
+            {sections.map((s, i) => (
+              <section
+                key={s.id}
+                id={s.id}
+                tabIndex={-1}
+                aria-label={s.title}
+                className="relative mt-6 scroll-mt-20 border border-white/10 bg-black/10 p-4 focus:outline-none sm:p-6"
+              >
+                <Markdown>{s.body}</Markdown>
+                <span aria-hidden className="absolute right-3 top-2 font-ui text-[10px] track-20 text-white/35">
+                  SECTION {String(i + 1).padStart(2, '0')} / {String(sections.length).padStart(2, '0')}
+                </span>
+              </section>
+            ))}
+          </Suspense>
+        </LoadBoundary>
       )}
       {text !== null && (
         <div className="mt-10 border-t border-white/10 pt-3 font-ui text-[10px] track-20 text-white/30">

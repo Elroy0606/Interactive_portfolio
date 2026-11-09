@@ -21,7 +21,7 @@ Day and with reduced motion the diagrams are static.
 | `timeline` | `08:00 | event | tone? live?` | Vertical timeline; `live` adds a blinking LED |
 | `netpath` | `Zone | text | attacker/breach/blocked/target` | Attack path; a `blocked` row hangs off the zone before it as a dead end. Roles only, no addresses |
 | `workflow` | `Step | text` or `? Question | YES: a | NO: b` | Flowchart with a decision split |
-| `scenarios` | `Situation | what to do` | Accordion, first item open |
+| `scenarios` | `Situation | what to do` | Accordion, first item open. `label:` replaces the WHAT TO DO label |
 | `verdict` | `False positive | reasoning` | Verdict stamp; colour from the wording |
 | `proctree` | `name.exe | note | !` | Process tree, two spaces of indent per level, `!` = suspicious. Only for trees that are in my own notes |
 

@@ -6,6 +6,7 @@ import { sfx } from '../../lib/sound';
 import { useMotion } from '../../theme/motion';
 import useReadingMode from '../../hooks/useReadingMode';
 import ReadingSurface from '../ui/ReadingSurface';
+import LoadBoundary from '../ui/LoadBoundary';
 
 const Markdown = lazy(() => import('../writeups/Markdown'));
 
@@ -53,9 +54,11 @@ function ReportBody({ report }) {
   if (text === null) return <Loading />;
   return (
     <div className="mt-8">
-      <Suspense fallback={<Loading />}>
-        <Markdown resolveImage={reportImage}>{text}</Markdown>
-      </Suspense>
+      <LoadBoundary>
+        <Suspense fallback={<Loading />}>
+          <Markdown resolveImage={reportImage}>{text}</Markdown>
+        </Suspense>
+      </LoadBoundary>
     </div>
   );
 }

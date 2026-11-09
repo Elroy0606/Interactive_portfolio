@@ -6,10 +6,11 @@ import { Frame, pad } from './shared';
 
 // ```scenarios
 // title: Optional heading
+// label: Optional label over each answer (default WHAT TO DO)
 // The situation | What to do
 // ```
 // An accordion: each situation opens to show the response. The first one starts open.
-function Item({ row, i, open, onToggle }) {
+function Item({ row, i, open, onToggle, label }) {
   const id = useId();
   const { revealProps } = useMotion();
   return (
@@ -40,7 +41,7 @@ function Item({ row, i, open, onToggle }) {
             className="overflow-hidden"
           >
             <div className="accent-bg-soft border-t border-white/10 px-3 py-2.5 pl-10">
-              <p className="accent-text font-ui text-[10px] tracking-widest">WHAT TO DO</p>
+              <p className="accent-text font-ui text-[10px] tracking-widest">{label}</p>
               <p className="mt-0.5 text-[14px] leading-relaxed text-white/85">{row[1]}</p>
             </div>
           </motion.div>
@@ -62,7 +63,7 @@ export default function Scenarios({ meta, rows }) {
     <Frame kind="SCENARIOS" title={meta.title} caption={meta.caption} hint="CLICK TO EXPAND">
       <ul className="space-y-2">
         {rows.map((row, i) => (
-          <Item key={i} row={row} i={i} open={open.has(i)} onToggle={() => toggle(i)} />
+          <Item key={i} row={row} i={i} open={open.has(i)} onToggle={() => toggle(i)} label={meta.label || 'WHAT TO DO'} />
         ))}
       </ul>
     </Frame>

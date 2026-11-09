@@ -6,7 +6,7 @@
 //
 // Blank lines are ignored. `depth` is the indentation of the line (two spaces
 // per level), used by the process tree.
-const META = new Set(['title', 'caption', 'severity', 'status', 'verdict', 'kind']);
+const META = new Set(['title', 'caption', 'severity', 'status', 'verdict', 'kind', 'label']);
 
 export default function parseBlock(text) {
   const meta = {};
