@@ -18,5 +18,10 @@
     "sha256": "71eea79b2a9252f88cf0b71bb8a1d0a180e195ae7c139857e455c3f940eb557c",
     "writeupId": "intro-to-edr",
     "importedAt": "2026-11-09"
+  },
+  "Intro to SIEM .docx": {
+    "sha256": "25987568b775d75f5c49b6ec7fc1e58c4af90676ec93d9220bff0d6b55cc3db6",
+    "writeupId": "intro-to-siem",
+    "importedAt": "2026-11-10"
   }
 }

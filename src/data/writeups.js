@@ -190,6 +190,18 @@ const list = [
     category: 'soc-studies',
     part: 5,
   },
+  {
+    id: 'intro-to-siem',
+    title: 'Intro to SIEM: TryHackMe Notes',
+    date: '2026-11-09',
+    summary:
+      'My notes from the TryHackMe Intro to SIEM room: host- and network-centric log sources, why scattered logs are hard to analyse, how a SIEM collects, normalizes and correlates them, what Windows, Linux and web server logs look like, and the common ways logs are ingested.',
+    tags: ['TryHackMe', 'SOC Level 1', 'SIEM', 'Log Analysis', 'Correlation'],
+    file: 'intro-to-siem.md',
+    privacyChecked: true,
+    category: 'soc-studies',
+    part: 6,
+  },
 ];
 
 function resolve(w) {
