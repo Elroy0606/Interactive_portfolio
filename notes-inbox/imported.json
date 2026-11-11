@@ -23,5 +23,10 @@
     "sha256": "25987568b775d75f5c49b6ec7fc1e58c4af90676ec93d9220bff0d6b55cc3db6",
     "writeupId": "intro-to-siem",
     "importedAt": "2026-11-10"
+  },
+  "Learning Splunk.docx": {
+    "sha256": "6804ad846d6962ac5ec8496129ed7370d06cb90516f290507958260074ad2275",
+    "writeupId": "learning-splunk",
+    "importedAt": "2026-11-11"
   }
 }

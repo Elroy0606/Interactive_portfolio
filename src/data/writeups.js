@@ -202,6 +202,18 @@ const list = [
     category: 'soc-studies',
     part: 6,
   },
+  {
+    id: 'learning-splunk',
+    title: 'Learning Splunk: TryHackMe Notes',
+    date: '2026-11-10',
+    summary:
+      'My notes from the TryHackMe Splunk room: the forwarder, indexer and search head, a tour of the Splunk home screen, how Splunk turns ingested data into events, and my first SPL searches on a sample set of VPN logs.',
+    tags: ['TryHackMe', 'SOC Level 1', 'Splunk', 'SPL', 'SIEM'],
+    file: 'learning-splunk.md',
+    privacyChecked: true,
+    category: 'soc-studies',
+    part: 7,
+  },
 ];
 
 function resolve(w) {
