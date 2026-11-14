@@ -46,9 +46,9 @@ export const SECTORS = [
         cta: 'OPEN_NOTES',
       },
       practical: {
-        label: 'Build Reports',
-        blurb: 'Reports that explain how I built and tested my labs and projects. Open one to read it on the site.',
-        tags: ['HOME LAB', 'BUILD REPORTS', 'ARTICLES'],
+        label: 'Build Reports and CTF Write-ups',
+        blurb: 'Reports that explain how I built and tested my labs and projects, and how I solved CTF challenges. Open one to read it on the site.',
+        tags: ['HOME LAB', 'BUILD REPORTS', 'CTF'],
       },
     },
   },

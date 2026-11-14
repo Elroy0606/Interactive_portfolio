@@ -28,5 +28,10 @@
     "sha256": "6804ad846d6962ac5ec8496129ed7370d06cb90516f290507958260074ad2275",
     "writeupId": "learning-splunk",
     "importedAt": "2026-11-11"
+  },
+  "XOR_CTF_Writeup.docx": {
+    "sha256": "0b1f7cd45af6b4e008cf9c9b1aba21ea5a802d6a4f64ae09a16141ed47addce2",
+    "writeupId": "xor-ctf-writeup",
+    "importedAt": "2026-11-14"
   }
 }

@@ -28,7 +28,9 @@ const flapVariants = (lively) => ({
 // papers slide out, neighbours shift aside, a holographic sheen follows the
 // pointer and the folder tilts toward it.
 // `wrapRef` registers the (untransformed) wrapper so the parent can aim the camera at it.
-export default function DossierFolder({ dossier, shift, hovered, dim, lively = true, wrapRef, onHover, onOpen }) {
+// `labels` overrides the dossier wording, so Sector 02 can reuse the folder:
+//   { top, status, stamp (null = none), aria }. Default: clearance / SEALED / CLASSIFIED.
+export default function DossierFolder({ dossier, shift, hovered, dim, lively = true, labels, wrapRef, onHover, onOpen }) {
   const tx = useMotionValue(0);
   const ty = useMotionValue(0);
   const rotateY = useSpring(useTransform(tx, [-0.5, 0.5], lively ? [-8, 8] : [0, 0]), spring);
@@ -50,6 +52,13 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
   };
 
   const count = dossier.reports.length;
+  const L = {
+    top: `CLEARANCE ${dossier.clearance}`,
+    status: 'SEALED',
+    stamp: 'CLASSIFIED',
+    aria: `Open ${dossier.code}, ${dossier.title}, ${count} reports, clearance ${dossier.clearance}`,
+    ...labels,
+  };
 
   return (
     <div ref={wrapRef} className={cn('zoomable mx-auto w-full max-w-[360px]', dim && 'is-dim')}>
@@ -81,7 +90,7 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
           sfx.open();
           onOpen();
         }}
-        aria-label={`Open ${dossier.code}, ${dossier.title}, ${count} reports, clearance ${dossier.clearance}`}
+        aria-label={L.aria}
         className="group/folder relative mt-14 block aspect-[4/3.3] w-full text-left"
       >
         {/* back plate + tab */}
@@ -122,9 +131,9 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
 
           <div className="relative flex h-full flex-col">
             <div className="flex items-start justify-between font-ui text-[10px] track-20">
-              <span className="text-white/45">CLEARANCE {dossier.clearance}</span>
+              <span className="text-white/45">{L.top}</span>
               <span className="accent-text flex items-center gap-1.5">
-                <span className="led" aria-hidden /> SEALED
+                <span className="led" aria-hidden /> {L.status}
               </span>
             </div>
 
@@ -142,13 +151,15 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
               </span>
             </div>
 
-            <span
-              aria-hidden
-              className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 -rotate-12 border-2 border-current px-2 py-0.5 font-ui text-xs font-bold track-30 opacity-[0.12]"
-              style={{ color: dossier.accent }}
-            >
-              CLASSIFIED
-            </span>
+            {L.stamp && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 -rotate-12 border-2 border-current px-2 py-0.5 font-ui text-xs font-bold track-30 opacity-[0.12]"
+                style={{ color: dossier.accent }}
+              >
+                {L.stamp}
+              </span>
+            )}
           </div>
         </motion.div>
       </motion.button>

@@ -6,7 +6,7 @@ import CornerBrackets from '../ui/CornerBrackets';
 import ReadingSurface from '../ui/ReadingSurface';
 import LoadBoundary from '../ui/LoadBoundary';
 import useReadingMode from '../../hooks/useReadingMode';
-import { FormatBadge, WriteupDate } from './WriteupCard';
+import { FormatBadge, WriteupDate } from './WriteupMeta';
 import { JumpMenu, SectionRail, splitSections, useActiveSection } from './SectionRail';
 import { getCategory } from '../../data/writeups';
 import { sfx } from '../../lib/sound';

@@ -84,7 +84,7 @@ export const TRACK_STATS = {
   [TRACK.PRACTICAL]: [
     { label: 'LAB NODES', value: SERVICES.length },
     { label: 'VULN REPORTS', value: REPORT_COUNT },
-    { label: 'BUILD REPORTS', value: published(writeupsFor(TRACK.PRACTICAL)) },
+    { label: 'WRITE-UPS', value: published(writeupsFor(TRACK.PRACTICAL)) },
     { label: 'PROJECTS', value: PROJECTS.length },
   ],
 };

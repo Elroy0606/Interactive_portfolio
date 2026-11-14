@@ -1,4 +1,4 @@
-import { Server, ShieldAlert } from 'lucide-react';
+import { Flag, Server, ShieldAlert } from 'lucide-react';
 
 // Sector 02: REPORTS AND WRITE-UPS (components/writeups/)
 //
@@ -101,6 +101,16 @@ export const CATEGORIES = [
     icon: Server,
     accent: 'var(--color-id-violet)',
     blurb: 'Reports on how I built, tested and documented projects in my home lab.',
+    track: 'practical',
+  },
+  {
+    id: 'ctf',
+    code: 'CTF_WRITEUPS',
+    label: 'CTF Write-ups',
+    icon: Flag,
+    accent: 'var(--color-id-amber)',
+    blurb: 'How I worked through capture-the-flag challenges, step by step, including what went wrong along the way.',
+    notice: 'PRACTICE_CHALLENGES // NOT REAL-WORLD TARGETS',
     track: 'practical',
   },
 ];
@@ -213,6 +223,17 @@ const list = [
     privacyChecked: true,
     category: 'soc-studies',
     part: 7,
+  },
+  {
+    id: 'xor-ctf-writeup',
+    title: 'Breaking Repeating-Key XOR: TryHackMe CTF Write-up',
+    date: '2026-11-14',
+    summary:
+      'How I recovered a 4-byte repeating XOR key from an encrypted .bin file using the known THM{ flag prefix, tested the attack on a practice file first, and solved it with PowerShell and plain Python on Windows.',
+    tags: ['TryHackMe', 'CTF', 'Cryptography', 'XOR', 'Known-Plaintext Attack', 'Python', 'PowerShell'],
+    file: 'xor-ctf-writeup.md',
+    privacyChecked: true,
+    category: 'ctf',
   },
 ];
 

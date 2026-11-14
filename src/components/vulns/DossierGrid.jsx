@@ -18,7 +18,21 @@ const COLS = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' };
 
 // Props: phase (ZOOM.*), pose (kept by the parent for the reverse zoom),
 // activeId (folder being opened), onOpen(id, pose).
-export default function DossierGrid({ phase, pose, activeId, onOpen }) {
+// Sector 02 reuses the shelf with its own folders and wording:
+//   folders   [{ id, code, title, blurb, accent, reports }]   (default: DOSSIERS)
+//   frame     { left, right, border, label }   corner labels + frame / label colour classes
+//   peek(f)   terminal readout while a folder is hovered
+//   labelsFor(f)  `labels` for DossierFolder
+const defaultPeek = (d) => `> peek ${d.code} :: ${d.title} :: ${d.reports.length} files :: clearance ${d.clearance}`;
+
+export default function DossierGrid({ phase, pose, activeId, onOpen, folders = DOSSIERS, frame, peek = defaultPeek, labelsFor }) {
+  const F = {
+    left: 'VAULT // SEC_OPS_GRID',
+    right: `${folders.length} FOLDERS · SEALED`,
+    border: 'border-id-green/25',
+    label: 'text-id-green/60',
+    ...frame,
+  };
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const m = useMotion();
   const cameraRef = useRef(null);
@@ -34,12 +48,13 @@ export default function DossierGrid({ phase, pose, activeId, onOpen }) {
     onOpen(id, measurePose(cam, el, { scale: isDesktop ? m.zoomScale.dossier : Math.min(1.1, m.zoomScale.dossier), pan: isDesktop && m.pan }));
   };
 
-  const hoveredDossier = hovered !== null ? DOSSIERS[hovered] : null;
+  const hoveredDossier = hovered !== null ? folders[hovered] : null;
 
   return (
     <motion.div
       className={cn(
-        'relative overflow-hidden border border-id-green/25 shadow-[0_0_50px_color-mix(in_srgb,var(--glow-matrix)_7%,transparent)]',
+        'relative overflow-hidden border shadow-[0_0_50px_color-mix(in_srgb,var(--glow-matrix)_7%,transparent)]',
+        F.border,
         phase !== ZOOM.NONE && 'pointer-events-none',
       )}
       {...m.fadeProps}
@@ -47,15 +62,15 @@ export default function DossierGrid({ phase, pose, activeId, onOpen }) {
       <motion.div ref={cameraRef} className="blueprint-grid relative px-4 pb-8 pt-6 sm:px-8 lg:flex lg:min-h-[66vh] lg:flex-col lg:justify-center lg:px-10 lg:py-12"
         {...cameraProps}
       >
-        <div aria-hidden className="pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25 text-id-green/60">
-          VAULT // SEC_OPS_GRID
+        <div aria-hidden className={cn('pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25', F.label)}>
+          {F.left}
         </div>
-        <div aria-hidden className="pointer-events-none absolute right-3 top-2 hidden font-ui text-[10px] track-25 text-id-green/60 sm:block">
-          {DOSSIERS.length} FOLDERS · SEALED
+        <div aria-hidden className={cn('pointer-events-none absolute right-3 top-2 hidden font-ui text-[10px] track-25 sm:block', F.label)}>
+          {F.right}
         </div>
 
-        <div className={cn('grid gap-x-8 gap-y-2', COLS[Math.min(DOSSIERS.length, 3)])}>
-          {DOSSIERS.map((d, i) => {
+        <div className={cn('grid gap-x-8 gap-y-2', COLS[Math.min(folders.length, 3)])}>
+          {folders.map((d, i) => {
             const shift = !isDesktop || hovered === null || hovered === i ? 0 : i < hovered ? -14 : 14;
             return (
               <DossierFolder
@@ -65,6 +80,7 @@ export default function DossierGrid({ phase, pose, activeId, onOpen }) {
                 lively={m.tilt}
                 hovered={hovered === i || activeId === d.id}
                 dim={dim && d.id !== activeId}
+                labels={labelsFor?.(d)}
                 wrapRef={(el) => {
                   folderEls.current[d.id] = el;
                 }}
@@ -85,7 +101,7 @@ export default function DossierGrid({ phase, pose, activeId, onOpen }) {
           aria-live="polite"
         >
           {hoveredDossier
-            ? `> peek ${hoveredDossier.code} :: ${hoveredDossier.title} :: ${hoveredDossier.reports.length} files :: clearance ${hoveredDossier.clearance}`
+            ? peek(hoveredDossier)
             : '> awaiting selection …'}
           <span className="cursor-block" />
         </motion.p>
