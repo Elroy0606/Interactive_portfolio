@@ -75,6 +75,8 @@
   --dur-dim: 0.55s;
   /* How far a clickable card rises on hover / keyboard focus (.lift). */
   --lift: -3px;
+  /* Project thumbnail link (.thumb-link): image zoom on hover / focus. */
+  --thumb-zoom: 1.06;
 
   /* Glow colours. `transparent` switches a glow off everywhere it is used. */
   --glow-cyber: var(--color-cyber);
@@ -205,6 +207,7 @@
   --dur-hover: 0.12s;
   --dur-dim: 0.18s;
   --lift: -1px;
+  --thumb-zoom: 1.02;
 
   /* No glows */
   --glow-cyber: transparent;
@@ -310,6 +313,7 @@
   --dur-hover: 0.15s;
   --dur-dim: 0.2s;
   --lift: -1px;
+  --thumb-zoom: 1.02;
 
   /* No glows */
   --glow-cyber: transparent;
@@ -491,6 +495,67 @@ body::before {
   font-size: 10px;
   letter-spacing: calc(0.2em * var(--track));
   color: color-mix(in srgb, var(--accent, var(--color-cyber)) 80%, transparent);
+}
+/* Project thumbnail that links to the live app (ProjectCard): a glass frame
+   (accent sheen + inner accent ring) whose ring firms up and glows on hover /
+   focus while the image zooms by --thumb-zoom. The OPEN chip is the "icon" of
+   the clickable rule. Glow is off in Dim / Day (--glow-accent: transparent). */
+.thumb-link .thumb-img {
+  transition: scale 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), filter var(--dur-hover);
+}
+.thumb-link:hover .thumb-img,
+.thumb-link:focus-visible .thumb-img {
+  scale: var(--thumb-zoom);
+}
+.thumb-glass {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent, var(--color-cyber)) 16%, transparent), transparent 42%, transparent 70%, color-mix(in srgb, var(--color-void) 45%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, var(--color-cyber)) 22%, transparent);
+  transition: box-shadow var(--dur-hover);
+}
+.thumb-link:hover .thumb-glass,
+.thumb-link:focus-visible .thumb-glass {
+  box-shadow:
+    inset 0 0 0 1px var(--accent, var(--color-cyber)),
+    inset 0 0 28px color-mix(in srgb, var(--glow-accent) 30%, transparent);
+}
+.thumb-chip {
+  opacity: 0.85;
+  transition: opacity var(--dur-hover), background-color var(--dur-hover);
+}
+.thumb-link:hover .thumb-chip,
+.thumb-link:focus-visible .thumb-chip {
+  opacity: 1;
+  background-color: color-mix(in srgb, var(--accent, var(--color-cyber)) 22%, var(--color-void));
+}
+/* Idle scan line over a project preview (Night only: --fx pauses it, and Dim /
+   Day hide it below). The shine is a light band that crosses the image once
+   on hover / focus. */
+.thumb-scan {
+  background: linear-gradient(90deg, transparent, var(--accent, var(--color-cyber)), transparent);
+  box-shadow: 0 0 10px var(--glow-accent);
+  opacity: 0.55;
+  animation: thumb-scan 5.5s linear infinite;
+  animation-play-state: var(--fx);
+}
+@keyframes thumb-scan {
+  0% { top: 0%; opacity: 0; }
+  8% { opacity: 0.55; }
+  60% { opacity: 0.55; }
+  70%, 100% { top: 100%; opacity: 0; }
+}
+.thumb-shine {
+  background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--color-white) 14%, transparent), transparent);
+  translate: -120% 0;
+  opacity: 0;
+}
+.thumb-link:hover .thumb-shine,
+.thumb-link:focus-visible .thumb-shine {
+  translate: 320% 0;
+  opacity: 1;
+  transition: translate 0.9s ease-out, opacity 0.2s;
+}
+:is([data-theme="professional"], [data-theme="dim"]) :is(.thumb-scan, .thumb-shine) {
+  display: none;
 }
 /* CTA arrows nudge forward while their card is hovered. */
 .group:hover .cta-arrow,
@@ -1018,7 +1083,9 @@ body::before {
   .btn-cyber:active,
   .theme-toggle button:active,
   .group:hover .cta-arrow,
-  .group:focus-within .cta-arrow {
+  .group:focus-within .cta-arrow,
+  .thumb-link:hover .thumb-img,
+  .thumb-link:focus-visible .thumb-img {
     translate: none;
     scale: none;
   }
@@ -1028,6 +1095,8 @@ body::before {
   .flicker,
   .ambient-drift,
   .tour-ring,
+  .thumb-scan,
+  .thumb-shine,
   .crt-sweep,
   .trace,
   .led,

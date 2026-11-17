@@ -11,6 +11,7 @@ import GlitchText from '../ui/GlitchText';
 import Tip from '../ui/Tip';
 import DossierGrid from '../vulns/DossierGrid';
 import ProjectCard from './ProjectCard';
+import CaseStudy from './CaseStudy';
 import { useMotion } from '../../theme/motion';
 import { cn } from '../../lib/cn';
 import { sfx } from '../../lib/sound';
@@ -20,10 +21,16 @@ const LIVE = PROJECTS.filter((p) => p.status === 'Live').length;
 const pad = (n) => String(n).padStart(2, '0');
 // One folder per category that holds a project, in KINDS order. Shaped for the
 // shared shelf (vulns/DossierGrid): code / title / blurb / accent / reports.
-const FOLDERS = KINDS.map((k) => ({ ...k, items: PROJECTS.filter((p) => p.kind === k.id) }))
+// Spotlight projects come first in their folder (stable sort keeps the rest in order).
+const FOLDERS = KINDS.map((k) => ({
+  ...k,
+  items: PROJECTS.filter((p) => p.kind === k.id).sort((a, b) => Number(!!b.spotlight) - Number(!!a.spotlight)),
+}))
   .filter((k) => k.items.length > 0)
   .map((k, i) => ({ ...k, code: `DIR_${pad(i + 1)}`, title: k.label, reports: k.items }));
 const dirOf = (f) => `~/projects/${f.id}s/`;
+// Two projects: an even pair side by side (stacked on phones), the same size each.
+const PAIR_WIDTH = 'w-full md:w-[calc(50%-0.75rem)] md:max-w-[680px]';
 
 if (import.meta.env.DEV) {
   for (const p of PROJECTS) {
@@ -33,7 +40,7 @@ if (import.meta.env.DEV) {
 
 // An opened category folder: header (close, path, title, blurb), buttons to
 // switch to the other folders, then the folder's projects as cards.
-function FolderView({ folder, num, onClose, onSwitch, onOpenWriteup }) {
+function FolderView({ folder, num, onClose, onSwitch, onOpenWriteup, onOpenCaseStudy }) {
   const { subView } = useMotion();
   const live = folder.items.filter((p) => p.status === 'Live').length;
 
@@ -101,8 +108,10 @@ function FolderView({ folder, num, onClose, onSwitch, onOpenWriteup }) {
             project={p}
             index={i}
             featured={folder.items.length === 1}
+            width={folder.items.length === 2 ? PAIR_WIDTH : undefined}
             writeup={getWriteupFor('project', p.id)}
             onOpenWriteup={onOpenWriteup}
+            onOpenCaseStudy={onOpenCaseStudy}
           />
         ))}
       </CardStage>
@@ -126,6 +135,8 @@ export default function DevDistrict() {
   const [openId, setOpenId] = useState(null);
   const [phase, setPhase] = useState(ZOOM.NONE);
   const [pose, setPose] = useState(null);
+  const [caseId, setCaseId] = useState(null); // project whose case study is open
+  const caseProject = PROJECTS.find((p) => p.id === caseId && p.caseStudy);
   const folder = FOLDERS.find((f) => f.id === openId);
   const inside = phase === ZOOM.INSIDE && folder;
 
@@ -162,7 +173,10 @@ export default function DevDistrict() {
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== 'Escape') return;
-      if (phase === ZOOM.INSIDE) {
+      if (caseId) {
+        sfx.close();
+        setCaseId(null);
+      } else if (phase === ZOOM.INSIDE) {
         sfx.close();
         closeFolder();
       } else if (phase === ZOOM.NONE) {
@@ -171,7 +185,7 @@ export default function DevDistrict() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, closeFolder, toHub]);
+  }, [phase, caseId, closeFolder, toHub]);
 
   return (
     <motion.main
@@ -189,6 +203,7 @@ export default function DevDistrict() {
             onClose={closeFolder}
             onSwitch={switchFolder}
             onOpenWriteup={openWriteup}
+            onOpenCaseStudy={setCaseId}
           />
         ) : (
           <motion.section
@@ -255,6 +270,10 @@ export default function DevDistrict() {
             )}
           </motion.section>
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {caseProject && <CaseStudy key={caseProject.id} project={caseProject} onClose={() => setCaseId(null)} />}
       </AnimatePresence>
     </motion.main>
   );
