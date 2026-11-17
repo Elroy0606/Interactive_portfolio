@@ -1,6 +1,6 @@
 import { Flag, Server, ShieldAlert } from 'lucide-react';
 
-// Sector 02: REPORTS AND WRITE-UPS (components/writeups/)
+// Sector 03: REPORTS AND WRITE-UPS (components/writeups/)
 //
 // The index is grouped by CATEGORIES (one tab each). A category only shows a
 // tab once at least one report points to it, so add a category when its first
@@ -21,7 +21,7 @@ import { Flag, Server, ShieldAlert } from 'lucide-react';
 //     notice: 'Training notes, not on-the-job experience.',  // optional badge text
 //     track: 'theory',             // required. 'theory' (study notes, concepts) or
 //                                  //   'practical' (hands-on builds and testing).
-//                                  //   Sector 02 lists a category under this track
+//                                  //   Sector 03 lists a category under this track
 //                                  //   only (data/tracks.js).
 //   },
 //
@@ -56,7 +56,7 @@ import { Flag, Server, ShieldAlert } from 'lucide-react';
 //                                  //   learning path (lowest first).
 //     related: {                   // optional. Links the report to a project,
 //                                  //   and the project back to the report.
-//       kind: 'lab',               // 'lab' = a home lab node, 'project' = a Sector 04 project
+//       kind: 'lab',               // 'lab' = a home lab node, 'project' = a Sector 02 project
 //       id: 'adlab',               // lab: node id in data/services.js
 //                                  //   project: id in data/projects.js
 //       label: 'Name of the project',  // text shown on the link

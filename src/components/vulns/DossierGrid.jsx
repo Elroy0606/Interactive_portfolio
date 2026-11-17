@@ -13,12 +13,14 @@ import DossierFolder from './DossierFolder';
 // it centres and scales up while the other folders blur away, then the parent
 // swaps in the archive view.
 //
-// The shelf has as many columns as there are folders, up to 3.
-const COLS = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' };
+// The shelf has as many columns as there are folders, up to 3; four make a 2 x 2
+// grid. Five or more wrap in rows of 3. Hover shifts only move folders in the same row.
+const COLS = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:mx-auto md:w-full md:max-w-4xl md:grid-cols-2' };
+const colsOf = (n) => (n === 4 ? 2 : Math.min(n, 3));
 
 // Props: phase (ZOOM.*), pose (kept by the parent for the reverse zoom),
 // activeId (folder being opened), onOpen(id, pose).
-// Sector 02 reuses the shelf with its own folders and wording:
+// Sector 03 reuses the shelf with its own folders and wording:
 //   folders   [{ id, code, title, blurb, accent, reports }]   (default: DOSSIERS)
 //   frame     { left, right, border, label }   corner labels + frame / label colour classes
 //   peek(f)   terminal readout while a folder is hovered
@@ -69,9 +71,11 @@ export default function DossierGrid({ phase, pose, activeId, onOpen, folders = D
           {F.right}
         </div>
 
-        <div className={cn('grid gap-x-8 gap-y-2', COLS[Math.min(folders.length, 3)])}>
+        <div className={cn('grid gap-x-8 gap-y-2', COLS[folders.length > 4 ? 3 : folders.length])}>
           {folders.map((d, i) => {
-            const shift = !isDesktop || hovered === null || hovered === i ? 0 : i < hovered ? -14 : 14;
+            const cols = colsOf(folders.length);
+            const sameRow = hovered !== null && Math.floor(i / cols) === Math.floor(hovered / cols);
+            const shift = !isDesktop || !sameRow || hovered === i ? 0 : i < hovered ? -14 : 14;
             return (
               <DossierFolder
                 key={d.id}

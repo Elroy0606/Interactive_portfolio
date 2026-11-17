@@ -15,9 +15,9 @@ import { PROJECTS } from './projects';
 // - A sector joins a track through its `tracks` field in data/sectors.js. The
 //   value is an object of per-track overrides for the card (label, blurb, tags,
 //   cta); `{}` = show the card as it is. A sector can sit in both tracks
-//   (Sector 02 does: its write-up categories are split by track).
+//   (Sector 03 does: its write-up categories are split by track).
 // - A write-up category joins a track through its `track` field in
-//   data/writeups.js. Sector 02 only lists the categories of the open track.
+//   data/writeups.js. Sector 03 only lists the categories of the open track.
 // - The order of TRACKS is the order of the cards on the home page.
 //
 // Ids are stored in the app state (`state.track`) and shown in the breadcrumb.
@@ -47,7 +47,7 @@ export const TRACKS = [
     icon: Wrench,
     accent: 'var(--color-id-magenta)',
     blurb:
-      'Things I have built, configured and tested hands-on: my home lab, vulnerability reports from practice labs, build reports, and the websites and apps I made.',
+      'Things I have built, configured and tested hands-on: my home lab, the tools and games I made, build reports, and vulnerability reports from practice labs.',
     notice: 'PERSONAL PROJECTS // NOT CLIENT WORK',
     cta: 'ENTER_PRACTICAL_TRACK',
   },
@@ -62,6 +62,24 @@ export const otherTrack = (id) => TRACKS.find((t) => t.id !== id);
 // The sector cards of a track, with that track's overrides applied.
 export const sectorsFor = (trackId) =>
   SECTORS.filter((s) => s.tracks?.[trackId]).map(({ tracks, ...s }) => ({ ...s, ...tracks[trackId] }));
+
+const pad2 = (n) => String(n).padStart(2, '0');
+// The number a sector shows: its position among the open path's sectors, so
+// numbering always starts at 01 on each path. Outside a path (or if the sector
+// is not on it), its position on the first path it belongs to.
+export const sectorNumber = (sectorId, trackId) => {
+  const on = (t) => sectorsFor(t).findIndex((s) => s.id === sectorId);
+  const i = on(trackId);
+  if (i >= 0) return pad2(i + 1);
+  const t = TRACKS.find((tr) => on(tr.id) >= 0);
+  return t ? pad2(on(t.id) + 1) : sectorId;
+};
+// Same, for the sector that renders a given view ('writeups', 'dev', ...).
+export const sectorNumberOfView = (view, trackId) => {
+  const s = SECTORS.find((x) => x.view === view);
+  return s ? sectorNumber(s.id, trackId) : '';
+};
+export const sectorOfView = (view) => SECTORS.find((x) => x.view === view);
 
 // The only track a sector belongs to (null if it is in both, or none).
 export const soleTrackOf = (sectorId) => {
@@ -83,14 +101,14 @@ export const TRACK_STATS = {
   [TRACK.THEORY]: [{ label: 'STUDY NOTES', value: published(writeupsFor(TRACK.THEORY)) }],
   [TRACK.PRACTICAL]: [
     { label: 'LAB NODES', value: SERVICES.length },
-    { label: 'VULN REPORTS', value: REPORT_COUNT },
-    { label: 'WRITE-UPS', value: published(writeupsFor(TRACK.PRACTICAL)) },
     { label: 'PROJECTS', value: PROJECTS.length },
+    { label: 'WRITE-UPS', value: published(writeupsFor(TRACK.PRACTICAL)) },
+    { label: 'VULN REPORTS', value: REPORT_COUNT },
   ],
 };
 
 if (import.meta.env.DEV) {
   for (const c of CATEGORIES) {
-    if (!getTrack(c.track)) console.warn(`[tracks] write-up category "${c.id}" has no valid track, so Sector 02 never lists it.`);
+    if (!getTrack(c.track)) console.warn(`[tracks] write-up category "${c.id}" has no valid track, so Sector 03 never lists it.`);
   }
 }

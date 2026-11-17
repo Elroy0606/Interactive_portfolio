@@ -13,7 +13,7 @@ import ReportViewer from './ReportViewer';
 import { cn } from '../../lib/cn';
 import { sfx } from '../../lib/sound';
 
-// Sector 03 (SEC_OPS_GRID / VULN_REPORTS).
+// Sector 04 (SEC_OPS_GRID / VULN_REPORTS).
 // Navigation layers, each reversible:
 //   folder shelf  --click folder-->  archive (mini report icons)  --click icon-->  report viewer
 // State lives in the app reducer (dossier phase, activeDossierId, activeReportId);
@@ -95,7 +95,7 @@ export default function VulnsWorld() {
             >
               <ArrowLeft size={14} aria-hidden /> {backLabel(state.track)}
             </button>
-            <p className="font-ui text-xs track-30 text-matrix">[SECTOR 03] // SEC_OPS_GRID // SECURE_ACCESS</p>
+            <p className="font-ui text-xs track-30 text-matrix">[SECTOR 04] // SEC_OPS_GRID // SECURE_ACCESS</p>
             <h1 className="mt-1 break-words font-ui text-xl font-bold leading-tight text-id-green text-glow sm:text-4xl">
               <GlitchText auto>{ARCHIVE.code}</GlitchText>
             </h1>

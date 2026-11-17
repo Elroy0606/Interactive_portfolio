@@ -35,7 +35,7 @@ export default function DossierArchive({ dossier, onClose, onOpenReport }) {
           >
             <ArrowLeft size={14} aria-hidden /> [CLOSE_DOSSIER]
           </button>
-          <p className="font-ui text-xs track-30 text-matrix">[SECTOR 03 ▸ {dossier.code}] // DECRYPTED</p>
+          <p className="font-ui text-xs track-30 text-matrix">[SECTOR 04 ▸ {dossier.code}] // DECRYPTED</p>
           <h1 className="accent-text text-glow mt-1 break-words font-ui text-2xl font-bold leading-tight sm:text-4xl">
             <GlitchText auto>{dossier.title}</GlitchText>
           </h1>

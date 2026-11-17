@@ -786,7 +786,7 @@ body::before {
   100% { transform: translateX(1.5rem); opacity: 0; }
 }
 
-/* ---------- Dossier folders (Sector 03) ---------- */
+/* ---------- Dossier folders (Sector 04) ---------- */
 /* Holographic sheen: the gradient position follows the pointer via --mx / --my
    (set from JS on pointermove, 0..1). */
 .holo {

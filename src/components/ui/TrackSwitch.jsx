@@ -8,7 +8,7 @@ import { sfx } from '../../lib/sound';
 export const trackTabId = (scope, id) => `${scope}-track-${id}`;
 
 // The Theory / Practical path switch (WAI-ARIA tabs: arrow keys, Home / End).
-// Used on the track page (switches the whole page) and in Sector 02 (filters
+// Used on the track page (switches the whole page) and in Sector 03 (filters
 // the write-up categories). `counts` is optional ({ theory: 3, ... }).
 // `scope` keeps ids and the shared underline unique per place it is used.
 export default function TrackSwitch({ active, onChange, counts, controls, scope = 'trk', hint = 'SWITCH PATH' }) {

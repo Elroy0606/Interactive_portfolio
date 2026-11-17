@@ -1,19 +1,32 @@
 import { useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useApp } from '../state/AppContext';
+import { useApp, ZOOM, SECTOR_VIEWS, VIEWS } from '../state/AppContext';
 import { useMotion } from '../theme/motion';
-import { TRACKS, TRACK_STATS, getTrack, sectorsFor } from '../data/tracks';
+import { TRACKS, TRACK_STATS, getTrack, sectorNumber, sectorsFor, writeupsFor } from '../data/tracks';
 import { CATEGORY_TABS } from '../data/writeups';
+import { SERVICES } from '../data/services';
+import { REPORT_COUNT } from '../data/dossiers';
+import { PROJECTS } from '../data/projects';
 import SectorHeader from './ui/SectorHeader';
-import CardStage from './ui/CardStage';
 import Tip from './ui/Tip';
 import TrackSwitch, { trackTabId } from './ui/TrackSwitch';
-import SectorCard from './SectorCard';
+import DossierGrid from './vulns/DossierGrid';
 import LearningPath from './writeups/LearningPath';
 
 const PANEL_ID = 'track-panel';
-// Two cards per row: a single sector sits centred, four make a 2 x 2 grid.
-const STATION_WIDTH = 'w-full md:w-[calc(50%-0.75rem)]';
+const pad = (n) => String(n).padStart(2, '0');
+// What each sector holds, for the folder's count line. Keyed by view, not by
+// sector number, so renumbering sectors never breaks it.
+const COUNT = {
+  [VIEWS.PROXMOX]: () => `${pad(SERVICES.length)} LAB NODES`,
+  [VIEWS.DEV]: () => `${pad(PROJECTS.length)} PROJECTS`,
+  [VIEWS.WRITEUPS]: (track) => `${pad(writeupsFor(track).length)} FILES`,
+  [VIEWS.VULNS]: () => `${pad(REPORT_COUNT)} REPORTS`,
+};
+// A sector drawn as a folder on the shared shelf (vulns/DossierGrid), the same
+// folder as the write-up categories and the report dossiers.
+// `num` is the sector's number on this path (01 first), not its id.
+const asFolder = (trackId) => (s) => ({ ...s, num: sectorNumber(s.id, trackId), code: `SECTOR_${sectorNumber(s.id, trackId)}`, title: s.code, reports: [] });
 
 // The page behind a home page path card: the sectors on the Theory or the
 // Practical path (data/tracks.js), plus any learning path of that track's
@@ -29,7 +42,8 @@ export default function TrackWorld() {
 
   const toHub = useCallback(() => dispatch({ type: 'RETURN_TO_HUB' }), [dispatch]);
   const switchTo = useCallback((id) => dispatch({ type: 'ENTER_TRACK', track: id }), [dispatch]);
-  const enterSector = useCallback((s) => dispatch({ type: 'ENTER_SECTOR', sectorId: s.id }), [dispatch]);
+  // No camera zoom here: a sector opens straight away (see CLAUDE.md, "Sector click").
+  const enterSector = useCallback((id) => dispatch({ type: 'ENTER_SECTOR', sectorId: id }), [dispatch]);
   const openWriteup = useCallback((id) => dispatch({ type: 'WRITEUP_OPEN', id }), [dispatch]);
 
   useEffect(() => {
@@ -86,21 +100,31 @@ export default function TrackWorld() {
             </div>
           ))}
 
-          <CardStage
-            label={`${track.code} // ${stations.length} ${stations.length === 1 ? 'SECTOR' : 'SECTORS'}`}
-            fig={`FIG.00 — TRACK_${track.letter}`}
-          >
-            {stations.map((s, i) => (
-              <li key={s.id} className={STATION_WIDTH}>
-                <SectorCard sector={s} index={i} onConnect={enterSector} onDenied={() => {}} onHover={() => {}} />
-              </li>
-            ))}
-          </CardStage>
+          <DossierGrid
+            phase={ZOOM.NONE}
+            onOpen={enterSector}
+            folders={stations.map(asFolder(track.id))}
+            frame={{
+              left: `MAINFRAME // ~/${track.id}`,
+              right: `${stations.length} ${stations.length === 1 ? 'SECTOR' : 'SECTORS'} · ONLINE`,
+              border: 'accent-border',
+              label: 'accent-text opacity-70',
+            }}
+            peek={(f) => `> cd ~/${track.id}/sector${f.num}/${f.slug} :: ${f.label} :: ${f.tags.join(' · ').toLowerCase()}`}
+            labelsFor={(f) => ({
+              top: f.label.toUpperCase(),
+              status: 'ACTIVE',
+              stamp: null,
+              count: COUNT[SECTOR_VIEWS[f.id]]?.(track.id) ?? '',
+              cta: f.cta ?? 'INITIATE_CONNECTION',
+              aria: `Sector ${f.num}: ${f.title}, ${f.label}. ${f.blurb}`,
+            })}
+          />
         </motion.div>
       </AnimatePresence>
 
       <p className="mt-4 text-center font-ui text-[11px] track-20 text-white/30">
-        [ PICK A SECTOR · SWITCH PATH ABOVE · ESC TO RETURN ]
+        [ HOVER A FOLDER TO PEEK · CLICK TO OPEN · SWITCH PATH ABOVE · ESC TO RETURN ]
       </p>
     </motion.main>
   );

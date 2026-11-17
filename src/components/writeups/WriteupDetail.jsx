@@ -10,6 +10,7 @@ import { FormatBadge, WriteupDate } from './WriteupMeta';
 import { JumpMenu, SectionRail, splitSections, useActiveSection } from './SectionRail';
 import { getCategory } from '../../data/writeups';
 import { sfx } from '../../lib/sound';
+import { sectorNumberOfView, trackOfWriteup } from '../../data/tracks';
 import { useMotion } from '../../theme/motion';
 
 const Markdown = lazy(() => import('./Markdown'));
@@ -171,7 +172,7 @@ export default function WriteupDetail({ writeup, onBack, onOpenRelated }) {
         backLabel="[BACK_TO_WRITE-UPS]"
         backRef={backRef}
         onBack={onBack}
-        eyebrow={`[SECTOR 02 ▸ ${writeup.id.toUpperCase()}] // ${writeup.published ? 'DECRYPTED' : 'PENDING'}`}
+        eyebrow={`[SECTOR ${sectorNumberOfView('writeups', trackOfWriteup(writeup.id))} ▸ ${writeup.id.toUpperCase()}] // ${writeup.published ? 'DECRYPTED' : 'PENDING'}`}
         title={writeup.title}
       >
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">

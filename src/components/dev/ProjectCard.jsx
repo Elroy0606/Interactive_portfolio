@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowUpRight, FileText, ImageOff } from 'lucide-react';
-import { STATUS } from '../../data/projects';
+import { KINDS, STATUS } from '../../data/projects';
 import CornerBrackets from '../ui/CornerBrackets';
 import GlitchText from '../ui/GlitchText';
 import { CARD_WIDTH } from '../ui/CardStage';
@@ -33,6 +33,8 @@ function Todo({ field }) {
 export default function ProjectCard({ project, index, featured = false, writeup, onOpenWriteup }) {
   const { itemProps } = useMotion();
   const status = STATUS[project.status] ?? { color: 'var(--color-body)', led: false };
+  const kind = KINDS.find((k) => k.id === project.kind) ?? KINDS[0];
+  const cta = project.cta ?? kind.cta;
 
   return (
     <motion.li
@@ -76,7 +78,7 @@ export default function ProjectCard({ project, index, featured = false, writeup,
         {/* details */}
         <div className="relative flex min-w-0 flex-1 flex-col p-5">
           <div className="flex items-start justify-between gap-3">
-            <span className="font-ui text-[11px] track-25 text-white/45">[BUILD {pad(index + 1)}]</span>
+            <span className="font-ui text-[11px] track-25 text-white/45">[{kind.item} {pad(index + 1)}]</span>
             <span
               className="flex items-center gap-1.5 border px-2 py-0.5 font-ui text-[10px] tracking-widest"
               style={{ color: status.color, borderColor: `color-mix(in srgb, ${status.color} 50%, transparent)`, backgroundColor: `color-mix(in srgb, ${status.color} 10%, transparent)`, '--led': status.color }}
@@ -118,7 +120,7 @@ export default function ProjectCard({ project, index, featured = false, writeup,
                 className="btn-cyber"
                 onClick={() => sfx.click()}
               >
-                VISIT <ArrowUpRight size={14} aria-hidden />
+                {cta} <ArrowUpRight size={14} aria-hidden />
                 <span className="sr-only">
                   {project.name} (opens in a new tab)
                 </span>

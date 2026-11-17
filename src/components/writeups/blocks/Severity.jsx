@@ -12,7 +12,7 @@ import { Badge, Frame, TONE, mix } from './shared';
 // Medium
 // Low
 // ```
-// A priority ladder, first row = picked first. Colours are the Sector 03
+// A priority ladder, first row = picked first. Colours are the Sector 04
 // SEVERITY colours, so a level looks the same everywhere on the site.
 export default function Severity({ meta, rows }) {
   const { revealProps } = useMotion();

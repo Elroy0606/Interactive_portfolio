@@ -6,36 +6,36 @@ import ThemeToggle from './ThemeToggle';
 import { THEME } from '../theme/theme';
 import { sfx } from '../lib/sound';
 import { getWriteup } from '../data/writeups';
+import { sectorNumberOfView, sectorOfView } from '../data/tracks';
 
-const PATHS = {
-  hub: '~/mainframe',
-  proxmox: '~/sector01/infrastructure_lab',
-  dev: '~/sector04/dev_district',
-  vulns: '~/sector03/sec_ops_grid',
-  writeups: '~/sector02/write_ups',
+const HUB = '~/mainframe';
+// ~/sectorNN/<slug>, numbered by the sector's position on the open path.
+const base = (state) => {
+  const s = sectorOfView(state.view);
+  return s ? `~/sector${sectorNumberOfView(state.view, state.track)}/${s.slug}` : undefined;
 };
 
 // Breadcrumb for the current view, including drill-downs. A sector opened
 // from a path is shown under it: ~/practical/sector01/infrastructure_lab/...
 function currentPath(state) {
-  if (state.view === 'hub' || state.view === 'track') return state.track ? `${PATHS.hub}/${state.track}` : PATHS.hub;
+  if (state.view === 'hub' || state.view === 'track') return state.track ? `${HUB}/${state.track}` : HUB;
   const p = sectorPath(state);
   return state.track && p ? p.replace(/^~\//, `~/${state.track}/`) : p;
 }
 
 function sectorPath(state) {
-  if (state.view === 'proxmox' && state.zoom !== 'none') return `${PATHS.proxmox}/${state.zoomTarget}`;
+  if (state.view === 'proxmox' && state.zoom !== 'none') return `${base(state)}/${state.zoomTarget}`;
   if (state.view === 'vulns') {
-    let p = PATHS.vulns;
+    let p = base(state);
     if (state.activeDossierId) p += `/${state.activeDossierId}`;
     if (state.activeReportId) p += `/${state.activeReportId}`;
     return p;
   }
   if (state.view === 'writeups' && state.activeWriteupId) {
     const cat = getWriteup(state.activeWriteupId)?.category;
-    return `${PATHS.writeups}/${cat ? `${cat.replace(/-/g, '_')}/` : ''}${state.activeWriteupId}`;
+    return `${base(state)}/${cat ? `${cat.replace(/-/g, '_')}/` : ''}${state.activeWriteupId}`;
   }
-  return PATHS[state.view];
+  return base(state);
 }
 
 const pad = (n) => String(n).padStart(2, '0');

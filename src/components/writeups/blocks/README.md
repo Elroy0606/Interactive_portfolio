@@ -16,7 +16,7 @@ Day and with reduced motion the diagrams are static.
 | `flow` | `Step | text` | Numbered steps, left to right from md, stacked on phones |
 | `cards` / `tools` | `BADGE | full name | body | note | tone?` | Badge cards; `note` opens as an accordion. `kind:` sets the FIG label |
 | `alert` | `Field | value | explanation?` | Mock SIEM alert. Settings `severity`, `status`, `verdict`. With explanations, numbered callouts |
-| `severity` | `Critical | note?` | Priority ladder in the Sector 03 SEVERITY colours, first row picked first |
+| `severity` | `Critical | note?` | Priority ladder in the Sector 04 SEVERITY colours, first row picked first |
 | `fivews` | `Who | answer | key?` | Five tiles; `key` marks the most important one |
 | `timeline` | `08:00 | event | tone? live?` | Vertical timeline; `live` adds a blinking LED |
 | `netpath` | `Zone | text | attacker/breach/blocked/target` | Attack path; a `blocked` row hangs off the zone before it as a dead end. Roles only, no addresses |

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FileCheck2, Folder } from 'lucide-react';
 import { useApp, ZOOM } from '../../state/AppContext';
 import { CATEGORY_TABS, getWriteup } from '../../data/writeups';
-import { TRACKS, backLabel, getTrack, trackOfWriteup, writeupsFor } from '../../data/tracks';
+import { TRACKS, backLabel, getTrack, sectorNumberOfView, trackOfWriteup, writeupsFor } from '../../data/tracks';
 import TrackSwitch, { trackTabId } from '../ui/TrackSwitch';
 import SectorHeader from '../ui/SectorHeader';
 import Tip from '../ui/Tip';
@@ -27,7 +27,7 @@ const COUNTS = Object.fromEntries(
 const asFolder = (c, i) => ({ ...c, code: `DIR_${String(i + 1).padStart(2, '0')}`, title: c.label, reports: c.writeups });
 const latest = (f) => f.reports.map((w) => w.date).filter(Boolean).sort().at(-1);
 
-// Sector 02 (WRITE-UPS): reports and study notes as a file explorer, split by path first.
+// Sector 03 (WRITE-UPS): reports and study notes as a file explorer, split by path first.
 //   folder shelf (one folder per category of the open path)
 //     --click folder, camera zoom-->  directory (explorer tree + file list)
 //     --click file-->                 detail page (article / PDF / coming soon)
@@ -67,7 +67,7 @@ export default function WriteupsWorld() {
     }
   }, [folder, phase]);
 
-  // Phase timers (same hand-off as Sector 03; the camera animation lives in DossierGrid).
+  // Phase timers (same hand-off as Sector 04; the camera animation lives in DossierGrid).
   useEffect(() => {
     if (phase === ZOOM.ENTERING) {
       const t = setTimeout(() => setPhase(ZOOM.INSIDE), FOLDER_MS.entering);
@@ -125,7 +125,7 @@ export default function WriteupsWorld() {
     <motion.main
       key="writeups"
       style={{ '--accent': ACCENT }}
-      // opacity/scale only, like Sector 03 (no filter / persistent transform on an ancestor of fixed overlays)
+      // opacity/scale only, like Sector 04 (no filter / persistent transform on an ancestor of fixed overlays)
       className="mx-auto max-w-[1600px] px-4 pb-16 pt-6 sm:px-8 sm:pt-8"
       {...viewProps}
     >
@@ -155,7 +155,7 @@ export default function WriteupsWorld() {
               <SectorHeader
                 backLabel={backLabel(state.track)}
                 onBack={toHub}
-                eyebrow={`[SECTOR 02] // KNOWLEDGE_BASE // ${track.label.toUpperCase()}`}
+                eyebrow={`[SECTOR ${sectorNumberOfView('writeups', track.id)}] // KNOWLEDGE_BASE // ${track.label.toUpperCase()}`}
                 title="REPORTS_AND_WRITE-UPS"
                 chips={
                   <>

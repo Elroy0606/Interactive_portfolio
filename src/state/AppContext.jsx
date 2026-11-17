@@ -2,26 +2,22 @@ import { createContext, useContext, useEffect, useMemo, useReducer } from 'react
 import { setSoundEnabled } from '../lib/sound';
 import { THEME, applyTheme, readTheme } from '../theme/theme';
 import { TRACK, getTrack, soleTrackOf, trackOfWriteup } from '../data/tracks';
+import { SECTORS } from '../data/sectors';
 
 export const VIEWS = {
   BOOT: 'boot',
   HUB: 'hub',
   TRACK: 'track', // the Theory / Practical path page (state.track says which)
   PROXMOX: 'proxmox', // Sector 01
-  DEV: 'dev', // Sector 04
-  VULNS: 'vulns', // Sector 03
-  WRITEUPS: 'writeups', // Sector 02
+  DEV: 'dev', // Sector 02
+  VULNS: 'vulns', // Sector 04 (Practical)
+  WRITEUPS: 'writeups', // Sector 03 on Practical, 01 on Theory
 };
 
-// Which view each hub sector opens.
-const SECTOR_VIEWS = {
-  '01': VIEWS.PROXMOX,
-  '02': VIEWS.WRITEUPS,
-  '03': VIEWS.VULNS,
-  '04': VIEWS.DEV,
-};
+// Which view each sector opens (from `view` in data/sectors.js).
+export const SECTOR_VIEWS = Object.fromEntries(SECTORS.map((s) => [s.id, s.view]));
 
-// Camera phases, used by the Proxmox lab (`zoom`) and the Sector 03 dossier
+// Camera phases, used by the Proxmox lab (`zoom`) and the Sector 04 dossier
 // shelf (`dossier`):
 //   none     -> normal stage (blueprint / folder grid)
 //   entering -> camera zooming toward the target, everything else fading out
@@ -61,7 +57,7 @@ const initialState = () => {
     theme,
     view: firstView(theme),
     // Path picked on the home page: 'theory' | 'practical' | null (hub).
-    // A sector opened from a track returns to that track; Sector 02 lists only
+    // A sector opened from a track returns to that track; Sector 03 lists only
     // the write-up categories of this track.
     track: null,
     // Sector 01. Every node click starts a camera zoom; nodes with a sub-view
@@ -69,11 +65,11 @@ const initialState = () => {
     zoom: ZOOM.NONE,
     zoomTarget: null, // service id being zoomed into
     activeContainerId: null, // container open in the info board inside the Docker sub-view
-    // Sector 03
+    // Sector 04
     dossier: ZOOM.NONE, // camera phase for opening a dossier folder
     activeDossierId: null,
     activeReportId: null, // report open in the PDF viewer
-    // Sector 02
+    // Sector 03
     activeWriteupId: null, // write-up whose detail page is open (null = index)
     // Onboarding
     tourStep: readTourStep(),
@@ -95,7 +91,7 @@ function reducer(state, action) {
     case 'ENTER_TRACK': // hub path card, or the path switch on a track page
       if (!getTrack(action.track) || (state.view !== VIEWS.HUB && state.view !== VIEWS.TRACK)) return state;
       return { ...state, view: VIEWS.TRACK, track: action.track };
-    case 'SET_TRACK': // path switch inside a sector (Sector 02): no view change
+    case 'SET_TRACK': // path switch inside a sector (Sector 03): no view change
       return getTrack(action.track) && state.view !== VIEWS.BOOT ? { ...state, track: action.track } : state;
     case 'ENTER_SECTOR': // sector card click on a track page: the sector opens straight away
       if (state.view !== VIEWS.HUB && state.view !== VIEWS.TRACK) return state;
@@ -140,7 +136,7 @@ function reducer(state, action) {
     case 'CLOSE_CONTAINER':
       return { ...state, activeContainerId: null };
 
-    // ---- Sector 03: dossiers ----
+    // ---- Sector 04: dossiers ----
     case 'DOSSIER_START':
       return state.view === VIEWS.VULNS && state.dossier === ZOOM.NONE
         ? { ...state, dossier: ZOOM.ENTERING, activeDossierId: action.id }
@@ -157,7 +153,7 @@ function reducer(state, action) {
     case 'REPORT_CLOSE':
       return { ...state, activeReportId: null };
 
-    // ---- Sector 02: write-ups (+ cross-links between a project and its write-up) ----
+    // ---- Sector 03: write-ups (+ cross-links between a project and its write-up) ----
     case 'WRITEUP_OPEN': // from the index, a related project in another sector, or a hub highlight
       return canJump(state)
         ? {

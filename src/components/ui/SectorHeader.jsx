@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import GlitchText from './GlitchText';
 import { sfx } from '../../lib/sound';
 
-// Page header shared by the card-based sectors (02 and 04): return button,
+// Page header shared by the card-based sectors (02 and 03): return button,
 // eyebrow line, glitch title, intro text and stat chips on the right.
 // The title colour follows the `--accent` CSS var of an ancestor.
 export default function SectorHeader({ backLabel, onBack, backRef, eyebrow, title, chips, children }) {

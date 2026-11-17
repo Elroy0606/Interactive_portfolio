@@ -7,10 +7,10 @@ import TerminalOutput from './TerminalOutput';
 const LINES = [
   { text: 'MAINFRAME_OS v4.2.0 // COLD BOOT', tone: 'cmd', pause: 200 },
   { text: 'BIOS CHECK ............................. PASS', tone: 'dim', pause: 60 },
-  { text: '[ OK ] mounting /dev/sector01 ... /dev/sector03', pause: 60 },
+  { text: '[ OK ] mounting /dev/sector01 ... /dev/sector04', pause: 60 },
   { text: '[ OK ] loading neural-grid drivers', pause: 60 },
   { text: '[ OK ] establishing encrypted uplink', pause: 60 },
-  { text: '[WARN] sector02 : clearance not granted', tone: 'warn', pause: 80 },
+  { text: '[WARN] sector05 : clearance not granted', tone: 'warn', pause: 80 },
   { text: '[ OK ] telemetry daemon online', pause: 200 },
   { text: '', pause: 40 },
   { text: '> authenticating GUEST_USER ...', tone: 'cmd', pause: 260 },
