@@ -15,8 +15,10 @@ import DossierFolder from './DossierFolder';
 //
 // The shelf has as many columns as there are folders, up to 3; four make a 2 x 2
 // grid. Five or more wrap in rows of 3. Hover shifts only move folders in the same row.
+// `row` (track page): every folder on one line on lg (up to 4), 2 per row on md.
 const COLS = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:mx-auto md:w-full md:max-w-4xl md:grid-cols-2' };
-const colsOf = (n) => (n === 4 ? 2 : Math.min(n, 3));
+const ROW_COLS = { 1: '', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-2 lg:grid-cols-4' };
+const colsOf = (n, row, desktop) => (row ? (desktop || n < 4 ? Math.min(n, 4) : 2) : n === 4 ? 2 : Math.min(n, 3));
 
 // Props: phase (ZOOM.*), pose (kept by the parent for the reverse zoom),
 // activeId (folder being opened), onOpen(id, pose).
@@ -27,7 +29,7 @@ const colsOf = (n) => (n === 4 ? 2 : Math.min(n, 3));
 //   labelsFor(f)  `labels` for DossierFolder
 const defaultPeek = (d) => `> peek ${d.code} :: ${d.title} :: ${d.reports.length} files :: clearance ${d.clearance}`;
 
-export default function DossierGrid({ phase, pose, activeId, onOpen, folders = DOSSIERS, frame, peek = defaultPeek, labelsFor }) {
+export default function DossierGrid({ phase, pose, activeId, onOpen, folders = DOSSIERS, frame, peek = defaultPeek, labelsFor, row = false }) {
   const F = {
     left: 'VAULT // SEC_OPS_GRID',
     right: `${folders.length} FOLDERS · SEALED`,
@@ -61,7 +63,7 @@ export default function DossierGrid({ phase, pose, activeId, onOpen, folders = D
       )}
       {...m.fadeProps}
     >
-      <motion.div ref={cameraRef} className="blueprint-grid relative px-4 pb-8 pt-6 sm:px-8 lg:flex lg:min-h-[66vh] lg:flex-col lg:justify-center lg:px-10 lg:py-12"
+      <motion.div ref={cameraRef} className={cn('blueprint-grid relative px-4 pb-8 pt-6 sm:px-8 lg:flex lg:flex-col lg:justify-center', row ? 'lg:px-6 lg:py-8 2xl:px-10' : 'lg:min-h-[66vh] lg:px-10 lg:py-12')}
         {...cameraProps}
       >
         <div aria-hidden className={cn('pointer-events-none absolute left-3 top-2 font-ui text-[10px] track-25', F.label)}>
@@ -71,9 +73,9 @@ export default function DossierGrid({ phase, pose, activeId, onOpen, folders = D
           {F.right}
         </div>
 
-        <div className={cn('grid gap-x-8 gap-y-2', COLS[folders.length > 4 ? 3 : folders.length])}>
+        <div className={cn('grid gap-y-2', row ? cn('gap-x-6 lg:gap-x-4 2xl:gap-x-8', ROW_COLS[Math.min(folders.length, 4)] ?? 'md:grid-cols-2 lg:grid-cols-4') : cn('gap-x-8', COLS[folders.length > 4 ? 3 : folders.length]))}>
           {folders.map((d, i) => {
-            const cols = colsOf(folders.length);
+            const cols = colsOf(folders.length, row, isDesktop);
             const sameRow = hovered !== null && Math.floor(i / cols) === Math.floor(hovered / cols);
             const shift = !isDesktop || !sameRow || hovered === i ? 0 : i < hovered ? -14 : 14;
             return (
@@ -82,6 +84,7 @@ export default function DossierGrid({ phase, pose, activeId, onOpen, folders = D
                 dossier={d}
                 shift={shift}
                 lively={m.tilt}
+                compact={row}
                 hovered={hovered === i || activeId === d.id}
                 dim={dim && d.id !== activeId}
                 labels={labelsFor?.(d)}

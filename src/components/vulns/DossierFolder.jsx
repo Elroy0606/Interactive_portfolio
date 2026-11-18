@@ -46,7 +46,8 @@ const DEPTH = { pocket: 'translateZ(1px)', flap: 2 };
 // `labels` overrides the dossier wording, so Sector 03 can reuse the folder:
 //   { top, status, stamp (null = none), aria, count, cta }. Default: clearance / SEALED /
 //   CLASSIFIED / "NN FILES" / OPEN. The track page uses it for the sector folders.
-export default function DossierFolder({ dossier, shift, hovered, dim, lively = true, labels, wrapRef, onHover, onOpen }) {
+// `compact` (one-row track shelf): narrow folders keep enough height for the flap text.
+export default function DossierFolder({ dossier, shift, hovered, dim, lively = true, labels, wrapRef, onHover, onOpen, compact = false }) {
   const tx = useMotionValue(0);
   const ty = useMotionValue(0);
   const rotateY = useSpring(useTransform(tx, [-0.5, 0.5], lively ? [-8, 8] : [0, 0]), spring);
@@ -109,7 +110,7 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
           onOpen();
         }}
         aria-label={L.aria}
-        className="group/folder relative mt-14 block aspect-[4/3.3] w-full text-left"
+        className={cn('group/folder relative mt-14 block aspect-[4/3.3] w-full text-left', compact && 'min-h-[17.5rem]')}
       >
         {/* back plate + tab */}
         <div className="accent-border absolute inset-x-0 bottom-0 top-[12%] border bg-paper shadow-[0_0_30px_color-mix(in_srgb,var(--glow-accent)_18%,transparent)] transition-shadow duration-300 group-hover/folder:shadow-[0_0_46px_color-mix(in_srgb,var(--glow-accent)_45%,transparent)]" />
@@ -146,7 +147,7 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
         <motion.div
           variants={flapVariants(lively)}
           style={{ transformOrigin: '50% 100%', zIndex: 10, z: DEPTH.flap }}
-          className="accent-border accent-glow absolute inset-x-0 bottom-0 h-[64%] overflow-hidden border bg-folder/95 p-4"
+          className={cn('accent-border accent-glow absolute inset-x-0 bottom-0 h-[64%] overflow-hidden border bg-folder/95', compact ? 'p-3.5 2xl:p-4' : 'p-4')}
         >
           <div aria-hidden className="folder-lines pointer-events-none absolute inset-0" />
           <div
@@ -167,8 +168,8 @@ export default function DossierFolder({ dossier, shift, hovered, dim, lively = t
             </h2>
             <p className="mt-1 text-[12.5px] leading-snug text-white/50">{dossier.blurb}</p>
 
-            <div className="mt-auto flex items-end justify-between font-ui text-[11px] tracking-widest">
-              <span className="text-white/60">{L.count}</span>
+            <div className="mt-auto flex items-end justify-between gap-2 font-ui text-[11px] tracking-widest">
+              <span className="whitespace-nowrap text-white/60">{L.count}</span>
               <span className="accent-text flex items-center transition-[gap] group-hover/folder:gap-1">
                 {L.cta} <ChevronRight size={13} aria-hidden className="cta-arrow" />
               </span>

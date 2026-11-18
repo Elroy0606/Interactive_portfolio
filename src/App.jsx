@@ -12,6 +12,7 @@ import WriteupsWorld from './components/writeups/WriteupsWorld';
 import AmbientBackground from './components/AmbientBackground';
 import TourGuide from './components/TourGuide';
 import HelperBot from './components/HelperBot';
+import SideBack from './components/SideBack';
 import ThemeToggle from './components/ThemeToggle';
 import { THEME } from './theme/theme';
 
@@ -46,6 +47,7 @@ function Shell() {
       <AnimatePresence mode="wait">
         <View key={state.view} />
       </AnimatePresence>
+      <SideBack />
       <TourGuide />
       <HelperBot />
       {cyberpunk && <Scanlines />}

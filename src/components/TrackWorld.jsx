@@ -102,6 +102,7 @@ export default function TrackWorld() {
 
           <DossierGrid
             phase={ZOOM.NONE}
+            row
             onOpen={enterSector}
             folders={stations.map(asFolder(track.id))}
             frame={{
